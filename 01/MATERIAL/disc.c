@@ -2,14 +2,14 @@
 #include "helper.h"
 
 /******** PRIVATE DERIVATIVE FUNCTIONS START ********/
-/** TODO: all the methods actually do not initialise the result before using it!! **/
+/** TODO: deal with boundary cases!! now the indeces go out of the bounds **/
 
 double** dMds(double** M, double ds, int nrl, int nrh, int ncl, int nch)
 {
     int i = 0;
     int j = 0;
 
-    double** result = NULL;
+    double** result = matrix(nrl, nrh, ncl, nch);
 
     for( i = nrl; i < nrh; ++i)
     {
@@ -32,7 +32,7 @@ double** dM2ds(double** M, double ds, int nrl, int nrh, int ncl, int nch)
     double secondOperand = 0;
     double alpha = 0;
 
-    double** result = NULL;
+    double** result = matrix(nrl, nrh, ncl, nch);
 
     for(i = nrl; i < nrh; ++i)
     {
@@ -63,7 +63,7 @@ double** dMNds(double** M, double **N, double ds, int nrl, int nrh, int ncl, int
     double secondOperand = 0;
     double alpha = 0;
 
-    double** result = NULL;
+    double** result = matrix(nrl, nrh, ncl, nch);
 
     for(i = nrl; i< nrh; ++i)
     {
@@ -89,7 +89,7 @@ double** d2Mds2(double** M, double ds, int nrl, int nrh, int ncl, int nch)
     int i = 0;
     int j = 0;
 
-    double** result = NULL;
+    double** result = matrix(nrl, nrh, ncl, nch);
 
     for( i = nrl; i < nrh; ++i)
     {
