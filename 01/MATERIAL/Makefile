@@ -7,7 +7,8 @@ OBJ = 	helper.o\
       	boundary_val.o\
       	uvp.o\
       	main.o\
-      	visual.o
+      	visual.o\
+        disc.o
 
 
 all:  $(OBJ)
@@ -24,5 +25,6 @@ init.o        : helper.h init.h
 boundary_val.o: helper.h boundary_val.h 
 uvp.o         : helper.h uvp.h
 visual.o      : helper.h
+disc.o        : disc.h
 
-main.o        : helper.h init.h boundary_val.h uvp.h visual.h
+main.o        : helper.h init.h boundary_val.h uvp.h visual.h disc.h
