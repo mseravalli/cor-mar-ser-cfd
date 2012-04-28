@@ -3,7 +3,6 @@
 
 double** du2dx(double** U, double dx, int nrl, int nrh, int ncl, int nch)
 {
-
     int i = 0;
     int j = 0;
 
@@ -32,5 +31,75 @@ double** du2dx(double** U, double dx, int nrl, int nrh, int ncl, int nch)
    return result; 
 
 }
+
+double** add_scalar(double** M, int nrl, int nrh, int ncl, int nch, double s)
+{
+    int i = 0;
+    int j = 0;
+    double** result = NULL;
+    
+    for(i = nrl; i < nrh; ++i)
+    {
+        for(j = ncl; j < nch; ++j)
+        {
+            result[i][j] += s;
+        }
+    }
+    
+    return result;
+}
+
+double** mult_scalar(double** M, int nrl, int nrh, int ncl, int nch, double s)
+{
+    int i = 0;
+    int j = 0;
+    double** result = NULL;
+    
+    for(i = nrl; i < nrh; ++i)
+    {
+        for(j = ncl; j < nch; ++j)
+        {
+            result[i][j] *= s;
+        }
+    }
+    
+    return result;
+}
+
+
+double** add_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch)
+{
+    int i = 0;
+    int j = 0;
+    double** result = NULL;
+    
+    for(i = nrl; i < nrh; ++i)
+    {
+        for(j = ncl; j < nch; ++j)
+        {
+            result[i][j] = M[i][j] + M[i][j];
+        }
+    }
+       
+    return result;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
