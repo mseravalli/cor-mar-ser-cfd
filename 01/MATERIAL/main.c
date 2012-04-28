@@ -88,13 +88,19 @@ int main(int argn, char** args){
                     &eps,    
                     &dt_value);
 
+    U = matrix(0, imax + 1, 0, jmax + 1); 
+    V = matrix(0, imax + 1, 0, jmax + 1); 
+    P = matrix(0, imax, 0, jmax); 
+
     init_uvp(UI, VI, PI, imax, jmax, U, V, P);
     
-    free_matrix(U, 0, imax + 1, 0, jmax + 1);
+    printf("%f\n", U[0][0]);
+    fflush(stdout);
 
-/*    free_matrix(V, 0, imax + 1, 0, jmax + 1);
+    free_matrix(U, 0, imax + 1, 0, jmax + 1);
+    free_matrix(V, 0, imax + 1, 0, jmax + 1);
     free_matrix(P, 0, imax, 0, jmax);
-*/
+
     return 1;
 }
 

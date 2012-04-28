@@ -71,17 +71,10 @@ void init_uvp(  double UI,
 {
 
     /* initialize the matrices */
-    U = matrix(0, imax + 1, 0, jmax + 1); 
     init_matrix(U, 0, imax + 1, 0, jmax + 1, UI);
     
-    V = matrix(0, imax + 1, 0, jmax + 1); 
     init_matrix(V, 0, imax + 1, 0, jmax + 1, VI);
     
-    P = matrix(0, imax, 0, jmax); 
     init_matrix(P, 0, imax, 0, jmax, PI);
-
-
-
-
 
 }
