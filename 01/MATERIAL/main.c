@@ -1,6 +1,7 @@
 #include "helper.h"
 #include "visual.h"
 #include "init.h"
+#include "uvp.h"
 #include <stdio.h>
 
 
@@ -96,6 +97,8 @@ int main(int argn, char** args){
     
     printf("%f\n", U[0][0]);
     fflush(stdout);
+    
+    calculate_dt(Re, tau, &dt, dx, dy, imax, jmax, U, V);
 
     free_matrix(U, 0, imax + 1, 0, jmax + 1);
     free_matrix(V, 0, imax + 1, 0, jmax + 1);
