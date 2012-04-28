@@ -22,7 +22,7 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     int  *itermax,             /* max. number of iterations  */
 		                               /* for pressure per time step */
                     double *eps,               /* accuracy bound for pressure*/
-		    double *dt_value)           /* time for output */
+        		    double *dt_value)           /* time for output */
 {
    READ_DOUBLE( szFileName, *xlength );
    READ_DOUBLE( szFileName, *ylength );
@@ -56,3 +56,32 @@ int read_parameters( const char *szFileName,       /* name of the file */
 
 
 
+/**
+ * The arrays U,V and P are initialized to the constant values UI, VI and PI on
+ * the whole domain.
+ */
+void init_uvp(  double UI,
+                double VI,
+                double PI,
+                int imax,
+                int jmax,
+                double **U,
+                double **V,
+                double **P)
+{
+
+    /* initialize the matrices */
+    U = matrix(0, imax + 1, 0, jmax + 1); 
+    init_matrix(U, 0, imax + 1, 0, jmax + 1, UI);
+    
+    V = matrix(0, imax + 1, 0, jmax + 1); 
+    init_matrix(V, 0, imax + 1, 0, jmax + 1, VI);
+    
+    P = matrix(0, imax, 0, jmax); 
+    init_matrix(P, 0, imax, 0, jmax, PI);
+
+
+
+
+
+}
