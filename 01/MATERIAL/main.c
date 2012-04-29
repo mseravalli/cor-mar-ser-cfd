@@ -93,7 +93,7 @@ int main(int argn, char** args){
 
     U = matrix(0, imax + 1, 0, jmax + 1); 
     V = matrix(0, imax + 1, 0, jmax + 1); 
-    P = matrix(0, imax + 1, 0, jmax + 1);
+    P = matrix(1, imax, 1, jmax);
     F = matrix(0, imax + 1, 0, jmax + 1);
     G = matrix(0, imax + 1, 0, jmax + 1);
     
@@ -139,7 +139,7 @@ int main(int argn, char** args){
 
     free_matrix(U, 0, imax + 1, 0, jmax + 1);
     free_matrix(V, 0, imax + 1, 0, jmax + 1);
-    free_matrix(P, 0, imax + 1, 0, jmax + 1);
+    free_matrix(P, 1, imax, 1, jmax);
     free_matrix(F, 0, imax + 1, 0, jmax + 1);
     free_matrix(G, 0, imax + 1, 0, jmax + 1);
 

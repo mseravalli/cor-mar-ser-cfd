@@ -195,18 +195,18 @@ void calculate_uv(
     dtody = dt/dy;
     
     /******** Calculate u in step next step ********/
-    for(i = 0; i < imax; i++)
+    for(i = 1; i < imax; i++)
     {
-        for(j = 0; j < jmax+1; j++)
+        for(j = 1; j < jmax+1; j++)
         {
             U[i][j] = F[i][j] - dtodx*(P[i+1][j] - P[i][j]);
         }
     }
 
     /******** Calculate v in step next step ********/
-    for(i = 0; i < imax + 1; i++)
+    for(i = 1; i < imax + 1; i++)
     {
-        for(j = 0; j < jmax; j++)
+        for(j = 1; j < jmax; j++)
         {
             V[i][j] = G[i][j] - dtody*(P[i][j+1] - P[i][j]);
         }
