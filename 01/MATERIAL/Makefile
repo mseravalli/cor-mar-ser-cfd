@@ -1,6 +1,6 @@
 IDIR =./
 CC=gcc
-CFLAGS = -Wall -pedantic -Werror
+CFLAGS = -Wall -pedantic -Werror -g
 
 ODIR=obj
 LDIR =../lib

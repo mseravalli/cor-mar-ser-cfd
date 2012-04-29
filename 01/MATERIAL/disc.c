@@ -10,10 +10,11 @@ double** dMds(double** M, double ds, int nrl, int nrh, int ncl, int nch)
     int j = 0;
 
     double** result = matrix(nrl, nrh, ncl, nch);
+    init_matrix(result, nrl, nrh, ncl, nch, 0);
 
-    for( i = nrl; i < nrh; ++i)
+    for( i = nrl + 1; i < nrh; ++i)
     {
-        for( j = ncl; j < nch; ++j)
+        for( j = ncl + 1; j < nch; ++j)
         {
             result[i][j]=(M[i+1][j]-M[i][j]) / ds;
         }
@@ -33,10 +34,11 @@ double** dM2ds(double** M, double ds, int nrl, int nrh, int ncl, int nch)
     double alpha = 0;
 
     double** result = matrix(nrl, nrh, ncl, nch);
+    init_matrix(result, nrl, nrh, ncl, nch, 0);
 
-    for(i = nrl; i < nrh; ++i)
+    for(i = nrl + 1; i < nrh; ++i)
     {
-        for(j = ncl; j < nch; ++j)
+        for(j = ncl + 1; j < nch; ++j)
         {
             firstOperand = ( (1-alpha) / ds) *
                 ( pow((M[i][j] + M[i+1][j])/2, 2) -  pow((M[i][j] + M[i-1][j])/2, 2));
@@ -64,10 +66,11 @@ double** dMNds(double** M, double **N, double ds, int nrl, int nrh, int ncl, int
     double alpha = 0;
 
     double** result = matrix(nrl, nrh, ncl, nch);
+    init_matrix(result, nrl, nrh, ncl, nch, 0);
 
-    for(i = nrl; i< nrh; ++i)
+    for(i = nrl + 1; i < nrh; ++i)
     {
-        for(j = ncl; j < nch; ++j)
+        for(j = ncl + 1; j < nch; ++j)
         {
             firstOperand = ( ( 1- alpha ) / ds )*
             ( ( N[i][j] + N[i+1][j] ) / 2 * ( M[i][j] + M[i][j+1] ) / 2
@@ -90,10 +93,11 @@ double** d2Mds2(double** M, double ds, int nrl, int nrh, int ncl, int nch)
     int j = 0;
 
     double** result = matrix(nrl, nrh, ncl, nch);
+    init_matrix(result, nrl, nrh, ncl, nch, 0);
 
-    for( i = nrl; i < nrh; ++i)
+    for( i = nrl + 1; i < nrh; ++i)
     {
-        for( j = ncl; j < nch; ++j)
+        for( j = ncl + 1; j < nch; ++j)
         {
             result[i][j] = (M[i-1][j] - 2*M[i][j] + M[i+1][j]) / pow(ds,2);
         }
