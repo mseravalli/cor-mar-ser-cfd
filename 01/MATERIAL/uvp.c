@@ -204,12 +204,11 @@ void calculate_uv(
     }
 
     /******** Calculate v in step next step ********/
-/*    for(i = 0; i < imax + 1; i++)
+    for(i = 0; i < imax + 1; i++)
     {
         for(j = 0; j < jmax; j++)
         {
             V[i][j] = G[i][j] - dtody*(P[i][j+1] - P[i][j]);
         }
     }
-*/
 }
