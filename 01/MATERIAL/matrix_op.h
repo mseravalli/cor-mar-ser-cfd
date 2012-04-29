@@ -2,10 +2,10 @@
 #define __MATRIX_OP_H__ 
 
 /*adds scalar to all elements of a matrix*/
-double** add_scalar(double** M, int nrl, int nrh, int ncl, int nch, double s);
+double** add_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch);
 
 /*multiplies all the elements of a matrix by a scalar*/
-double** mult_scalar(double** M, int nrl, int nrh, int ncl, int nch, double s);
+double** mult_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch);
 
 /*adds two matrices with same dimension */
 double** add_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch);

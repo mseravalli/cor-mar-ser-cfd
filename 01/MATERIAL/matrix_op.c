@@ -2,7 +2,7 @@
 #include "helper.h"
 
 
-double** add_scalar(double** M, int nrl, int nrh, int ncl, int nch, double s)
+double** add_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch)
 {
     int i = 0;
     int j = 0;
@@ -12,14 +12,14 @@ double** add_scalar(double** M, int nrl, int nrh, int ncl, int nch, double s)
     {
         for(j = ncl; j <= nch; ++j)
         {
-            result[i][j] += s;
+            result[i][j] = M[i][j] + s;
         }
     }
     
     return result;
 }
 
-double** mult_scalar(double** M, int nrl, int nrh, int ncl, int nch, double s)
+double** mult_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch)
 {
     int i = 0;
     int j = 0;
@@ -29,7 +29,7 @@ double** mult_scalar(double** M, int nrl, int nrh, int ncl, int nch, double s)
     {
         for(j = ncl; j <= nch; ++j)
         {
-            result[i][j] *= s;
+            result[i][j] = M[i][j] * s;
         }
     }
     
