@@ -145,7 +145,8 @@ void calculate_dt(
 
     double dtcond, dxcond, dycond;
     double minval;
-   
+
+    /******** Determine umax and vmax *********/
     for(i = 0; i < imax; i++)
     {
         for(j = 0; j < jmax; j++)
@@ -156,16 +157,59 @@ void calculate_dt(
                 vmax = V[i][j];
         }
     }
-   
+
+    /******** Calculate conditions ********/
     dtcond = Re/(2*(1/(dx*dx) + 1/(dy*dy)));
     dxcond = dx/fabs(umax);
     dycond = dy/fabs(vmax);
-   
+
+    /******** Determine smalles condition ********/
     minval = dtcond;
     if(minval > dxcond)
         minval = dxcond;
     if(minval > dycond)
         minval = dycond;
-      
+    
+    /******** Calculate dt ********/
     *dt = tau * minval;
+}
+
+void calculate_uv(
+  double dt,
+  double dx,
+  double dy,
+  int imax,
+  int jmax,
+  double **U,
+  double **V,
+  double **F,
+  double **G,
+  double **P
+)
+{
+    int i, j;
+    double dtodx, dtody;  
+    
+    /******** Calculate dt/dx and dt/dy (it is the same for each element) ********/
+    dtodx = dt/dx;
+    dtody = dt/dy;
+    
+    /******** Calculate u in step next step ********/
+    for(i = 0; i < imax; i++)
+    {
+        for(j = 0; j < jmax+1; j++)
+        {
+            U[i][j] = F[i][j] - dtodx*(P[i+1][j] - P[i][j]);
+        }
+    }
+
+    /******** Calculate v in step next step ********/
+/*    for(i = 0; i < imax + 1; i++)
+    {
+        for(j = 0; j < jmax; j++)
+        {
+            V[i][j] = G[i][j] - dtody*(P[i][j+1] - P[i][j]);
+        }
+    }
+*/
 }
