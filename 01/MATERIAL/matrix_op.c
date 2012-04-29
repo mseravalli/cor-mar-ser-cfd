@@ -47,7 +47,25 @@ double** add_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch)
     {
         for(j = ncl; j < nch; ++j)
         {
-            result[i][j] = M[i][j] + M[i][j];
+            result[i][j] = M[i][j] + N[i][j];
+        }
+    }
+       
+    return result;
+}
+
+
+double** sub_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch)
+{
+    int i = 0;
+    int j = 0;
+    double** result = NULL;
+    
+    for(i = nrl; i < nrh; ++i)
+    {
+        for(j = ncl; j < nch; ++j)
+        {
+            result[i][j] = M[i][j] - N[i][j];
         }
     }
        
