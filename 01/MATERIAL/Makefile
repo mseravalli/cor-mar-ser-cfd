@@ -1,8 +1,22 @@
-CC = gcc
+IDIR =./
+CC=gcc
 CFLAGS = -Wall -pedantic -Werror
-.c.o:  ; $(CC) -c $(CFLAGS) $<
 
-OBJ = 	helper.o\
+ODIR=obj
+LDIR =../lib
+
+LIBS=-lm
+
+_DEPS = helper.h\
+		init.h\
+		boundary_val.h\
+		uvp.h\
+		visual.h\
+		disc.h\
+		matrix_op.h 
+DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+
+_OBJ = 	helper.o\
       	init.o\
       	boundary_val.o\
       	uvp.o\
@@ -10,23 +24,16 @@ OBJ = 	helper.o\
       	visual.o\
         disc.o\
         matrix_op.o
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
-all:  $(OBJ)
-	$(CC) $(CFLAGS) -o sim $(OBJ)  -lm
+$(ODIR)/%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
 
-%.o : %.c
-	$(CC) -c $(CFLAGS) $*.c -o $*.o
+sim: $(OBJ)
+	gcc -o $@ $^ $(CFLAGS) $(LIBS)
+
+.PHONY: clean
 
 clean:
-	rm $(OBJ)
-
-helper.o      : helper.h 
-init.o        : helper.h init.h 
-boundary_val.o: helper.h boundary_val.h 
-uvp.o         : helper.h uvp.h
-visual.o      : helper.h
-disc.o        : disc.h
-matrix.o      : matrix.h
-
-main.o        : helper.h init.h boundary_val.h uvp.h visual.h disc.h matrix_op.h
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ 
