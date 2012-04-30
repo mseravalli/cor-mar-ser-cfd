@@ -68,6 +68,7 @@ int main(int argn, char** args){
     double **P = NULL;
     double **F = NULL;
     double **G = NULL;
+    double **RS = NULL;
 
     read_parameters(szFileName,
                     &Re,     
@@ -96,7 +97,7 @@ int main(int argn, char** args){
     P = matrix(1, imax, 1, jmax);
     F = matrix(0, imax + 1, 0, jmax + 1);
     G = matrix(0, imax + 1, 0, jmax + 1);
-    
+    RS = matrix(0, imax + 1, 0, jmax + 1); 
     init_uvp(UI, VI, PI, imax, jmax, U, V, P);
 
     printf("%f\n", U[0][0]);
@@ -136,16 +137,25 @@ int main(int argn, char** args){
                  F,
                  G,
                  P);
+    
+    calculate_rs(dt,
+                 dx,
+                 dy,
+                 imax,
+                 jmax,
+                 F,
+                 G,
+                 RS);
 
     free_matrix(U, 0, imax + 1, 0, jmax + 1);
     free_matrix(V, 0, imax + 1, 0, jmax + 1);
     free_matrix(P, 1, imax, 1, jmax);
     free_matrix(F, 0, imax + 1, 0, jmax + 1);
     free_matrix(G, 0, imax + 1, 0, jmax + 1);
+    free_matrix(RS, 0, imax + 1, 0, jmax + 1);
 
     return 1;
 }
-
 
 
 

@@ -212,3 +212,27 @@ void calculate_uv(
         }
     }
 }
+
+void calculate_rs(
+  double dt,
+  double dx,
+  double dy,
+  int imax,
+  int jmax,
+  double **F,
+  double **G,
+  double **RS
+)
+{
+    int i, j;
+   
+    /******** Calculate RS ********/
+
+    for(i = 1; i < imax + 1; i++)
+    {
+        for(j = 1; j < jmax + 1; j++)
+        {
+            RS[i][j]= 1/dt*((F[i][j]-F[i-1][j])/dx+(G[i][j]-G[i][j-1])/dy);
+            }
+        }
+}
