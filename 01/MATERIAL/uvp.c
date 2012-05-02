@@ -47,6 +47,9 @@ void calculate_fg(
     double** sub_duvdx        ;
     double** sub_dv2dy        ;
     double** add_GY           ;
+    
+    int i;
+    int j;
 
     /******** VARIABLE DECLARATION END ********/
 
@@ -125,6 +128,18 @@ void calculate_fg(
     free_matrix(_dv2dy,     0, imax+1, 0, jmax+1);
 
     /******** CALCULATE G END ********/
+    
+    for(j=0; j<=jmax+1; j++)
+    {
+        F[0][j]=U[0][j];
+        F[imax+1][j]=U[imax+1][j];
+    }
+    
+    for(i=0; i<=imax+1; i++)
+    {
+        G[i][0]=V[i][0];
+        G[i][jmax+1]=V[i][jmax+1];
+    }
 }
 
 void calculate_dt(

@@ -11,6 +11,7 @@ _DEPS = helper.h\
 		init.h\
 		boundary_val.h\
 		uvp.h\
+		sor.h\
 		visual.h\
 		disc.h\
 		matrix_op.h 
@@ -20,6 +21,7 @@ _OBJ = 	helper.o\
       	init.o\
       	boundary_val.o\
       	uvp.o\
+      	sor.o\
       	main.o\
       	visual.o\
         disc.o\

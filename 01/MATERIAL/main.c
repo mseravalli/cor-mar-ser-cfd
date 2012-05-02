@@ -2,6 +2,8 @@
 #include "visual.h"
 #include "init.h"
 #include "uvp.h"
+#include "boundary_val.h"
+#include "sor.h"
 #include <stdio.h>
 
 
@@ -69,6 +71,14 @@ int main(int argn, char** args){
     double **F = NULL;
     double **G = NULL;
     double **RS = NULL;
+    
+    double t; 
+    int n;
+    int it;
+    double res;
+    
+    int i;
+    int j;
 
     read_parameters(szFileName,
                     &Re,     
@@ -91,19 +101,24 @@ int main(int argn, char** args){
                     &itermax,
                     &eps,    
                     &dt_value);
+                    
+    t = 0;
+    n = 0;
 
     U = matrix(0, imax + 1, 0, jmax + 1); 
     V = matrix(0, imax + 1, 0, jmax + 1); 
-    P = matrix(1, imax, 1, jmax);
+    /*P = matrix(1, imax, 1, jmax);*/
+    P = matrix(0, imax + 1, 0, jmax + 1);
     F = matrix(0, imax + 1, 0, jmax + 1);
     G = matrix(0, imax + 1, 0, jmax + 1);
     RS = matrix(0, imax + 1, 0, jmax + 1); 
     init_uvp(UI, VI, PI, imax, jmax, U, V, P);
 
-    printf("%f\n", U[0][0]);
-    fflush(stdout);
+    /*t_end = 1;*/
 
-    calculate_dt(Re,
+    while (t < t_end)
+    {
+        calculate_dt(Re,
                  tau,
                  &dt,
                  dx,
@@ -112,8 +127,13 @@ int main(int argn, char** args){
                  jmax,
                  U,
                  V);
-
-    calculate_fg(Re,
+                 
+        boundaryvalues(imax,
+                       jmax,
+                       U,
+                       V);
+    
+        calculate_fg(Re,
                  GX,
                  GY,
                  alpha,
@@ -126,8 +146,47 @@ int main(int argn, char** args){
                  V,
                  F,
                  G);
+        
+        calculate_rs(dt,
+                 dx,
+                 dy,
+                 imax,
+                 jmax,
+                 F,
+                 G,
+                 RS);
                  
-    calculate_uv(dt,
+        it = 0;
+        res = eps + 1;
+        
+        for (i = 1; i<=imax;i++)
+        {
+            P[i][0]= P[i][1];
+            P[i][jmax+1]= P[i][jmax];
+        }
+        
+        for (j = 1; j<=jmax;j++)
+        {
+            P[0][j]= P[1][j];
+            P[imax+1][j]= P[imax][j];
+        }
+        
+        while (it < itermax && res > eps)
+        {
+             sor(
+                 omg,
+                 dx,
+                 dy,
+                 imax,
+                 jmax,
+                 P,
+                 RS,
+                 &res);
+                 
+            it++;
+        }
+        
+        calculate_uv(dt,
                  dx,
                  dy,
                  imax,
@@ -137,19 +196,39 @@ int main(int argn, char** args){
                  F,
                  G,
                  P);
-    
-    calculate_rs(dt,
-                 dx,
-                 dy,
-                 imax,
-                 jmax,
-                 F,
-                 G,
-                 RS);
+        
+        write_vtkFile("files/file",
+		                  n,
+		                  xlength,
+                          ylength,
+                          imax,
+                          jmax,
+                		  dx,
+		                  dy,
+                          U,
+                          V,
+                          P);
+        
+        t += dt;
+        n++;
+    }
+    write_vtkFile("files/file",
+		                  n,
+		                  xlength,
+                          ylength,
+                          imax,
+                          jmax,
+                		  dx,
+		                  dy,
+                          U,
+                          V,
+                          P);
+
+
 
     free_matrix(U, 0, imax + 1, 0, jmax + 1);
     free_matrix(V, 0, imax + 1, 0, jmax + 1);
-    free_matrix(P, 1, imax, 1, jmax);
+    free_matrix(P, 0, imax + 1, 0, jmax + 1);
     free_matrix(F, 0, imax + 1, 0, jmax + 1);
     free_matrix(G, 0, imax + 1, 0, jmax + 1);
     free_matrix(RS, 0, imax + 1, 0, jmax + 1);

@@ -23,8 +23,8 @@ void boundaryvalues(
 
     for(i = 1; i <= imax; ++i)
     {
-        U[i][0]    = 0;
-        U[i][jmax+1] = 0;
+        V[i][0]    = 0;
+        V[i][jmax+1] = 0;
     }
 
     /** formula (15) **/
@@ -36,8 +36,8 @@ void boundaryvalues(
 
     for(i = 1; i <= imax; ++i)
     {
-        V[i][0]      = -1.0 * V[i][1];
-        V[i][jmax+1] = -1.0 * V[i][jmax];
+        U[i][0]      = -1.0 * U[i][1];
+        U[i][jmax+1] = -1.0 * U[i][jmax];
     }
 
 }
