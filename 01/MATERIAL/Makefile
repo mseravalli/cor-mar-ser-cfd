@@ -12,9 +12,7 @@ _DEPS = helper.h\
 		boundary_val.h\
 		uvp.h\
 		sor.h\
-		visual.h\
-		disc.h\
-		matrix_op.h 
+		visual.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 _OBJ = 	helper.o\
@@ -22,10 +20,8 @@ _OBJ = 	helper.o\
       	boundary_val.o\
       	uvp.o\
       	sor.o\
-      	main.o\
       	visual.o\
-        disc.o\
-        matrix_op.o
+      	main.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
