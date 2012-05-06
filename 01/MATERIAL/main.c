@@ -80,6 +80,16 @@ int main(int argn, char** args){
     int i;
     int j;
 
+    char write = 1;
+
+    if(argn > 1)
+    {
+        if(args[1][0] == 0x30)
+            write = 0;
+        else
+            write = 1;
+    }
+
     read_parameters(szFileName,
                     &Re,     
                     &UI,     
@@ -196,8 +206,9 @@ int main(int argn, char** args){
                  F,
                  G,
                  P);
-        
-        write_vtkFile("files/file",
+
+        if(write)
+            write_vtkFile("files/file",
 		                  n,
 		                  xlength,
                           ylength,
@@ -208,11 +219,13 @@ int main(int argn, char** args){
                           U,
                           V,
                           P);
-        
+
         t += dt;
         n++;
     }
-    write_vtkFile("files/file",
+
+    if(write)
+        write_vtkFile("files/file",
 		                  n,
 		                  xlength,
                           ylength,
