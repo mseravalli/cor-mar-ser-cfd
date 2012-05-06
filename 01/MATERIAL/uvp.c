@@ -1,7 +1,5 @@
 #include "boundary_val.h"
-#include "disc.h"
 #include "helper.h"
-#include "matrix_op.h"
 #include "uvp.h"
 #include <math.h>
 
@@ -25,16 +23,19 @@ void calculate_fg(
     
     /******** VARIABLE DECLARATION START ********/
 
-    double** _d2udx2;
-    double** _d2udy2;
-    double** _du2dx ;
-    double** _duvdy ;
+    double d2udx2;
+    double d2udy2;
+    double du2dx ;
+    double duvdy ;
 
-    double** _d2vdx2;
-    double** _d2vdy2;
-    double** _duvdx ;
-    double** _dv2dy ;
+    double d2vdx2;
+    double d2vdy2;
+    double duvdx ;
+    double dv2dy ;
     
+    double firstOperand;
+    double secondOperand;
+
     int i;
     int j;
 
@@ -47,26 +48,42 @@ void calculate_fg(
 
     /******** Calculate the single derivatives ********/
 
-    /* calculate derivatives */
-    _d2udx2 = d2udx2(U, dx,    0, imax + 1, 0, jmax + 1);
-    _d2udy2 = d2udy2(U, dy,    0, imax + 1, 0, jmax + 1);
-    _du2dx  = du2dx( U, dx,    0, imax + 1, 0, jmax + 1);
-    _duvdy  = duvdy( U, V, dy, 0, imax + 1, 0, jmax + 1);
-
     /******** Calculate F ********/
-    add_mat(   _d2udx2, _d2udy2, 0, imax+1, 0, jmax+1, F);
-    mult_scalar(F,       1/Re,   0, imax+1, 0, jmax+1, F);
-    sub_mat(    F,       _du2dx, 0, imax+1, 0, jmax+1, F);
-    sub_mat(    F,       _duvdy, 0, imax+1, 0, jmax+1, F);
-    add_scalar( F,       GX,     0, imax+1, 0, jmax+1, F);
-    mult_scalar(F,       dt,     0, imax+1, 0, jmax+1, F);
-    add_mat(    F,       U,      0, imax+1, 0, jmax+1, F);
+    
+    for(i = 1; i <= imax-1; i++)
+    {
+        for(j = 1; j <= jmax; j++)
+        {
 
-    /******** Free the derivatives ********/
-    free_matrix(_d2udx2, 0, imax+1, 0, jmax+1);
-    free_matrix(_d2udy2, 0, imax+1, 0, jmax+1);
-    free_matrix(_du2dx,  0, imax+1, 0, jmax+1);
-    free_matrix(_duvdy,  0, imax+1, 0, jmax+1);
+            /* du2dx */
+            firstOperand = ( 1 / dx) *
+                ( pow((U[i][j] + U[i+1][j])/2, 2) -  pow((U[i-1][j] + U[i][j])/2, 2));
+
+            secondOperand = ( alpha / dx ) *
+                ( ( (abs(U[i][j] + U[i+1][j])/2) * ((U[i][j] - U[i+1][j])/2) )  
+                - ( (abs(U[i-1][j] + U[i][j])/2) * ((U[i-1][j] - U[i][j])/2) ) );
+
+            du2dx = firstOperand + secondOperand;
+            
+            /* duvdy */
+            firstOperand = ( 1 / dy )*
+            ( ( (V[i][j] + V[i+1][j]) / 2 ) * ( (U[i][j] + U[i][j+1]) / 2 )
+            - ( (V[i][j-1] + V[i+1][j-1]) / 2 ) * ( (U[i][j-1] + U[i][j]) / 2 ) );
+
+            secondOperand = ( alpha / dy )*
+            ( ( (abs(V[i][j] + V[i+1][j])/2) * ((U[i][j] - U[i][j+1])/2) )
+            - ( (abs(V[i][j-1] + V[i+1][j-1])/2) * ((U[i][j-1] - U[i][j])/2) ));
+            duvdy = firstOperand + secondOperand;
+
+            /* d2udx2 */
+            d2udx2 = (U[i+1][j] - 2*U[i][j] + U[i-1][j]) / pow(dx,2);
+
+            /* d2udy2 */
+            d2udy2 = (U[i][j+1] - 2*U[i][j] + U[i][j-1]) / pow(dy,2);
+
+            F[i][j] = U[i][j] + dt * ( (1/Re) * (d2udx2 + d2udy2 ) - du2dx - duvdy + GX );
+        }
+    }
 
     /******** CALCULATE F END ********/
     
@@ -75,28 +92,43 @@ void calculate_fg(
 
     boundaryvalues(imax, jmax, U, V);
 
-    /******** Calculate the single derivatives ********/
-
-    /* calculate derivatives */
-    _d2vdx2 = d2vdx2(V, dx,    0, imax+1, 0, jmax+1);
-    _d2vdy2 = d2vdy2(V, dy,    0, imax+1, 0, jmax+1);
-    _duvdx  = duvdx( U, V, dx, 0, imax+1, 0, jmax+1);
-    _dv2dy  = dv2dy( V, dy,    0, imax+1, 0, jmax+1);
-
     /******** Calculate G ********/
-    add_mat(   _d2vdx2, _d2vdy2, 0, imax+1, 0, jmax+1, G);
-    mult_scalar(G,      1/Re,    0, imax+1, 0, jmax+1, G);
-    sub_mat(    G,      _duvdx,  0, imax+1, 0, jmax+1, G);
-    sub_mat(    G,      _dv2dy,  0, imax+1, 0, jmax+1, G);
-    add_scalar( G,      GY,      0, imax+1, 0, jmax+1, G);
-    mult_scalar(G,      dt,      0, imax+1, 0, jmax+1, G);
-    add_mat(    G,      V,       0, imax+1, 0, jmax+1, G);
 
-    /******** Free the derivatives ********/
-    free_matrix(_d2vdx2,    0, imax+1, 0, jmax+1);
-    free_matrix(_d2vdy2,    0, imax+1, 0, jmax+1);
-    free_matrix(_duvdx,     0, imax+1, 0, jmax+1);
-    free_matrix(_dv2dy,     0, imax+1, 0, jmax+1);
+    for(i = 1; i <= imax; i++)
+    {
+        for(j = 1; j <= jmax-1; j++)
+        {
+
+           /* dv2dy */ 
+            firstOperand = ( 1 / dy) *
+                ( pow((V[i][j] + V[i][j+1])/2, 2) -  pow((V[i][j-1] + V[i][j])/2, 2));
+
+            secondOperand = ( alpha / dy ) *
+                ( ( (abs(V[i][j] + V[i][j+1])/2) * ((V[i][j] - V[i][j+1])/2) )  
+                - ( (abs(V[i][j-1] + V[i][j])/2) * ((V[i][j-1] - V[i][j])/2) ) );
+
+            dv2dy = firstOperand + secondOperand;
+
+            /* duvdx */
+            firstOperand = ( 1 / dx )*
+            ( ( (U[i][j] + U[i][j+1]) / 2 ) * ( (V[i][j] + V[i+1][j]) / 2 )
+            - ( (U[i-1][j] + U[i-1][j+1]) / 2 ) * ( (V[i-1][j] + V[i][j]) / 2 ) );
+
+            secondOperand = ( alpha / dx )*
+            ( ( (abs(U[i][j] + U[i][j+1])/2) * ((V[i][j] - V[i+1][j])/2) )
+            - ( (abs(U[i-1][j] + U[i-1][j+1])/2) * ((V[i-1][j] - V[i][j])/2) ));
+
+            duvdx = firstOperand + secondOperand;
+
+            /* d2vdx2 */
+            d2vdx2 = (V[i+1][j] - 2*V[i][j] + V[i-1][j]) / pow(dx,2);
+          
+            /* d2vdy2*/
+            d2vdy2 = (V[i][j+1] - 2*V[i][j] + V[i][j-1]) / pow(dy,2);
+
+            G[i][j] = V[i][j] + dt * ( (1/Re) * ( d2vdx2 + d2vdy2 ) - duvdx - dv2dy + GY);
+        }
+    }
 
     /******** CALCULATE G END ********/
     
