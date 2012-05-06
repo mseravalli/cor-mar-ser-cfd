@@ -2,7 +2,7 @@
 #include "helper.h"
 
 
-double** add_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch, double** result)
+void add_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch, double** result)
 {
     int i = 0;
     int j = 0;
@@ -14,11 +14,9 @@ double** add_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch, do
             result[i][j] = M[i][j] + s;
         }
     }
-    
-    return result;
 }
 
-double** mult_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch, double** result)
+void mult_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch, double** result)
 {
     int i = 0;
     int j = 0;
@@ -30,12 +28,10 @@ double** mult_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch, d
             result[i][j] = M[i][j] * s;
         }
     }
-    
-    return result;
 }
 
 
-double** add_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch, double** result)
+void add_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch, double** result)
 {
     int i = 0;
     int j = 0;
@@ -47,12 +43,10 @@ double** add_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch, dou
             result[i][j] = M[i][j] + N[i][j];
         }
     }
-       
-    return result;
 }
 
 
-double** sub_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch, double** result)
+void sub_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch, double** result)
 {
     int i = 0;
     int j = 0;
@@ -64,6 +58,4 @@ double** sub_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch, dou
             result[i][j] = M[i][j] - N[i][j];
         }
     }
-       
-    return result;
 }

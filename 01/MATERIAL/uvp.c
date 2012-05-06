@@ -48,10 +48,10 @@ void calculate_fg(
     /******** Calculate the single derivatives ********/
 
     /* calculate derivatives */
-    _d2udx2 = d2udx2(U, dx,   0, imax + 1, 0, jmax + 1);
-    _d2udy2 = d2udy2(U, dy,   0, imax + 1, 0, jmax + 1);
-    _du2dx  = du2dx(U, dx,    0, imax + 1, 0, jmax + 1);
-    _duvdy  = duvdy(U, V, dy, 0, imax + 1, 0, jmax + 1);
+    _d2udx2 = d2udx2(U, dx,    0, imax + 1, 0, jmax + 1);
+    _d2udy2 = d2udy2(U, dy,    0, imax + 1, 0, jmax + 1);
+    _du2dx  = du2dx( U, dx,    0, imax + 1, 0, jmax + 1);
+    _duvdy  = duvdy( U, V, dy, 0, imax + 1, 0, jmax + 1);
 
     /******** Calculate F ********/
     add_mat(   _d2udx2, _d2udy2, 0, imax+1, 0, jmax+1, F);
@@ -78,10 +78,10 @@ void calculate_fg(
     /******** Calculate the single derivatives ********/
 
     /* calculate derivatives */
-    _d2vdx2 = d2vdx2(U, dx,   0, imax+1, 0, jmax+1);
-    _d2vdy2 = d2vdy2(U, dy,   0, imax+1, 0, jmax+1);
-    _duvdx  = duvdx(U, V, dy, 0, imax+1, 0, jmax+1);
-    _dv2dy  = dv2dy(U, dx,    0, imax+1, 0, jmax+1);
+    _d2vdx2 = d2vdx2(V, dx,    0, imax+1, 0, jmax+1);
+    _d2vdy2 = d2vdy2(V, dy,    0, imax+1, 0, jmax+1);
+    _duvdx  = duvdx( U, V, dx, 0, imax+1, 0, jmax+1);
+    _dv2dy  = dv2dy( V, dy,    0, imax+1, 0, jmax+1);
 
     /******** Calculate G ********/
     add_mat(   _d2vdx2, _d2vdy2, 0, imax+1, 0, jmax+1, G);
@@ -100,17 +100,19 @@ void calculate_fg(
 
     /******** CALCULATE G END ********/
     
-    for(j=0; j<=jmax+1; j++)
+    /******** BOUNDARY VALUES START ********/
+    for(j=1; j<=jmax; j++)
     {
         F[0][j]=U[0][j];
-        F[imax+1][j]=U[imax+1][j];
+        F[imax][j]=U[imax][j];
     }
     
-    for(i=0; i<=imax+1; i++)
+    for(i=1; i<=imax; i++)
     {
         G[i][0]=V[i][0];
-        G[i][jmax+1]=V[i][jmax+1];
+        G[i][jmax]=V[i][jmax];
     }
+    /******** BOUNDARY VALUES END ********/
 }
 
 void calculate_dt(
@@ -214,9 +216,9 @@ void calculate_rs(
    
     /******** Calculate RS ********/
 
-    for(i = 1; i < imax + 1; i++)
+    for(i = 1; i <= imax; i++)
     {
-        for(j = 1; j < jmax + 1; j++)
+        for(j = 1; j <= jmax; j++)
         {
             RS[i][j]= 1/dt*((F[i][j]-F[i-1][j])/dx+(G[i][j]-G[i][j-1])/dy);
             }

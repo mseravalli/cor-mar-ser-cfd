@@ -19,7 +19,7 @@ double** du2dx(double** U, double dx, int nrl, int nrh, int ncl, int nch)
     {
         for(j = ncl + 1; j < nch; ++j)
         {
-            firstOperand = ( (1-alpha) / dx) *
+            firstOperand = ( 1 / dx) *
                 ( pow((U[i][j] + U[i+1][j])/2, 2) -  pow((U[i-1][j] + U[i][j])/2, 2));
 
             secondOperand = ( alpha / dx ) *
@@ -50,7 +50,7 @@ double** duvdy(double** U, double **V, double dy, int nrl, int nrh, int ncl, int
     {
         for(j = ncl + 1; j < nch; ++j)
         {
-            firstOperand = ( ( 1- alpha ) / dy )*
+            firstOperand = ( 1 / dy )*
             ( ( (V[i][j] + V[i+1][j]) / 2 ) * ( (U[i][j] + U[i][j+1]) / 2 )
             - ( (V[i][j-1] + V[i+1][j-1]) / 2 ) * ( (U[i][j-1] + U[i][j]) / 2 ) );
 
@@ -145,7 +145,7 @@ double** dv2dy(double** V, double dy, int nrl, int nrh, int ncl, int nch)
     {
         for(j = ncl + 1; j < nch; ++j)
         {
-            firstOperand = ( (1-alpha) / dy) *
+            firstOperand = ( 1 / dy) *
                 ( pow((V[i][j] + V[i][j+1])/2, 2) -  pow((V[i][j-1] + V[i][j])/2, 2));
 
             secondOperand = ( alpha / dy ) *
@@ -176,7 +176,7 @@ double** duvdx(double** U, double **V, double dx, int nrl, int nrh, int ncl, int
     {
         for(j = ncl + 1; j < nch; ++j)
         {
-            firstOperand = ( ( 1- alpha ) / dx )*
+            firstOperand = ( 1 / dx )*
             ( ( (U[i][j] + U[i][j+1]) / 2 ) * ( (V[i][j] + V[i+1][j]) / 2 )
             - ( (U[i-1][j] + U[i-1][j+1]) / 2 ) * ( (V[i-1][j] + V[i][j]) / 2 ) );
 

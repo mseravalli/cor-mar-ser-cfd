@@ -18,13 +18,13 @@ void boundaryvalues(
     for(j = 1; j <= jmax; ++j)
     {
         U[0][j]    = 0;
-        U[imax+1][j] = 0;
+        U[imax][j] = 0;
     }
 
     for(i = 1; i <= imax; ++i)
     {
         V[i][0]    = 0;
-        V[i][jmax+1] = 0;
+        V[i][jmax] = 0;
     }
 
     /** formula (15) **/
