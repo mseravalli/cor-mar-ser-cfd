@@ -2,15 +2,15 @@
 #define __MATRIX_OP_H__ 
 
 /*adds scalar to all elements of a matrix*/
-double** add_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch);
+double** add_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch, double** result);
 
 /*multiplies all the elements of a matrix by a scalar*/
-double** mult_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch);
+double** mult_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch, double** result);
 
 /*adds two matrices with same dimension */
-double** add_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch);
+double** add_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch, double** result);
 
 /*subtracts the second matrix from the first one with same dimension */
-double** sub_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch);
+double** sub_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch, double** result);
 
 #endif

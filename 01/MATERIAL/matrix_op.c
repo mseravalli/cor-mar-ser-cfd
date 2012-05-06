@@ -2,11 +2,10 @@
 #include "helper.h"
 
 
-double** add_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch)
+double** add_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch, double** result)
 {
     int i = 0;
     int j = 0;
-    double** result = matrix(nrl, nrh, ncl, nch);
     
     for(i = nrl; i <= nrh; ++i)
     {
@@ -19,11 +18,10 @@ double** add_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch)
     return result;
 }
 
-double** mult_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch)
+double** mult_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch, double** result)
 {
     int i = 0;
     int j = 0;
-    double** result = matrix(nrl, nrh, ncl, nch);
     
     for(i = nrl; i <= nrh; ++i)
     {
@@ -37,11 +35,10 @@ double** mult_scalar(double** M, double s, int nrl, int nrh, int ncl, int nch)
 }
 
 
-double** add_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch)
+double** add_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch, double** result)
 {
     int i = 0;
     int j = 0;
-    double** result = matrix(nrl, nrh, ncl, nch);
     
     for(i = nrl; i <= nrh; ++i)
     {
@@ -55,11 +52,10 @@ double** add_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch)
 }
 
 
-double** sub_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch)
+double** sub_mat(double** M, double** N, int nrl, int nrh, int ncl, int nch, double** result)
 {
     int i = 0;
     int j = 0;
-    double** result = matrix(nrl, nrh, ncl, nch);
     
     for(i = nrl; i <= nrh; ++i)
     {
