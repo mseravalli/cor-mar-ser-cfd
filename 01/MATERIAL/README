@@ -1,0 +1,14 @@
+Assignment 1
+
+to compile the file simply run (the object files are placed in the obj folder)
+$ make
+
+to run the file simply type
+$./sim
+the vtk files will be stored in the files/ folder
+
+in order not to write the vtk files 0 could be passed as parameter
+$./sim 0
+
+this speeds up the code significantly
+
