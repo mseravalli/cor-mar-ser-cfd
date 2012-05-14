@@ -5,7 +5,6 @@
 
 /* reads the parameters for the lid driven cavity scenario from a config file */
 int readParameters(
-const char *szFileName,             /* name of file*/
 int *xlength,                       /* reads domain size. Parameter name: "xlength" */
 double *tau,                        /* relaxation parameter tau. Parameter name: "tau" */
 double *velocityWall,               /* velocity of the lid. Parameter name: "characteristicvelocity" */
