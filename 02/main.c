@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
     /* initialise the pointers */
     collideField = calloc(Q*(xlength+2)*(xlength+2)*(xlength+2), sizeof(double));
     streamField  = calloc(Q*(xlength+2)*(xlength+2)*(xlength+2), sizeof(double));
-    streamField  = calloc((xlength+2)*(xlength+2)*(xlength+2), sizeof(int));
+    flagField  = calloc((xlength+2)*(xlength+2)*(xlength+2), sizeof(int));
     
     for(t = 0; t < timesteps; ++t){
         doStreaming(collideField, streamField, flagField, xlength);
