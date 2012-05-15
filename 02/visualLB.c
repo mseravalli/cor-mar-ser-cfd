@@ -1,5 +1,6 @@
 #include "visualLB.h"
 #include "helper.h"
+#include "LBDefinitions.h"
 
 void write_vtkHeader( FILE *fp, int xlength) {
   if( fp == NULL )		       
@@ -52,6 +53,10 @@ void writeVtkOutput(const double * const collideField,
     char szFileName[80];
     FILE *fp=NULL;
 
+    int x = 0;
+    int y = 0;
+    int z = 0;
+
     /* try to open the file, if it does not exists abort */
     sprintf( szFileName, "%s.%i.vtk", filename, t );
     fp = fopen( szFileName, "w");
@@ -64,6 +69,19 @@ void writeVtkOutput(const double * const collideField,
 
     write_vtkHeader(fp, xlength);
     write_vtkPointCoordinates(fp, xlength);
+
+    fprintf(fp,"\n");
+    fprintf(fp,"POINT_DATA %i \n", ((xlength + 2) * (xlength + 2) * (xlength + 2)) );
+    fprintf(fp, "SCALARS collisionField float 1 \n"); 
+    fprintf(fp, "LOOKUP_TABLE default \n");
+    for(z = 0; z < xlength + 2; ++z) {
+        for(y = 0; y < xlength + 2; ++y) {
+            for(x = 0; x < xlength + 2; ++x) {
+                int pos = Q * (z*xlength*xlength + y*xlength + x) + 9;
+                fprintf(fp, "%f\n", collideField[pos] );
+            }
+        }
+    }
   
 }
 
