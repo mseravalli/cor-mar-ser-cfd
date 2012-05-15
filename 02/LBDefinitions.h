@@ -1,12 +1,14 @@
 #ifndef _LBDEFINITIONS_H_
 #define _LBDEFINITIONS_H_
 
+#define Q           19
+#define C_S         0.577350269
+#define FLUID       0
+#define NO_SLIP     1
+#define MOVING_WALL 2
+
 /* TODO check LATTICEVELOCITIES */
 
-  static const int Q = 19;
-  static const int FLUID = 0;
-  static const int NO_SLIP = 1;
-  static const int MOVING_WALL = 2;
   static const int LATTICEVELOCITIES[19][3] ={ { 0, -1, -1},    /* 0 */ 
                                                {-1,  0, -1},    /* 1 */                   
                                                { 0,  0, -1},    /* 2 */                   
@@ -45,7 +47,6 @@
                                             2/36,    /* 16 */
                                             1/36,    /* 17 */
                                             1/36};   /* 18 */
-  static const double C_S;
 
 #endif
 
