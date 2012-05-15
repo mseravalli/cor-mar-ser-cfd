@@ -9,14 +9,21 @@ int readParameters(int *xlength,                 /* reads domain size. Parameter
                    int argc,                     /* number of arguments. Should equal 2 (program + name of config file */ 
                    char *argv[])                 /* argv[1] shall contain the path to the config file */
 {
-    if(argc < 2){
-        printf("filename not passed \n");    
-        return 1;
-    }
+
+    double W1 = 0;
+    double W2;
+    double W3;
 
     READ_INT(    argv[1], *xlength);
     READ_DOUBLE( argv[1], *tau );
-    READ_DOUBLE( argv[1], *velocityWall );
+    
+    read_double( argv[1], "W1", &W1 );
+    read_double( argv[1], "W2", &W2 );
+    read_double( argv[1], "W3", &W3 );
+    velocityWall[0] = W1;
+    velocityWall[1] = W2;
+    velocityWall[2] = W3;
+
     READ_INT(    argv[1], *timesteps );
     READ_INT(    argv[1], *timestepsPerPlotting );
 
