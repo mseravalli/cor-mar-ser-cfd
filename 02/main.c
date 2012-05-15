@@ -19,6 +19,9 @@ int main(int argc, char *argv[]){
     int     timesteps;
     int     timestepsPerPlotting;
     int     readResult = 1;
+
+    int t = 0;
+    double* swap = NULL;
     
     /* read the parameters */
     readResult = readParameters(&xlength,             
@@ -34,11 +37,24 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
-    /* initialise the pointer */
+    /* initialise the pointers */
     collideField = calloc(Q*(xlength+2)*(xlength+2)*(xlength+2), sizeof(double));
     streamField  = calloc(Q*(xlength+2)*(xlength+2)*(xlength+2), sizeof(double));
     streamField  = calloc((xlength+2)*(xlength+2)*(xlength+2), sizeof(int));
     
+    for(t = 0; t < timesteps; ++t){
+        doStreaming(collideField, streamField, flagField, xlength);
+        swap = collideField;
+        collideField = streamField;
+        streamField = swap;
+
+        doCollision(collideField, flagField, &tau, xlength);
+        treatBoundary(collideField, flagField, velocityWall, xlength);
+
+        if(t % timestepsPerPlotting == 0){
+            writeVtkOutput(collideField, flagField, argv[2], t, xlength);
+        }
+    }
 
     free(collideField);
     free(streamField); 

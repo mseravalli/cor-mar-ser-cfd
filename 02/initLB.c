@@ -33,11 +33,11 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
     int pos = 0;
 
     /* from 0 to 20 */
-    for(z = 0; z < Q + 2; ++z){
+    for(z = 0; z < xlength + 2; ++z){
         /* from 0 to 20 */
-        for(y = 0; y < Q + 2; ++y){
+        for(y = 0; y < xlength + 2; ++y){
             /* from 0 to 20 */
-            for(x = 0; x < Q + 2; ++x){
+            for(x = 0; x < xlength + 2; ++x){
                 
                 pos = ( z*xlength*xlength + y*xlength + x ); 
                 /* 
