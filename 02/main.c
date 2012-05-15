@@ -22,6 +22,16 @@ int main(int argc, char *argv[]){
 
     int t = 0;
     double* swap = NULL;
+
+    if(argc < 2) {
+        printf("you need to pass the configuration file as first argument\n");
+    }
+
+    if(argc < 3) {
+        printf("you need to pass the destination file as second argument\n");
+        printf("the program will exit\n");
+        return 1;
+    }
     
     /* read the parameters */
     readResult = readParameters(&xlength,             
@@ -32,15 +42,12 @@ int main(int argc, char *argv[]){
                                 argc,                 
                                 argv);
 
-    if(readResult != 0){
-        printf("could nor read some parameters, program will exit\n");
-        return 1;
-    }
-
     /* initialise the pointers */
     collideField = calloc(Q*(xlength+2)*(xlength+2)*(xlength+2), sizeof(double));
     streamField  = calloc(Q*(xlength+2)*(xlength+2)*(xlength+2), sizeof(double));
     flagField  = calloc((xlength+2)*(xlength+2)*(xlength+2), sizeof(int));
+
+    initialiseFields(collideField, streamField, flagField, xlength);
     
     for(t = 0; t < timesteps; ++t){
         doStreaming(collideField, streamField, flagField, xlength);
