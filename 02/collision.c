@@ -14,11 +14,11 @@ void doCollision(double *collideField, int *flagField,const double * const tau,i
   int x, y, z;
   double density, velocity[3], feq[Q];
   
-  for(x = 0; x < xlength+2; x++)
+  for(z = 0; z < xlength+2; z++)
   {
     for(y = 0; y < xlength+2; y++)
     {
-        for(z = 0; z < xlength+2; z++)
+        for(x = 0; x < xlength+2; x++)
         {
             if(flagField[z*xlength*xlength + y*xlength + x] == FLUID)
             {
