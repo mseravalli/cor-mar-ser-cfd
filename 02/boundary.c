@@ -2,7 +2,7 @@
 #include "LBDefinitions.h"
 #include "computeCellValues.h"
 
-int findFluid(int* flagField, int x, int y, int z, int xlength, int* direction){
+void findFluid(int* flagField, int x, int y, int z, int xlength, int* direction){
 
     direction[0] = 0;
     direction[1] = 0;

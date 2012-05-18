@@ -21,7 +21,7 @@ void doStreaming(double *collideField, double *streamField,int *flagField,int xl
 
                             nb = ( (z+LATTICEVELOCITIES[i][2])*xlength*xlength +(y+LATTICEVELOCITIES[i][1])*xlength +(x+LATTICEVELOCITIES[i][0]) );
                             /* probably not correct, need to check */
-                            streamField[Q * pos + i] = collideField[Q * nb + (Q-1-i)];
+                            streamField[Q * pos + (Q-1-i)] = collideField[Q * nb + (Q-1-i)];
 
 
                     }

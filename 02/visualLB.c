@@ -86,7 +86,7 @@ void writeVtkOutput(const double * const collideField,
                     computeVelocity(&collideField[Q*pos], &density, vel);
                     fprintf(fp, "%f %f %f\n", vel[0], vel[1], vel[2] );
                 } else {
-                    fprintf(fp, "%f %f %f\n", 0, 0, 0 );
+                    fprintf(fp, "%f %f %f\n", 0.0, 0.0, 0.0 );
                 }
             }
         }
