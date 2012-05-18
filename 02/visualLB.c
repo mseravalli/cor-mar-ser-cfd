@@ -80,7 +80,7 @@ void writeVtkOutput(const double * const collideField,
     for(z = 0; z < xlength + 2; ++z) {
         for(y = 0; y < xlength + 2; ++y) {
             for(x = 0; x < xlength + 2; ++x) {
-                pos = (z*xlength*xlength + y*xlength + x);
+                pos = ( z*(xlength+2)*(xlength+2) + y*(xlength+2) + x ); 
                 if (flagField[pos] == FLUID) {
                     computeDensity(&collideField[Q*pos], &density);
                     computeVelocity(&collideField[Q*pos], &density, vel);

@@ -77,17 +77,21 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
                 if(dirIndex == -1)
                     continue;
             
-                pos = z*xlength*xlength + y*xlength + x;
+                pos = ( z*(xlength+2)*(xlength+2) + y*(xlength+2) + x ); 
 
                 if (flagField[pos] == NO_SLIP || flagField[pos] == MOVING_WALL) {
 
                     for (i = 0; i < Q; ++i) {
                         if(LATTICEVELOCITIES[i][dirIndex] == fluidDirection[dirIndex]){
-                            nb = ( (z+LATTICEVELOCITIES[i][2])*xlength*xlength +(y+LATTICEVELOCITIES[i][1])*xlength +(x+LATTICEVELOCITIES[i][0]) );
+                            nb = ( (z+LATTICEVELOCITIES[i][2])*(xlength+2)*(xlength+2) 
+                                 + (y+LATTICEVELOCITIES[i][1])*(xlength+2) 
+                                 + (x+LATTICEVELOCITIES[i][0]) );
                             wv = 0;
                             if( flagField[pos] == MOVING_WALL) {
                                computeDensity(&collideField[Q*nb],&density);
-                               cispu = LATTICEVELOCITIES[i][0]*wallVelocity[0] + LATTICEVELOCITIES[i][1]*wallVelocity[1] + LATTICEVELOCITIES[i][2]*wallVelocity[2];
+                               cispu = LATTICEVELOCITIES[i][0]*wallVelocity[0] 
+                                     + LATTICEVELOCITIES[i][1]*wallVelocity[1] 
+                                     + LATTICEVELOCITIES[i][2]*wallVelocity[2];
                                wv = 2*LATTICEWEIGHTS[i]*density*cispu/(C_S*C_S);
                             }
 

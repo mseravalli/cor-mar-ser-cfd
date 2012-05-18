@@ -43,15 +43,15 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
         for(y = 0; y < xlength + 2; ++y){
             for(x = 0; x < xlength + 2; ++x){
                 
-                pos = ( z*xlength*xlength + y*xlength + x ); 
+                pos = ( z*(xlength+2)*(xlength+2) + y*(xlength+2) + x ); 
                 /* 
                  * set NO_SLIP at the boundaries, MOVING_WALL on the top
                  * and FLUID everywhere else
                  */
-                if(x == 0 || x == xlength + 1 || y == 0 || y == xlength + 1 || z == 0){
-                    flagField[pos] = NO_SLIP; 
-                } else if(z == xlength + 1){
+                if (z == xlength + 1) {
                     flagField[pos] = MOVING_WALL; 
+                } else if (x == 0 || x == xlength + 1 || y == 0 || y == xlength + 1 || z == 0) {
+                    flagField[pos] = NO_SLIP; 
                 } else {
                     flagField[pos] = FLUID; 
                 }

@@ -12,6 +12,7 @@ void computePostCollisionDistributions(double *currentCell, const double * const
 
 void doCollision(double *collideField, int *flagField,const double * const tau,int xlength){
   int x, y, z;
+  int pos;
   double density, velocity[3], feq[Q];
   
   for(z = 0; z < xlength+2; z++)
@@ -20,12 +21,13 @@ void doCollision(double *collideField, int *flagField,const double * const tau,i
     {
         for(x = 0; x < xlength+2; x++)
         {
-            if(flagField[z*xlength*xlength + y*xlength + x] == FLUID)
+            pos = ( z*(xlength+2)*(xlength+2) + y*(xlength+2) + x ); 
+            if(flagField[pos]== FLUID)
             {
-                computeDensity(&collideField[Q*(z*xlength*xlength + y*xlength + x)], &density);
-                computeVelocity(&collideField[Q*(z*xlength*xlength + y*xlength + x)], &density, velocity);
+                computeDensity(&collideField[Q*pos], &density);
+                computeVelocity(&collideField[Q*pos], &density, velocity);
                 computeFeq(&density, velocity, feq);
-                computePostCollisionDistributions(&collideField[Q*(z*xlength*xlength + y*xlength + x)], tau, feq);
+                computePostCollisionDistributions(&collideField[Q*pos], tau, feq);
             }
         }
     }
