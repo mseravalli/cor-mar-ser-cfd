@@ -17,8 +17,7 @@ void computeVelocity(const double * const currentCell, const double * const dens
     velocity[1] = 0;
     velocity[2] = 0;
 
-    for(i = 0; i<Q; i++)
-    {
+    for (i = 0; i < Q; i++) {
         velocity[0] += currentCell[i]*LATTICEVELOCITIES[i][0]/(*density);
         velocity[1] += currentCell[i]*LATTICEVELOCITIES[i][1]/(*density);
         velocity[2] += currentCell[i]*LATTICEVELOCITIES[i][2]/(*density);

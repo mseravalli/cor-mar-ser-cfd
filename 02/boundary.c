@@ -4,42 +4,46 @@
 
 void findFluid(int* flagField, int x, int y, int z, int xlength, int* direction){
 
+    int pos = 0;
+
     direction[0] = 0;
     direction[1] = 0;
     direction[2] = 0;
+    
+    pos = ( z*(xlength+2)*(xlength+2) + y*(xlength+2) + x ); 
 
     if( x == 0 ){
-        if(flagField[z*xlength*xlength + y*xlength + (x + 1)] == FLUID){
+        if(flagField[pos + 1] == FLUID){
             direction[0] = 1;
             return;
         }
     }
     if( x == xlength + 1 ){
-        if(flagField[z*xlength*xlength + y*xlength + (x - 1)] == FLUID){
+        if(flagField[pos - 1] == FLUID){
             direction[0] = -1;
             return;
         }
     }
     if( y == 0 ){
-        if(flagField[z*xlength*xlength + (y + 1)*xlength + x] == FLUID){
+        if(flagField[pos + (xlength + 2)] == FLUID){
             direction[1] = 1;
             return;
         }
     }
     if( y == xlength + 1 ){
-        if(flagField[z*xlength*xlength + (y - 1)*xlength + x] == FLUID){
+        if(flagField[pos - (xlength + 2)] == FLUID){
             direction[1] = -1;
             return;
         }
     }
     if( z == 0 ){
-        if(flagField[(z + 1)*xlength*xlength + y*xlength + x] == FLUID){
+        if(flagField[pos + ((xlength+2)*(xlength+2))] == FLUID){
             direction[2] = 1;
             return;
         }
     }
     if( z == xlength + 1 ){
-        if(flagField[(z - 1)*xlength*xlength + y*xlength + x] == FLUID){
+        if(flagField[pos - ((xlength+2)*(xlength+2))] == FLUID){
             direction[2] = -1;
             return;
         }
@@ -63,23 +67,23 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
     for (z = 0; z < xlength + 2; ++z) {
         for (y = 0; y < xlength + 2; ++y) {
             for (x = 0; x < xlength + 2; ++x) {
-
-                dirIndex = -1;
-                
-                findFluid(flagField, x, y, z, xlength, fluidDirection);
-
-                for (i = 0; i < 3; ++i) {
-                    if (fluidDirection[i] != 0) {
-                        dirIndex = i;
-                    }
-                }
-
-                if(dirIndex == -1)
-                    continue;
             
                 pos = ( z*(xlength+2)*(xlength+2) + y*(xlength+2) + x ); 
 
                 if (flagField[pos] == NO_SLIP || flagField[pos] == MOVING_WALL) {
+
+                        dirIndex = -1;
+                    
+                    findFluid(flagField, x, y, z, xlength, fluidDirection);
+
+                    for (i = 0; i < 3; ++i) {
+                        if (fluidDirection[i] != 0) {
+                            dirIndex = i;
+                        }
+                    }
+
+                    if(dirIndex == -1)
+                        continue;
 
                     for (i = 0; i < Q; ++i) {
                         if(LATTICEVELOCITIES[i][dirIndex] == fluidDirection[dirIndex]){

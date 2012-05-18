@@ -32,7 +32,7 @@ void write_vtkPointCoordinates( FILE *fp, int xlength ) {
     int y = 0;
     int z = 0;
 
-    double delta = 1/(double)xlength;
+    double delta = 1/(double)(xlength + 1);
 
     for(z = 0; z < xlength + 2; ++z) {
         for(y = 0; y < xlength + 2; ++y) {
