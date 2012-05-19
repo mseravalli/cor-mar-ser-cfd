@@ -31,7 +31,7 @@ void computeFeq(const double * const density, const double * const velocity, dou
     for(i = 0; i < Q; i++)
     {
         cispu = LATTICEVELOCITIES[i][0]*velocity[0] + LATTICEVELOCITIES[i][1]*velocity[1] + LATTICEVELOCITIES[i][2]*velocity[2];
-        feq[i] = LATTICEWEIGHTS[i] * (*density) * (1 + cispu/(C_S*C_S)) + (cispu*cispu)/(2*C_S*C_S*C_S*C_S) - uspu/(2*C_S*C_S);
+        feq[i] = LATTICEWEIGHTS[i] * (*density) * (1 + cispu/(C_S*C_S) + (cispu*cispu)/(2*C_S*C_S*C_S*C_S) - uspu/(2*C_S*C_S));
     }
 }
 

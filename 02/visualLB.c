@@ -74,8 +74,8 @@ void writeVtkOutput(const double * const collideField,
     write_vtkHeader(fp, xlength);
     write_vtkPointCoordinates(fp, xlength);
 
-    fprintf(fp,"\n");
-    fprintf(fp,"POINT_DATA %i \n", ((xlength) * (xlength) * (xlength)) );
+    fprintf(fp, "\n");
+    fprintf(fp, "POINT_DATA %i \n", ((xlength) * (xlength) * (xlength)) );
     fprintf(fp, "VECTORS velocity float \n"); 
     for(z = 1; z <= xlength; ++z) {
         for(y = 1; y <= xlength; ++y) {
@@ -84,6 +84,19 @@ void writeVtkOutput(const double * const collideField,
                     computeDensity(&collideField[Q*pos], &density);
                     computeVelocity(&collideField[Q*pos], &density, vel);
                     fprintf(fp, "%f %f %f\n", vel[0], vel[1], vel[2] );
+            }
+        }
+    }
+
+    fprintf(fp, "\n");
+    fprintf(fp, "SCALARS density float 1 \n"); 
+    fprintf(fp, "LOOKUP_TABLE default \n"); 
+    for(z = 1; z <= xlength; ++z) {
+        for(y = 1; y <= xlength; ++y) {
+            for(x = 1; x <= xlength; ++x) {
+                pos = ( z*(xlength+2)*(xlength+2) + y*(xlength+2) + x ); 
+                    computeDensity(&collideField[Q*pos], &density);
+                    fprintf(fp, "%f\n", density );
             }
         }
     }

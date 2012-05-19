@@ -10,7 +10,7 @@ int readParameters(int *xlength,                 /* reads domain size. Parameter
                    char *argv[])                 /* argv[1] shall contain the path to the config file */
 {
 
-    double W1 = 0;
+    double W1;
     double W2;
     double W3;
 
@@ -48,10 +48,10 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
                  * set NO_SLIP at the boundaries, MOVING_WALL on the top
                  * and FLUID everywhere else
                  */
-                if (x == 0 || x == xlength + 1 || y == 0 || y == xlength + 1 || z == 0) {
-                    flagField[pos] = NO_SLIP; 
-                } else if (z == xlength + 1) {
+                if (z == xlength + 1) {
                     flagField[pos] = MOVING_WALL; 
+                } else if (x == 0 || x == xlength + 1 || y == 0 || y == xlength + 1 || z == 0) {
+                    flagField[pos] = NO_SLIP; 
                 } else {
                     flagField[pos] = FLUID; 
                 }

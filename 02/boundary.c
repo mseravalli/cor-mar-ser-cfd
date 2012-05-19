@@ -2,54 +2,6 @@
 #include "LBDefinitions.h"
 #include "computeCellValues.h"
 
-void findFluid(int* flagField, int x, int y, int z, int xlength, int* direction){
-
-    int pos = 0;
-
-    direction[0] = 0;
-    direction[1] = 0;
-    direction[2] = 0;
-    
-    pos = ( z*(xlength+2)*(xlength+2) + y*(xlength+2) + x ); 
-
-    if( x == 0 ){
-        if(flagField[pos + 1] == FLUID){
-            direction[0] = 1;
-            return;
-        }
-    }
-    if( x == xlength + 1 ){
-        if(flagField[pos - 1] == FLUID){
-            direction[0] = -1;
-            return;
-        }
-    }
-    if( y == 0 ){
-        if(flagField[pos + (xlength + 2)] == FLUID){
-            direction[1] = 1;
-            return;
-        }
-    }
-    if( y == xlength + 1 ){
-        if(flagField[pos - (xlength + 2)] == FLUID){
-            direction[1] = -1;
-            return;
-        }
-    }
-    if( z == 0 ){
-        if(flagField[pos + ((xlength+2)*(xlength+2))] == FLUID){
-            direction[2] = 1;
-            return;
-        }
-    }
-    if( z == xlength + 1 ){
-        if(flagField[pos - ((xlength+2)*(xlength+2))] == FLUID){
-            direction[2] = -1;
-            return;
-        }
-    }
-}
-
 void treatBoundary(double *collideField, int* flagField, const double * const wallVelocity, int xlength){
 
     int x = 0;
@@ -68,17 +20,20 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             
                 pos = ( z*(xlength+2)*(xlength+2) + y*(xlength+2) + x ); 
 
+                /* proceed only if we are at a boundary */
                 if (flagField[pos] == NO_SLIP || flagField[pos] == MOVING_WALL) {
 
                     for (i = 0; i < Q; ++i) {
 
-                        if (   (z+LATTICEVELOCITIES[i][2] >= 0 && z+LATTICEVELOCITIES[i][2] <= xlength + 1) 
-                            && (y+LATTICEVELOCITIES[i][1] >= 0 && y+LATTICEVELOCITIES[i][1] <= xlength + 1)
-                            && (x+LATTICEVELOCITIES[i][0] >= 0 && x+LATTICEVELOCITIES[i][0] <= xlength + 1) ) {
+                        /* check if the neighbour is within the domain */
+                        if (   (z+LATTICEVELOCITIES[i][2] > 0 && z+LATTICEVELOCITIES[i][2] < xlength + 1) 
+                            && (y+LATTICEVELOCITIES[i][1] > 0 && y+LATTICEVELOCITIES[i][1] < xlength + 1)
+                            && (x+LATTICEVELOCITIES[i][0] > 0 && x+LATTICEVELOCITIES[i][0] < xlength + 1) ) {
 
                             nb = ( (z+LATTICEVELOCITIES[i][2])*(xlength+2)*(xlength+2) 
                                  + (y+LATTICEVELOCITIES[i][1])*(xlength+2) 
                                  + (x+LATTICEVELOCITIES[i][0]) );
+
                             wv = 0;
                             if( flagField[pos] == MOVING_WALL) {
                                computeDensity(&collideField[Q*nb],&density);
