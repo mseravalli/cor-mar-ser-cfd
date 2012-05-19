@@ -17,8 +17,8 @@ void write_vtkHeader( FILE *fp, int xlength) {
   fprintf(fp,"ASCII\n");
   fprintf(fp,"\n");	
   fprintf(fp,"DATASET STRUCTURED_GRID\n");
-  fprintf(fp,"DIMENSIONS  %i %i %i \n", xlength + 2, xlength + 2, xlength + 2);
-  fprintf(fp,"POINTS %i float\n", (xlength + 2)*(xlength + 2)*(xlength + 2) );
+  fprintf(fp,"DIMENSIONS  %i %i %i \n", xlength, xlength, xlength);
+  fprintf(fp,"POINTS %i float\n", (xlength)*(xlength)*(xlength) );
   fprintf(fp,"\n");
 }
 
@@ -32,11 +32,11 @@ void write_vtkPointCoordinates( FILE *fp, int xlength ) {
     int y = 0;
     int z = 0;
 
-    double delta = 1/(double)(xlength + 1);
+    double delta = 1/(double)(xlength - 1);
 
-    for(z = 0; z < xlength + 2; ++z) {
-        for(y = 0; y < xlength + 2; ++y) {
-            for(x = 0; x < xlength + 2; ++x) {
+    for(z = 0; z < xlength; ++z) {
+        for(y = 0; y < xlength; ++y) {
+            for(x = 0; x < xlength; ++x) {
                 fprintf(fp, "%f %f %f\n", originX+(x*delta), originY+(y*delta), originZ+(z*delta) );
             }
         }
@@ -75,19 +75,15 @@ void writeVtkOutput(const double * const collideField,
     write_vtkPointCoordinates(fp, xlength);
 
     fprintf(fp,"\n");
-    fprintf(fp,"POINT_DATA %i \n", ((xlength + 2) * (xlength + 2) * (xlength + 2)) );
+    fprintf(fp,"POINT_DATA %i \n", ((xlength) * (xlength) * (xlength)) );
     fprintf(fp, "VECTORS velocity float \n"); 
-    for(z = 0; z < xlength + 2; ++z) {
-        for(y = 0; y < xlength + 2; ++y) {
-            for(x = 0; x < xlength + 2; ++x) {
+    for(z = 1; z <= xlength; ++z) {
+        for(y = 1; y <= xlength; ++y) {
+            for(x = 1; x <= xlength; ++x) {
                 pos = ( z*(xlength+2)*(xlength+2) + y*(xlength+2) + x ); 
-                if (flagField[pos] == FLUID) {
                     computeDensity(&collideField[Q*pos], &density);
                     computeVelocity(&collideField[Q*pos], &density, vel);
                     fprintf(fp, "%f %f %f\n", vel[0], vel[1], vel[2] );
-                } else {
-                    fprintf(fp, "%f %f %f\n", 0.0, 0.0, 0.0 );
-                }
             }
         }
     }

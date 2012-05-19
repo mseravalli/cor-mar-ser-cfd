@@ -48,10 +48,10 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
                  * set NO_SLIP at the boundaries, MOVING_WALL on the top
                  * and FLUID everywhere else
                  */
-                if (z == xlength + 1) {
-                    flagField[pos] = MOVING_WALL; 
-                } else if (x == 0 || x == xlength + 1 || y == 0 || y == xlength + 1 || z == 0) {
+                if (x == 0 || x == xlength + 1 || y == 0 || y == xlength + 1 || z == 0) {
                     flagField[pos] = NO_SLIP; 
+                } else if (z == xlength + 1) {
+                    flagField[pos] = MOVING_WALL; 
                 } else {
                     flagField[pos] = FLUID; 
                 }

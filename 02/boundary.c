@@ -56,8 +56,6 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
     int y = 0;
     int z = 0;
     int i = 0;
-    int fluidDirection [3];
-    int dirIndex = -1;
     int pos = 0;
     int nb = 0;
     double density = 0;
@@ -72,21 +70,12 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 
                 if (flagField[pos] == NO_SLIP || flagField[pos] == MOVING_WALL) {
 
-                        dirIndex = -1;
-                    
-                    findFluid(flagField, x, y, z, xlength, fluidDirection);
-
-                    for (i = 0; i < 3; ++i) {
-                        if (fluidDirection[i] != 0) {
-                            dirIndex = i;
-                        }
-                    }
-
-                    if(dirIndex == -1)
-                        continue;
-
                     for (i = 0; i < Q; ++i) {
-                        if(LATTICEVELOCITIES[i][dirIndex] == fluidDirection[dirIndex]){
+
+                        if (   (z+LATTICEVELOCITIES[i][2] >= 0 && z+LATTICEVELOCITIES[i][2] <= xlength + 1) 
+                            && (y+LATTICEVELOCITIES[i][1] >= 0 && y+LATTICEVELOCITIES[i][1] <= xlength + 1)
+                            && (x+LATTICEVELOCITIES[i][0] >= 0 && x+LATTICEVELOCITIES[i][0] <= xlength + 1) ) {
+
                             nb = ( (z+LATTICEVELOCITIES[i][2])*(xlength+2)*(xlength+2) 
                                  + (y+LATTICEVELOCITIES[i][1])*(xlength+2) 
                                  + (x+LATTICEVELOCITIES[i][0]) );
