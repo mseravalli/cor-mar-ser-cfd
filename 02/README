@@ -1,0 +1,9 @@
+Worksheet 2 - Cordero, Maric, Seravalli
+
+the conf.conf file contains the setting values for running the simulation
+
+to run the file
+$ ./lbsim conf.conf destinationFileName
+
+the vtk files will have the following format destinationFileName.timestep.vtk
+
