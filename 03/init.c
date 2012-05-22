@@ -1,5 +1,6 @@
 #include "helper.h"
 #include "init.h"
+#include "constants.h"
 
 int read_parameters( const char *szFileName,       /* name of the file */
                     double *Re,                /* reynolds number   */
@@ -77,4 +78,52 @@ void init_uvp(  double UI,
     
     init_matrix(P, 1, imax, 1, jmax, PI);
 
+}
+
+/**
+ * Initializes flag matrix
+**/
+int init_flag(
+    int **Problem,
+    int imax,
+    int jmax,
+    int **Flag)
+{
+    int i, j;
+    
+    for(i = 1; i < imax+1; i++)
+    {
+        for(j = 1; j < jmax+1; j++)
+        {
+            /*if it is a fluid cell it is being set to C_F, regardles of its neighbours*/
+            if(Problem[i][j] == 1)
+            {
+                Flag[i][j] = C_F;
+            }
+            /*otherwise, its flag is calculated as 8*eastern + 4*western + 2*southern + 1*northern cell*/
+            else
+            {
+                Flag[i][j] = 8 * Problem[i][j-1] + 4 * Problem[i][j+1] + 2 * Problem[i+1][j] + 1 * Problem[i-1][j];
+                /*if falg is not valid it returns a wrong result*/
+                if(Flag[i][j] == 3 || Flag[i][j] == 7 || Flag[i][j] == 11 || Flag[i][j] == 12 || Flag[i][j] == 13 || Flag[i][j] == 14 || Flag[i][j] == 15){
+                    return 1;
+                }
+            }
+        }
+    }
+    
+    /*boundaries depend on only one neighbouring cell*/
+    for(i = 1; i < imax+1; i++)
+    {
+        Flag[i][0] = 8 * Problem[i][1];
+        Flag[i][jmax+1] = 4 * Problem[i][jmax];
+    }
+    
+    for(j = 1; j < jmax+1; j++)
+    {
+        Flag[0][j] = 2 * Problem[1][j];
+        Flag[imax+1][j] = 1 * Problem[imax][j];
+    }
+    
+    return 0;
 }

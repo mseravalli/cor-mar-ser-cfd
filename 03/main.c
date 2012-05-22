@@ -78,7 +78,7 @@ int main(int argn, char** args){
     int n;
     int it;
     double res;
-    
+
     int i;
     int j;
 
@@ -127,6 +127,39 @@ int main(int argn, char** args){
     init_uvp(UI, VI, PI, imax, jmax, U, V, P);
     
     Problem = read_pgm("geometry.pgm");
+    
+    /*printf("Problem matrix\n");
+    for(i = 0; i<6; i++){
+        for(j = 0; j<6; j++){
+            printf("%d ", Problem[i][j]);
+        }
+        printf("\n");
+    }*/
+    
+    if(init_flag(Problem, 4, 4, Flag) == 1)
+    {
+        /*if there was a forbidden obstacle it returns an error, frees everything and finishes the program*/
+        printf("ERROR: Invalid obstacle in .pgm file\n");
+
+        free_matrix(U, 0, imax + 1, 0, jmax + 1);
+        free_matrix(V, 0, imax + 1, 0, jmax + 1);
+        free_matrix(P, 0, imax + 1, 0, jmax + 1);
+        free_matrix(F, 0, imax + 1, 0, jmax + 1);
+        free_matrix(G, 0, imax + 1, 0, jmax + 1);
+        free_matrix(RS, 0, imax + 1, 0, jmax + 1);
+        free_imatrix(Flag, 0, imax + 1, 0, jmax + 1);
+        free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
+
+        return 1;
+    }
+    
+    /*printf("Flag matrix\n");
+    for(i = 0; i<6; i++){
+        for(j = 0; j<6; j++){
+            printf("%d ", Flag[i][j]);
+        }
+        printf("\n");
+    }*/
 
     while (t < t_end)
     {
@@ -240,13 +273,14 @@ int main(int argn, char** args){
                           P);
 
 
-
     free_matrix(U, 0, imax + 1, 0, jmax + 1);
     free_matrix(V, 0, imax + 1, 0, jmax + 1);
     free_matrix(P, 0, imax + 1, 0, jmax + 1);
     free_matrix(F, 0, imax + 1, 0, jmax + 1);
     free_matrix(G, 0, imax + 1, 0, jmax + 1);
     free_matrix(RS, 0, imax + 1, 0, jmax + 1);
+    free_imatrix(Flag, 0, imax + 1, 0, jmax + 1);
+    free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
 
     return 1;
 }
