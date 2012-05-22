@@ -10,7 +10,7 @@ int readParameters(int *xlength,                 /* reads domain size. Parameter
                    char *argv[])                 /* argv[1] shall contain the path to the config file */
 {
 
-    double W1 = 0;
+    double W1;
     double W2;
     double W3;
 
@@ -39,36 +39,26 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
     int i = 0;
     int pos = 0;
 
-    /* from 0 to 20 */
     for(z = 0; z < xlength + 2; ++z){
-        /* from 0 to 20 */
         for(y = 0; y < xlength + 2; ++y){
-            /* from 0 to 20 */
             for(x = 0; x < xlength + 2; ++x){
                 
-                pos = ( z*xlength*xlength + y*xlength + x ); 
+                pos = ( z*(xlength+2)*(xlength+2) + y*(xlength+2) + x ); 
                 /* 
                  * set NO_SLIP at the boundaries, MOVING_WALL on the top
                  * and FLUID everywhere else
                  */
-                if(x == 0 || x == Q - 1 || y == 0 || y == Q - 1 || z == 0){
-                    flagField[pos] = NO_SLIP; 
-                } else if(z == Q - 1){
+                if (z == xlength + 1) {
                     flagField[pos] = MOVING_WALL; 
+                } else if (x == 0 || x == xlength + 1 || y == 0 || y == xlength + 1 || z == 0) {
+                    flagField[pos] = NO_SLIP; 
                 } else {
                     flagField[pos] = FLUID; 
                 }
 
                 for(i = 0; i < Q; ++i){
-                    /* process only the fluid cells */
-                    /* TODO: the boundary values ?? */
-                    if(flagField[pos] == FLUID){
-                        collideField[Q * pos + i] = LATTICEWEIGHTS[i];
-                        streamField [Q * pos + i] = LATTICEWEIGHTS[i];
-                    } else {                        
-                        collideField[Q * pos + i] = LATTICEWEIGHTS[i];
-                        streamField [Q * pos + i] = LATTICEWEIGHTS[i];
-                    }
+                    collideField[Q * pos + i] = LATTICEWEIGHTS[i];
+                    streamField [Q * pos + i] = LATTICEWEIGHTS[i];
                 }
             }
         }

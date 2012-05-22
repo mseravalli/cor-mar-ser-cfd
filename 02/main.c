@@ -23,6 +23,7 @@ int main(int argc, char *argv[]){
     int t = 0;
     double* swap = NULL;
 
+    /* check if the arguments are correctly passed */
     if(argc < 2) {
         printf("you need to pass the configuration file as first argument\n");
     }
@@ -49,6 +50,7 @@ int main(int argc, char *argv[]){
 
     initialiseFields(collideField, streamField, flagField, xlength);
     
+    /* solve the lattice boltzmann problem */
     for(t = 0; t < timesteps; ++t){
         doStreaming(collideField, streamField, flagField, xlength);
         swap = collideField;

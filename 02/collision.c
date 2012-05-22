@@ -6,26 +6,28 @@ void computePostCollisionDistributions(double *currentCell, const double * const
     int i;
     for(i = 0; i < Q; i++)
     {
-        currentCell[i] = currentCell[i] - 1/ (*tau) * (currentCell[i] - feq[i]);
+        currentCell[i] = currentCell[i] - ((currentCell[i] - feq[i]) / (*tau)) ;
     }
 }
 
 void doCollision(double *collideField, int *flagField,const double * const tau,int xlength){
   int x, y, z;
+  int pos;
   double density, velocity[3], feq[Q];
   
-  for(x = 0; x < xlength+2; x++)
+  for(z = 0; z < xlength+2; z++)
   {
     for(y = 0; y < xlength+2; y++)
     {
-        for(z = 0; z < xlength+2; z++)
+        for(x = 0; x < xlength+2; x++)
         {
-            if(flagField[z*xlength*xlength + y*xlength + x] == FLUID)
+            pos = ( z*(xlength+2)*(xlength+2) + y*(xlength+2) + x ); 
+            if(flagField[pos]== FLUID)
             {
-                computeDensity(&collideField[Q*(z*xlength*xlength + y*xlength + x)], &density);
-                computeVelocity(&collideField[Q*(z*xlength*xlength + y*xlength + x)], &density, velocity);
+                computeDensity(&collideField[Q*pos], &density);
+                computeVelocity(&collideField[Q*pos], &density, velocity);
                 computeFeq(&density, velocity, feq);
-                computePostCollisionDistributions(&collideField[Q*(z*xlength*xlength + y*xlength + x)], tau, feq);
+                computePostCollisionDistributions(&collideField[Q*pos], tau, feq);
             }
         }
     }
