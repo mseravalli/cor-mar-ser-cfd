@@ -71,6 +71,8 @@ int main(int argn, char** args){
     double **F = NULL;
     double **G = NULL;
     double **RS = NULL;
+    int **Problem = NULL;
+    int **Flag = NULL;
     
     double t; 
     int n;
@@ -117,14 +119,14 @@ int main(int argn, char** args){
 
     U = matrix(0, imax + 1, 0, jmax + 1); 
     V = matrix(0, imax + 1, 0, jmax + 1); 
-    /*P = matrix(1, imax, 1, jmax);*/
     P = matrix(0, imax + 1, 0, jmax + 1);
     F = matrix(0, imax + 1, 0, jmax + 1);
     G = matrix(0, imax + 1, 0, jmax + 1);
-    RS = matrix(0, imax + 1, 0, jmax + 1); 
+    RS = matrix(0, imax + 1, 0, jmax + 1);
+    Flag = imatrix(0, imax + 1, 0, jmax + 1);
     init_uvp(UI, VI, PI, imax, jmax, U, V, P);
-
-    /*t_end = 1;*/
+    
+    Problem = read_pgm("geometry.pgm");
 
     while (t < t_end)
     {
