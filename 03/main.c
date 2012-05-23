@@ -187,6 +187,10 @@ int main(int argn, char** args){
                  
         boundaryvalues(imax,
                        jmax,
+                       wl,
+                       wr,
+                       wt,
+                       wb,
                        U,
                        V);
     
@@ -202,7 +206,12 @@ int main(int argn, char** args){
                  U,
                  V,
                  F,
-                 G);
+                 G,
+                 Flag,
+                 wl,
+                 wr,
+                 wt,
+                 wb);
         
         calculate_rs(dt,
                  dx,
@@ -238,7 +247,7 @@ int main(int argn, char** args){
                  jmax,
                  P,
                  RS,
-                 FLAG,
+                 Flag,
                  &res);
                  
             it++;
