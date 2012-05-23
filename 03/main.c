@@ -65,6 +65,11 @@ int main(int argn, char** args){
     double  eps;               /* accuracy bound for pressure*/
     double  dt_value;           /* time for output */              
 
+    int wl;
+    int wr;
+    int wt;
+    int wb;
+
     double **U = NULL;
     double **V = NULL;
     double **P = NULL;
@@ -112,6 +117,10 @@ int main(int argn, char** args){
                     &tau,    
                     &itermax,
                     &eps,    
+                    &wl,
+                    &wr,
+                    &wt,
+                    &wb,
                     &dt_value);
                     
     t = 0;
@@ -138,7 +147,10 @@ int main(int argn, char** args){
     
     if(init_flag(Problem, 4, 4, Flag) == 1)
     {
-        /*if there was a forbidden obstacle it returns an error, frees everything and finishes the program*/
+        /* 
+         * if there was a forbidden obstacle it returns an error, 
+         * frees everything and finishes the program
+         */
         printf("ERROR: Invalid obstacle in .pgm file\n");
 
         free_matrix(U, 0, imax + 1, 0, jmax + 1);
@@ -226,6 +238,7 @@ int main(int argn, char** args){
                  jmax,
                  P,
                  RS,
+                 FLAG,
                  &res);
                  
             it++;

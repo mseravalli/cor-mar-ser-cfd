@@ -9,7 +9,7 @@ void sor(
   int      jmax,
   double** P,
   double** RS,
-  double** FLAG,
+  int**    FLAG,
   double*  res
 ) {
   int i,j; 

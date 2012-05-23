@@ -59,6 +59,10 @@ int read_parameters(
   double *tau,
   int  *itermax,
   double *eps,
+  int *wl,
+  int *wr,
+  int *wt,
+  int *wb,
   double *dt_value
 );
 
