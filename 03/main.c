@@ -71,13 +71,14 @@ int main(int argn, char** args){
     double **F = NULL;
     double **G = NULL;
     double **RS = NULL;
+    int **Problem = NULL;
     int **Flag = NULL;
     
     double t; 
     int n;
     int it;
     double res;
-    
+
     int i;
     int j;
 
@@ -118,15 +119,47 @@ int main(int argn, char** args){
 
     U = matrix(0, imax + 1, 0, jmax + 1); 
     V = matrix(0, imax + 1, 0, jmax + 1); 
-    /*P = matrix(1, imax, 1, jmax);*/
     P = matrix(0, imax + 1, 0, jmax + 1);
     F = matrix(0, imax + 1, 0, jmax + 1);
     G = matrix(0, imax + 1, 0, jmax + 1);
     RS = matrix(0, imax + 1, 0, jmax + 1);
     Flag = imatrix(0, imax + 1, 0, jmax + 1);
     init_uvp(UI, VI, PI, imax, jmax, U, V, P);
+    
+    Problem = read_pgm("geometry.pgm");
+    
+    /*printf("Problem matrix\n");
+    for(i = 0; i<6; i++){
+        for(j = 0; j<6; j++){
+            printf("%d ", Problem[i][j]);
+        }
+        printf("\n");
+    }*/
+    
+    if(init_flag(Problem, 4, 4, Flag) == 1)
+    {
+        /*if there was a forbidden obstacle it returns an error, frees everything and finishes the program*/
+        printf("ERROR: Invalid obstacle in .pgm file\n");
 
-    /*t_end = 1;*/
+        free_matrix(U, 0, imax + 1, 0, jmax + 1);
+        free_matrix(V, 0, imax + 1, 0, jmax + 1);
+        free_matrix(P, 0, imax + 1, 0, jmax + 1);
+        free_matrix(F, 0, imax + 1, 0, jmax + 1);
+        free_matrix(G, 0, imax + 1, 0, jmax + 1);
+        free_matrix(RS, 0, imax + 1, 0, jmax + 1);
+        free_imatrix(Flag, 0, imax + 1, 0, jmax + 1);
+        free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
+
+        return 1;
+    }
+    
+    /*printf("Flag matrix\n");
+    for(i = 0; i<6; i++){
+        for(j = 0; j<6; j++){
+            printf("%d ", Flag[i][j]);
+        }
+        printf("\n");
+    }*/
 
     while (t < t_end)
     {
@@ -240,13 +273,14 @@ int main(int argn, char** args){
                           P);
 
 
-
     free_matrix(U, 0, imax + 1, 0, jmax + 1);
     free_matrix(V, 0, imax + 1, 0, jmax + 1);
     free_matrix(P, 0, imax + 1, 0, jmax + 1);
     free_matrix(F, 0, imax + 1, 0, jmax + 1);
     free_matrix(G, 0, imax + 1, 0, jmax + 1);
     free_matrix(RS, 0, imax + 1, 0, jmax + 1);
+    free_imatrix(Flag, 0, imax + 1, 0, jmax + 1);
+    free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
 
     return 1;
 }

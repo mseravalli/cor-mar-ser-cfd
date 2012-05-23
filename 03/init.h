@@ -77,5 +77,14 @@ void init_uvp(
   double **P
 );
 
+/**
+ * Initializes flag matrix
+**/
+int init_flag(
+    int **Problem,
+    int imax,
+    int jmax,
+    int **Flag
+);
 #endif
 

@@ -7,7 +7,8 @@ LDIR =../lib
 
 LIBS=-lm
 
-_DEPS = helper.h\
+_DEPS = constants.h\
+        helper.h\
 		init.h\
 		boundary_val.h\
 		uvp.h\

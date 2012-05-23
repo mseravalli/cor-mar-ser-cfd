@@ -17,8 +17,13 @@ void calculate_fg(
   double **U,
   double **V,
   double **F,
-  double **G
-)
+  double **G,
+  int **Flag,
+  int wl,
+  int wr,
+  int wt,
+  int wb
+) 
 {
     
     /******** VARIABLE DECLARATION START ********/
@@ -39,12 +44,14 @@ void calculate_fg(
     int i;
     int j;
 
+    int C_F = 0;
+
     /******** VARIABLE DECLARATION END ********/
 
 
     /******** CALCULATE F START ********/
     
-    boundaryvalues(imax, jmax, U, V);
+    boundaryvalues(imax, jmax, wl, wr, wt, wb, U, V);
 
     /******** Calculate the single derivatives ********/
 
@@ -54,6 +61,9 @@ void calculate_fg(
     {
         for(j = 1; j <= jmax; j++)
         {
+
+            if (Flag[i][j]== C_F)
+            {
 
             /* du2dx */
             firstOperand = ( 1 / dx) *
@@ -82,6 +92,9 @@ void calculate_fg(
             d2udy2 = (U[i][j+1] - 2*U[i][j] + U[i][j-1]) / pow(dy,2);
 
             F[i][j] = U[i][j] + dt * ( (1/Re) * (d2udx2 + d2udy2 ) - du2dx - duvdy + GX );
+            } 
+
+            /**TODO B_xx**/
         }
     }
 
@@ -90,7 +103,7 @@ void calculate_fg(
 
     /******** CALCULATE G START ********/
 
-    boundaryvalues(imax, jmax, U, V);
+    boundaryvalues(imax, jmax, wl, wr, wt, wb, U, V);
 
     /******** Calculate G ********/
 
@@ -98,6 +111,9 @@ void calculate_fg(
     {
         for(j = 1; j <= jmax-1; j++)
         {
+
+            if (Flag[i][j]==C_F)
+            {
 
            /* dv2dy */ 
             firstOperand = ( 1 / dy) *
@@ -127,6 +143,9 @@ void calculate_fg(
             d2vdy2 = (V[i][j+1] - 2*V[i][j] + V[i][j-1]) / pow(dy,2);
 
             G[i][j] = V[i][j] + dt * ( (1/Re) * ( d2vdx2 + d2vdy2 ) - duvdx - dv2dy + GY);
+            }
+
+            /** TODO B_xx **/
         }
     }
 
