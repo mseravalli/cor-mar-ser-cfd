@@ -104,6 +104,16 @@ int init_flag(
     int **Flag)
 {
     int i, j;
+
+    /* 
+     * normalize the values of the matrix, this could be deleted if we are sure
+     * that the given matrix contains only 0 or 1
+     */
+    for (i = 1; i < imax+1; i++) {
+        for (j = 1; j < jmax+1; j++) {
+            Problem[i][j] /= (Problem[i][j] != 0 ? Problem[i][j] : 1);
+        }
+    }
     
     for(i = 1; i < imax+1; i++)
     {
