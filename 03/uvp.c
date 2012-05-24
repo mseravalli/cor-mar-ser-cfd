@@ -297,7 +297,8 @@ void calculate_uv(
   double **V,
   double **F,
   double **G,
-  double **P
+  double **P,
+  int **Flag
 )
 {
     int i, j;
@@ -312,7 +313,9 @@ void calculate_uv(
     {
         for(j = 1; j < jmax+1; j++)
         {
-            U[i][j] = F[i][j] - dtodx*(P[i+1][j] - P[i][j]);
+            if (Flag[i][j] == C_F){
+                 U[i][j] = F[i][j] - dtodx*(P[i+1][j] - P[i][j]);
+            }
         }
     }
 
@@ -321,7 +324,9 @@ void calculate_uv(
     {
         for(j = 1; j < jmax; j++)
         {
-            V[i][j] = G[i][j] - dtody*(P[i][j+1] - P[i][j]);
+            if (Flag[i][j] == C_F ){
+                V[i][j] = G[i][j] - dtody*(P[i][j+1] - P[i][j]);
+            }
         }
     }
 }
@@ -334,7 +339,8 @@ void calculate_rs(
   int jmax,
   double **F,
   double **G,
-  double **RS
+  double **RS,
+  int **Flag
 )
 {
     int i, j;
@@ -345,7 +351,9 @@ void calculate_rs(
     {
         for(j = 1; j <= jmax; j++)
         {
-            RS[i][j]= 1/dt*((F[i][j]-F[i-1][j])/dx+(G[i][j]-G[i][j-1])/dy);
+            if (Flag[i][j] == C_F){
+                RS[i][j]= 1/dt*((F[i][j]-F[i-1][j])/dx+(G[i][j]-G[i][j-1])/dy);
             }
         }
+     }
 }

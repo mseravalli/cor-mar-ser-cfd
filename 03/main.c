@@ -220,7 +220,8 @@ int main(int argn, char** args){
                  jmax,
                  F,
                  G,
-                 RS);
+                 RS,
+                 Flag);
                  
         it = 0;
         res = eps + 1;
@@ -262,7 +263,8 @@ int main(int argn, char** args){
                  V,
                  F,
                  G,
-                 P);
+                 P,
+                 Flag);
 
         if(write)
             write_vtkFile("files/file",
