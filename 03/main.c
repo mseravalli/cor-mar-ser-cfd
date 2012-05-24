@@ -70,6 +70,8 @@ int main(int argn, char** args){
     int wt;
     int wb;
 
+    char problemName[64];
+
     double **U = NULL;
     double **V = NULL;
     double **P = NULL;
@@ -121,21 +123,14 @@ int main(int argn, char** args){
                     &wr,
                     &wt,
                     &wb,
-                    &dt_value);
+                    &dt_value,
+                    problemName);
                     
     t = 0;
     n = 0;
 
-    U = matrix(0, imax + 1, 0, jmax + 1); 
-    V = matrix(0, imax + 1, 0, jmax + 1); 
-    P = matrix(0, imax + 1, 0, jmax + 1);
-    F = matrix(0, imax + 1, 0, jmax + 1);
-    G = matrix(0, imax + 1, 0, jmax + 1);
-    RS = matrix(0, imax + 1, 0, jmax + 1);
-    Flag = imatrix(0, imax + 1, 0, jmax + 1);
-    init_uvp(UI, VI, PI, imax, jmax, U, V, P);
     
-    Problem = read_pgm("geometry.pgm");
+    Problem = read_pgm(problemName, &imax, &jmax);
     
     /*printf("Problem matrix\n");
     for(i = 0; i<6; i++){
@@ -145,7 +140,9 @@ int main(int argn, char** args){
         printf("\n");
     }*/
     
-    if(init_flag(Problem, 4, 4, Flag) == 1)
+    Flag = imatrix(0, imax + 1, 0, jmax + 1);
+
+    if(init_flag(Problem, imax, jmax, Flag) == 1)
     {
         /* 
          * if there was a forbidden obstacle it returns an error, 
@@ -153,25 +150,29 @@ int main(int argn, char** args){
          */
         printf("ERROR: Invalid obstacle in .pgm file\n");
 
-        free_matrix(U, 0, imax + 1, 0, jmax + 1);
-        free_matrix(V, 0, imax + 1, 0, jmax + 1);
-        free_matrix(P, 0, imax + 1, 0, jmax + 1);
-        free_matrix(F, 0, imax + 1, 0, jmax + 1);
-        free_matrix(G, 0, imax + 1, 0, jmax + 1);
-        free_matrix(RS, 0, imax + 1, 0, jmax + 1);
-        free_imatrix(Flag, 0, imax + 1, 0, jmax + 1);
         free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
+        free_imatrix(Flag, 0, imax + 1, 0, jmax + 1);
 
         return 1;
     }
+
+    U = matrix(0, imax + 1, 0, jmax + 1); 
+    V = matrix(0, imax + 1, 0, jmax + 1); 
+    P = matrix(0, imax + 1, 0, jmax + 1);
+    F = matrix(0, imax + 1, 0, jmax + 1);
+    G = matrix(0, imax + 1, 0, jmax + 1);
+    RS = matrix(0, imax + 1, 0, jmax + 1);
+    init_uvp(UI, VI, PI, imax, jmax, U, V, P);
     
-    /*printf("Flag matrix\n");
-    for(i = 0; i<6; i++){
-        for(j = 0; j<6; j++){
-            printf("%d ", Flag[i][j]);
+    /*
+    printf("Flag matrix\n");
+    for(i = 0; i<=imax+1; i++){
+        for(j = 0; j<=jmax+1; j++){
+            printf("%2i ", Flag[i][j]);
         }
         printf("\n");
-    }*/
+    }
+    */
 
     while (t < t_end)
     {
