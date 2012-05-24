@@ -2,7 +2,7 @@
 #include "helper.h"
 #include "uvp.h"
 #include <math.h>
-
+#include "constants.h"
 
 void calculate_fg(
   double Re,
@@ -44,7 +44,6 @@ void calculate_fg(
     int i;
     int j;
 
-    int C_F = 0;
 
     /******** VARIABLE DECLARATION END ********/
 
@@ -62,7 +61,8 @@ void calculate_fg(
         for(j = 1; j <= jmax; j++)
         {
 
-            if (Flag[i][j]== C_F)
+            /* Fluid */
+            if (Flag[i][j]>= C_F)
             {
 
             /* du2dx */
@@ -92,9 +92,81 @@ void calculate_fg(
             d2udy2 = (U[i][j+1] - 2*U[i][j] + U[i][j-1]) / pow(dy,2);
 
             F[i][j] = U[i][j] + dt * ( (1/Re) * (d2udx2 + d2udy2 ) - du2dx - duvdy + GX );
-            } 
+            }
+            
+            /* Boundary */
+            else if (Flag[i][j] == B_N)
+            {
+                V[i][j]=0;
+                U[i-1][j]=-1.0*U[i-1][j+1];
+                U[i][j]=-1.0*U[i][j+1];
+                G[i][j]=V[i][j];
+            }
+            
+            else if (Flag[i][j] == B_W)
+            {
+                U[i-1][j]=0;
+                V[i][j]=-1.0*V[i-1][j];
+                V[i][j-1]=-1.0*V[i-1][j-1];
+                F[i-1][j]=U[i-1][j];
+            }
 
-            /**TODO B_xx**/
+            else if (Flag[i][j] == B_S)
+            {
+                V[i][j-1]=0;
+                U[i-1][j]=-1.0*U[i-1][j-1];
+                U[i][j]=-1.0*U[i][j-1];
+                G[i][j-1]=V[i][j-1];
+            }
+
+            else if (Flag[i][j] == B_O)
+            {
+                U[i][j]=0;
+                V[i][j]=-1.0*V[i+1][j];
+                V[i][j-1]=-1.0*V[i+1][j-1];
+                F[i][j]=U[i][j];
+            }
+
+            else if (Flag[i][j] == B_NO) 
+            {
+                U[i][j]=0;
+                V[i][j]=0;
+                U[i-1][j]=-1.0*U[i-1][j+1];
+                V[i][j-1]=-1.0*V[i+1][j-1];
+                F[i][j]=U[i][j];
+                G[i][j]=V[i][j];
+            }
+
+            else if (Flag[i][j] == B_NW) 
+            {
+                U[i-1][j]=0;
+                V[i][j]=0;
+                U[i][j]=-1.0*U[i][j+1];
+                V[i][j-1]=-1.0*V[i-1][j-1];
+                F[i-1][j]=U[i][j];
+                G[i][j]=V[i][j];
+            }
+
+            else if (Flag[i][j] == B_SO) 
+            {
+                U[i][j]=0;
+                V[i][j-1]=0;
+                U[i-1][j]=-1.0*U[i-1][j-1];
+                V[i][j]=-1.0*V[i+1][j];
+                F[i][j]=U[i][j];
+                G[i][j-1]=V[i][j-1];
+            }
+
+            else if (Flag[i][j] == B_SW) 
+            {
+                U[i-1][j]=0;
+                V[i][j-1]=0;
+                U[i][j]=-1.0*U[i][j-1];
+                V[i][j]=-1.0*V[i-1][j];
+                F[i-1][j]=U[i-1][j];
+                G[i][j-1]=V[i][j-1];
+            }
+
         }
     }
 
@@ -111,6 +183,8 @@ void calculate_fg(
     {
         for(j = 1; j <= jmax-1; j++)
         {
+            
+            /* Fluid */
 
             if (Flag[i][j]==C_F)
             {
@@ -145,7 +219,7 @@ void calculate_fg(
             G[i][j] = V[i][j] + dt * ( (1/Re) * ( d2vdx2 + d2vdy2 ) - duvdx - dv2dy + GY);
             }
 
-            /** TODO B_xx **/
+            /** Cells that correspond with "Boundary" (i.e. B_O, etc) are calculated in the F loop **/
         }
     }
 
