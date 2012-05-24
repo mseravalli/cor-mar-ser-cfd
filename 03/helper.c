@@ -422,7 +422,7 @@ void init_imatrix( int **m, int nrl, int nrh, int ncl, int nch, int a)
 }
 
 
-int **read_pgm(const char *filename)
+int **read_pgm( const char *filename, int* imax, int* jmax )
 {
     FILE *input = NULL;
     char line[1024];
@@ -480,7 +480,7 @@ int **read_pgm(const char *filename)
 	        else
 	        {
 		        pic[i1][ysize+1-j1] = byte;
-		        printf("%d,%d: %d\n", i1,ysize+1-j1,byte);
+		        /* printf("%d,%d: %d\n", i1,ysize+1-j1,byte); */
 	        }
 	     }
     }
@@ -500,6 +500,9 @@ int **read_pgm(const char *filename)
 
     /* close file */
     fclose(input);
+
+    *imax = xsize;
+    *jmax = ysize;
     
     return pic;
 }
