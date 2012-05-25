@@ -5,6 +5,7 @@
 #include "boundary_val.h"
 #include "sor.h"
 #include <stdio.h>
+#include <string.h>
 
 
 /**
@@ -70,7 +71,7 @@ int main(int argn, char** args){
     int wt;
     int wb;
 
-    char problemName[64];
+    char fileName[64];
 
     double **U = NULL;
     double **V = NULL;
@@ -78,6 +79,7 @@ int main(int argn, char** args){
     double **F = NULL;
     double **G = NULL;
     double **RS = NULL;
+    char* problem = NULL;
     int **Problem = NULL;
     int **Flag = NULL;
     
@@ -89,15 +91,18 @@ int main(int argn, char** args){
     int i;
     int j;
 
-    char write = 1;
-
-    if(argn > 1)
+    if(argn <= 1)
     {
-        if(args[1][0] == 0x30)
-            write = 0;
-        else
-            write = 1;
+        printf("ERROR: you need to specify a problem (karman, plane, step)");
+    } else {
+        if( !(   strcmp(args[1], "karman") == 0 
+              || strcmp(args[1], "plane")  == 0
+              || strcmp(args[1], "step")   == 0)){
+            printf("ERROR: the passed argument was different from karman, plane or step");
+        }
     }
+
+    strcpy(problem, args[1]);
 
     read_parameters(szFileName,
                     &Re,     
@@ -123,14 +128,14 @@ int main(int argn, char** args){
                     &wr,
                     &wt,
                     &wb,
-                    &dt_value,
-                    problemName);
+                    &dt_value);
                     
     t = 0;
     n = 0;
 
-    
-    Problem = read_pgm(problemName, &imax, &jmax);
+    strcpy(fileName, problem);
+    strcat(fileName, ".pgm");
+    Problem = read_pgm(fileName, &imax, &jmax);
     
     /*printf("Problem matrix\n");
     for(i = 0; i<6; i++){
@@ -193,8 +198,21 @@ int main(int argn, char** args){
                        wt,
                        wb,
                        U,
-                       V);
-    
+                       V,
+                       F,
+                       G,
+                       Flag);
+
+        spec_boundary_val(problem,
+                          imax,
+                          jmax,
+                          dx,
+                          dy,
+                          Re,
+                          U,
+                          V,
+                          P);
+
         calculate_fg(Re,
                  GX,
                  GY,
@@ -267,7 +285,7 @@ int main(int argn, char** args){
                  P,
                  Flag);
 
-        if(write)
+        if( ((int)(t*1000)) % ((int)(1000*t_end / 20)) )
             write_vtkFile("files/file",
 		                  n,
 		                  xlength,
@@ -284,18 +302,17 @@ int main(int argn, char** args){
         n++;
     }
 
-    if(write)
-        write_vtkFile("files/file",
-		                  n,
-		                  xlength,
-                          ylength,
-                          imax,
-                          jmax,
-                		  dx,
-		                  dy,
-                          U,
-                          V,
-                          P);
+    write_vtkFile("files/file",
+		          n,
+		          xlength,
+                  ylength,
+                  imax,
+                  jmax,
+                  dx,
+		          dy,
+                  U,
+                  V,
+                  P);
 
 
     free_matrix(U, 0, imax + 1, 0, jmax + 1);

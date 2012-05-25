@@ -13,7 +13,10 @@ void boundaryvalues(
   int wt,
   int wb,
   double **U,
-  double **V
+  double **V,
+  double **F,
+  double **G,
+  int **Flag
 );
 
 /*Set special boundary*/
@@ -22,8 +25,12 @@ void spec_boundary_val(
     char *problem,
     int imax,
     int jmax,
+    double dx,
+    double dy,
+    double Re,
     double **U,
-    double **V
+    double **V,
+    double **P
 );
 
 #endif

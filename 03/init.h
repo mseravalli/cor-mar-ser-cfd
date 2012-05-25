@@ -63,8 +63,7 @@ int read_parameters(
   int *wr,
   int *wt,
   int *wb,
-  double *dt_value,
-  char *problemName
+  double *dt_value
 );
 
 /**

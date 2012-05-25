@@ -27,8 +27,7 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     int    *wr,
                     int    *wt,
                     int    *wb,
-        		    double *dt_value,
-                    char   *problemName)           /* time for output */
+        		    double *dt_value)           /* time for output */
 {
    READ_DOUBLE( szFileName, *xlength );
    READ_DOUBLE( szFileName, *ylength );
@@ -60,8 +59,6 @@ int read_parameters( const char *szFileName,       /* name of the file */
    READ_DOUBLE( szFileName, *GX );
    READ_DOUBLE( szFileName, *GY );
    READ_DOUBLE( szFileName, *PI );
-
-   READ_STRING( szFileName, problemName );
 
    *dx = *xlength / (double)(*imax);
    *dy = *ylength / (double)(*jmax);
