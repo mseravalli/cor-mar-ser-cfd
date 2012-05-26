@@ -166,7 +166,8 @@ void calculate_dt(
   int imax,
   int jmax,
   double **U,
-  double **V
+  double **V,
+  int **Flag
 )
 {
     double umax = 0;
@@ -181,10 +182,12 @@ void calculate_dt(
     {
         for(j = 0; j < jmax; j++)
         {
-            if(umax < U[i][j])
-                umax = U[i][j];
-            if(vmax < V[i][j])
-                vmax = V[i][j];
+            if(Flag[i][j] >= C_F){
+                if(umax < U[i][j])
+                    umax = U[i][j];
+                if(vmax < V[i][j])
+                    vmax = V[i][j];
+            }
         }
     }
 

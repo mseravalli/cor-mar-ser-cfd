@@ -79,7 +79,7 @@ int main(int argn, char** args){
     double **F = NULL;
     double **G = NULL;
     double **RS = NULL;
-    char* problem = NULL;
+    char problem[64];
     int **Problem = NULL;
     int **Flag = NULL;
     
@@ -93,12 +93,14 @@ int main(int argn, char** args){
 
     if(argn <= 1)
     {
-        printf("ERROR: you need to specify a problem (karman, plane, step)");
+        printf("ERROR: you need to specify a problem (karman, plane, step)\n");
+        return 1;
     } else {
         if( !(   strcmp(args[1], "karman") == 0 
               || strcmp(args[1], "plane")  == 0
               || strcmp(args[1], "step")   == 0)){
-            printf("ERROR: the passed argument was different from karman, plane or step");
+            printf("ERROR: the passed argument was different from karman, plane or step\n");
+            return 1;
         }
     }
 
@@ -136,6 +138,8 @@ int main(int argn, char** args){
     strcpy(fileName, problem);
     strcat(fileName, ".pgm");
     Problem = read_pgm(fileName, &imax, &jmax);
+    dx = xlength / (double)(imax);
+    dy = ylength / (double)(jmax);
     
     /*printf("Problem matrix\n");
     for(i = 0; i<6; i++){
@@ -189,7 +193,8 @@ int main(int argn, char** args){
                  imax,
                  jmax,
                  U,
-                 V);
+                 V,
+                 Flag);
                  
         boundaryvalues(imax,
                        jmax,
@@ -285,7 +290,8 @@ int main(int argn, char** args){
                  P,
                  Flag);
 
-        if( ((int)(t*1000)) % ((int)(1000*t_end / 20)) )
+        if( ((int)t) % ((int)dt_value) == 0 
+            && t > n*dt_value){
             write_vtkFile("files/file",
 		                  n,
 		                  xlength,
@@ -297,9 +303,10 @@ int main(int argn, char** args){
                           U,
                           V,
                           P);
+            n++;
+        }
 
         t += dt;
-        n++;
     }
 
     write_vtkFile("files/file",
@@ -324,7 +331,7 @@ int main(int argn, char** args){
     free_imatrix(Flag, 0, imax + 1, 0, jmax + 1);
     free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
 
-    return 1;
+    return 0;
 }
 
 
