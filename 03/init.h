@@ -77,6 +77,7 @@ void init_uvp(
   double PI,
   int imax,
   int jmax,
+  char* problem,
   double **U,
   double **V,
   double **P

@@ -232,9 +232,9 @@ void spec_boundary_val(
             V[0][j] = 0.0;
         }
     } else if (strcmp(problem, "plane") == 0) {
+        dpdx = (deltaP) / dx;
         for(j = 1; j <= jmax; ++j)
         {
-            dpdx = (deltaP) / dx;
             U[0][j] = -0.5 * Re * (j - 1)*dy * (j - jmax)*dy * dpdx;
             V[0][j] = 0.0;
         }

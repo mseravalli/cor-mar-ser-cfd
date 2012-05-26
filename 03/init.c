@@ -82,13 +82,23 @@ void init_uvp(  double UI,
                 double PI,
                 int imax,
                 int jmax,
+                char* problem,
                 double **U,
                 double **V,
                 double **P)
 {
+    
+    int i ,j;
 
     /* initialize the matrices */
     init_matrix(U, 0, imax + 1, 0, jmax + 1, UI);
+    if (strcmp(problem, "step") == 0) {
+        for (i = 0; i <=imax + 1; ++i) {
+            for (j = 0; j < jmax/2; ++j) {
+                U[i][j] = 0;
+            }
+        }
+    }
     
     init_matrix(V, 0, imax + 1, 0, jmax + 1, VI);
     
