@@ -43,7 +43,6 @@
  */
 int main(int argn, char** args){
 
-    const char *szFileName = "cavity100.dat";       /* name of the file */
     double  Re;                /* reynolds number   */          
     double  UI;                /* velocity x-direction */
     double  VI;                /* velocity y-direction */
@@ -71,7 +70,10 @@ int main(int argn, char** args){
     int wt;
     int wb;
 
-    char fileName[64];
+    double deltaP;
+
+    char imageName[64];
+    char cavityFile[64];
 
     double **U = NULL;
     double **V = NULL;
@@ -106,7 +108,10 @@ int main(int argn, char** args){
 
     strcpy(problem, args[1]);
 
-    read_parameters(szFileName,
+    strcpy(cavityFile, problem);
+    strcat(cavityFile, "_cavity.dat");
+
+    read_parameters(cavityFile,
                     &Re,     
                     &UI,     
                     &VI,     
@@ -130,14 +135,15 @@ int main(int argn, char** args){
                     &wr,
                     &wt,
                     &wb,
-                    &dt_value);
+                    &dt_value,
+                    &deltaP);
                     
     t = 0;
     n = 0;
 
-    strcpy(fileName, problem);
-    strcat(fileName, ".pgm");
-    Problem = read_pgm(fileName, &imax, &jmax);
+    strcpy(imageName, problem);
+    strcat(imageName, ".pgm");
+    Problem = read_pgm(imageName, &imax, &jmax);
     dx = xlength / (double)(imax);
     dy = ylength / (double)(jmax);
     
@@ -214,6 +220,7 @@ int main(int argn, char** args){
                           dx,
                           dy,
                           Re,
+                          deltaP,
                           U,
                           V,
                           P);

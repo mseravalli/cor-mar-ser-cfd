@@ -28,6 +28,7 @@ void spec_boundary_val(
     double dx,
     double dy,
     double Re,
+    double deltaP,
     double **U,
     double **V,
     double **P
