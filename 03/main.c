@@ -177,7 +177,7 @@ int main(int argn, char** args){
     F = matrix(0, imax + 1, 0, jmax + 1);
     G = matrix(0, imax + 1, 0, jmax + 1);
     RS = matrix(0, imax + 1, 0, jmax + 1);
-    init_uvp(UI, VI, PI, imax, jmax, U, V, P);
+    init_uvp(UI, VI, PI, imax, jmax, problem, U, V, P);
     
     /*
     printf("Flag matrix\n");
