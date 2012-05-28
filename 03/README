@@ -1,0 +1,8 @@
+Worksheet 3
+
+to compile the file simply run $make in the main folder
+
+The three different simulations can be started by the following arguments
+karman, plane and step.
+
+The vtk files will be stored in the files directory

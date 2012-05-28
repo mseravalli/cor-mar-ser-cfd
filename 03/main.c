@@ -147,14 +147,6 @@ int main(int argn, char** args){
     dx = xlength / (double)(imax);
     dy = ylength / (double)(jmax);
     
-    /*printf("Problem matrix\n");
-    for(i = 0; i<6; i++){
-        for(j = 0; j<6; j++){
-            printf("%d ", Problem[i][j]);
-        }
-        printf("\n");
-    }*/
-    
     Flag = imatrix(0, imax + 1, 0, jmax + 1);
 
     if(init_flag(Problem, imax, jmax, Flag) == 1)
@@ -179,16 +171,6 @@ int main(int argn, char** args){
     RS = matrix(0, imax + 1, 0, jmax + 1);
     init_uvp(UI, VI, PI, imax, jmax, problem, U, V, P);
     
-    /*
-    printf("Flag matrix\n");
-    for(i = 0; i<=imax+1; i++){
-        for(j = 0; j<=jmax+1; j++){
-            printf("%2i ", Flag[i][j]);
-        }
-        printf("\n");
-    }
-    */
-
     while (t < t_end)
     {
         calculate_dt(Re,

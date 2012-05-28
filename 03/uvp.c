@@ -89,8 +89,6 @@ void calculate_fg(
                 F[i][j] = U[i][j] + dt * ( (1/Re) * (d2udx2 + d2udy2 ) - du2dx - duvdy + GX );
             }
             
-            /* Boundary */
-
         }
     }
 
