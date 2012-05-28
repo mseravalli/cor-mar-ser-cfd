@@ -194,6 +194,7 @@ int main(int argn, char** args){
                        V,
                        F,
                        G,
+                       P,
                        Flag);
 
         spec_boundary_val(problem,
@@ -241,7 +242,7 @@ int main(int argn, char** args){
         
         while (it < itermax && res > eps)
         {
-            for (i = 1; i<=imax;i++)
+/*            for (i = 1; i<=imax;i++)
             {
                 P[i][0]= P[i][1];
                 P[i][jmax+1]= P[i][jmax];
@@ -251,7 +252,7 @@ int main(int argn, char** args){
             {
                 P[0][j]= P[1][j];
                 P[imax+1][j]= P[imax][j];
-            }
+            }*/
 
              sor(
                  omg,
@@ -259,10 +260,12 @@ int main(int argn, char** args){
                  dy,
                  imax,
                  jmax,
+                 deltaP,
                  P,
                  RS,
                  Flag,
-                 &res);
+                 &res,
+                 problem);
                  
             it++;
         }

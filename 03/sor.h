@@ -14,10 +14,12 @@ void sor(
   double   dy,
   int      imax,
   int      jmax,
+  double deltaP,
   double** P,
   double** RS,
   int**    FLAG,
-  double*  res
+  double*  res,
+  char* problem
 );
 
 

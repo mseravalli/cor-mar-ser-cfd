@@ -104,7 +104,7 @@ void calculate_fg(
         for(j = 1; j <= jmax-1; j++)
         {
             /* Fluid */
-            if (Flag[i][j]==C_F)
+            if (Flag[i][j]>=C_F)
             {
                /* dv2dy */ 
                 firstOperand = ( 1 / dy) *
@@ -231,7 +231,7 @@ void calculate_uv(
     {
         for(j = 1; j < jmax+1; j++)
         {
-            if (Flag[i][j] == C_F){
+            if (Flag[i][j] >= C_F){
                  U[i][j] = F[i][j] - dtodx*(P[i+1][j] - P[i][j]);
             }
         }
@@ -242,7 +242,7 @@ void calculate_uv(
     {
         for(j = 1; j < jmax; j++)
         {
-            if (Flag[i][j] == C_F ){
+            if (Flag[i][j] >= C_F ){
                 V[i][j] = G[i][j] - dtody*(P[i][j+1] - P[i][j]);
             }
         }
@@ -269,7 +269,7 @@ void calculate_rs(
     {
         for(j = 1; j <= jmax; j++)
         {
-            if (Flag[i][j] == C_F){
+            if (Flag[i][j] >= C_F){
                 RS[i][j]= 1/dt*((F[i][j]-F[i-1][j])/dx+(G[i][j]-G[i][j-1])/dy);
             }
         }

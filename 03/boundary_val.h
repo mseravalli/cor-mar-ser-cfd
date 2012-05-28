@@ -16,6 +16,7 @@ void boundaryvalues(
   double **V,
   double **F,
   double **G,
+  double **P,
   int **Flag
 );
 
