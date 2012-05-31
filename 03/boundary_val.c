@@ -139,7 +139,6 @@ void boundaryvalues(
                 U[i-1][j]=-1.0*U[i-1][j+1];
                 U[i][j]=-1.0*U[i][j+1];
                 G[i][j]=V[i][j];
-                P[i][j]=P[i][j+1];
             }
             
             else if (Flag[i][j] == B_W)
@@ -148,7 +147,6 @@ void boundaryvalues(
                 V[i][j]=-1.0*V[i-1][j];
                 V[i][j-1]=-1.0*V[i-1][j-1];
                 F[i-1][j]=U[i-1][j];
-                P[i][j]=P[i-1][j];
             }
 
             else if (Flag[i][j] == B_S)
@@ -157,7 +155,6 @@ void boundaryvalues(
                 U[i-1][j]=-1.0*U[i-1][j-1];
                 U[i][j]=-1.0*U[i][j-1];
                 G[i][j-1]=V[i][j-1];
-                P[i][j]=P[i][j-1];
             }
 
             else if (Flag[i][j] == B_O)
@@ -166,7 +163,6 @@ void boundaryvalues(
                 V[i][j]=-1.0*V[i+1][j];
                 V[i][j-1]=-1.0*V[i+1][j-1];
                 F[i][j]=U[i][j];
-                P[i][j]=P[i+1][j];
             }
 
             else if (Flag[i][j] == B_NO) 
@@ -177,7 +173,6 @@ void boundaryvalues(
                 V[i][j-1]=-1.0*V[i+1][j-1];
                 F[i][j]=U[i][j];
                 G[i][j]=V[i][j];
-                P[i][j]=(P[i+1][j]+P[i][j+1])/2;
             }
 
             else if (Flag[i][j] == B_NW) 
@@ -186,9 +181,8 @@ void boundaryvalues(
                 V[i][j]=0;
                 U[i][j]=-1.0*U[i][j+1];
                 V[i][j-1]=-1.0*V[i-1][j-1];
-                F[i-1][j]=U[i][j];
+                F[i-1][j]=U[i-1][j];
                 G[i][j]=V[i][j];
-                P[i][j]=(P[i-1][j]+P[i][j+1])/2;
             }
 
             else if (Flag[i][j] == B_SO) 
@@ -199,7 +193,6 @@ void boundaryvalues(
                 V[i][j]=-1.0*V[i+1][j];
                 F[i][j]=U[i][j];
                 G[i][j-1]=V[i][j-1];
-                P[i][j]=(P[i+1][j]+P[i][j-1])/2;
             }
 
             else if (Flag[i][j] == B_SW) 
@@ -210,7 +203,6 @@ void boundaryvalues(
                 V[i][j]=-1.0*V[i-1][j];
                 F[i-1][j]=U[i-1][j];
                 G[i][j-1]=V[i][j-1];
-                P[i][j]=(P[i-1][j]+P[i][j-1])/2;
             }
         }
     }
@@ -240,14 +232,6 @@ void spec_boundary_val(
             U[0][j] = 1.0;
             V[0][j] = 0.0;
         }
-    } else if (strcmp(problem, "plane") == 0) {
-        dpdx = (deltaP) / dx;
-        for(j = 1; j <= jmax; ++j)
-        {
-            U[0][j] = -0.5 * Re * (j - 1)*dy * (j - jmax)*dy * dpdx;
-            V[0][j] = 0.0;
-        }
-        
     }
 
 }
