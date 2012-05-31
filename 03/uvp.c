@@ -44,7 +44,6 @@ void calculate_fg(
     int i;
     int j;
 
-
     /******** VARIABLE DECLARATION END ********/
 
 
@@ -58,7 +57,7 @@ void calculate_fg(
         {
 
             /* Fluid */
-            if (Flag[i][j]>= C_F)
+            if (Flag[i][j]>= C_F && Flag[i+1][j]>= C_F)
             {
                 /* du2dx */
                 firstOperand = ( 1 / dx) *
@@ -91,7 +90,7 @@ void calculate_fg(
             
         }
     }
-
+    
     /******** CALCULATE F END ********/
     
 
@@ -104,7 +103,7 @@ void calculate_fg(
         for(j = 1; j <= jmax-1; j++)
         {
             /* Fluid */
-            if (Flag[i][j]>=C_F)
+            if (Flag[i][j]>=C_F && Flag[i][j+1]>=C_F)
             {
                /* dv2dy */ 
                 firstOperand = ( 1 / dy) *
@@ -231,7 +230,7 @@ void calculate_uv(
     {
         for(j = 1; j < jmax+1; j++)
         {
-            if (Flag[i][j] >= C_F){
+            if (Flag[i][j] >= C_F && Flag[i+1][j] >= C_F){
                  U[i][j] = F[i][j] - dtodx*(P[i+1][j] - P[i][j]);
             }
         }
@@ -242,7 +241,7 @@ void calculate_uv(
     {
         for(j = 1; j < jmax; j++)
         {
-            if (Flag[i][j] >= C_F ){
+            if (Flag[i][j] >= C_F && Flag[i][j+1] >= C_F){
                 V[i][j] = G[i][j] - dtody*(P[i][j+1] - P[i][j]);
             }
         }
