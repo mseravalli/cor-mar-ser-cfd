@@ -242,17 +242,6 @@ int main(int argn, char** args){
         
         while (it < itermax && res > eps)
         {
-/*            for (i = 1; i<=imax;i++)
-            {
-                P[i][0]= P[i][1];
-                P[i][jmax+1]= P[i][jmax];
-            }
-            
-            for (j = 1; j<=jmax;j++)
-            {
-                P[0][j]= P[1][j];
-                P[imax+1][j]= P[imax][j];
-            }*/
 
              sor(
                  omg,
