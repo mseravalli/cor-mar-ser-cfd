@@ -230,7 +230,7 @@ void spec_boundary_val(
         for(j = 1; j <= jmax; ++j)
         {
             U[0][j] = 1.0;
-            V[0][j] = 0.0;
+            V[0][j] = -V[1][j];
         }
     }
 
