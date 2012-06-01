@@ -15,7 +15,7 @@ void Programm_Sync(char *txt);
 void Programm_Stop(char *txt);
 /* all processes will produce a text output, be synchronized and finished */
 
-void init parallel (int iproc,
+void init_parallel(int iproc,
                     int jproc,
                     int imax,
                     int jmax,
@@ -34,7 +34,7 @@ void init parallel (int iproc,
 
 
 /* Exchanges pressure between nighbouring processes */
-void pressure comm(double **P,
+void pressure_comm(double **P,
                    int il,
                    int ir,
                    int jb,
@@ -49,7 +49,7 @@ void pressure comm(double **P,
                    int chunk);
 
 /* Exchanges velocities between nighbouring processes */
-void uv comm (double **U,
+void uv_comm(double **U,
               double **V,
               int il,
               int ir,
