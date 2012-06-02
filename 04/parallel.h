@@ -2,6 +2,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/* definition of the MPI messagess */
+#define OMGI   10
+#define OMGJ   20
+
+#define NBL    110
+#define NBR    120
+#define NBT    130
+#define NBB    140
+
+#define BOUNDL 210
+#define BOUNDR 220
+#define BOUNDT 230
+#define BOUNDB 240
+
 void Program_Message(char *txt);
 /* produces a stderr text output  */
 
@@ -45,7 +59,7 @@ void pressure_comm(double **P,
                    int rank_t,
                    double *bufSend,
                    double *bufRecv,
-                   MPI Status *status,
+                   MPI_Status *status,
                    int chunk);
 
 /* Exchanges velocities between nighbouring processes */
@@ -61,5 +75,5 @@ void uv_comm(double **U,
               int rank_t,
               double *bufSend,
               double *bufRecv,
-              MPI Status *status,
+              MPI_Status *status,
               int chunk);

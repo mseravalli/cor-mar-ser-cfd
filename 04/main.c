@@ -4,6 +4,7 @@
 #include "uvp.h"
 #include "boundary_val.h"
 #include "sor.h"
+#include "parallel.h"
 #include <stdio.h>
 
 
