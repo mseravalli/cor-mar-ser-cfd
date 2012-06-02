@@ -6,6 +6,7 @@
 #include "sor.h"
 #include "parallel.h"
 #include <stdio.h>
+#include "mpi.h"
 
 
 /**
@@ -56,15 +57,15 @@ int main(int argn, char** args){
     double  dt;                /* time step */
     double  dx;                /* length of a cell x-dir. */
     double  dy;                /* length of a cell y-dir. */
-    int     imax;                /* number of cells x-direction*/
-    int     jmax;                /* number of cells y-direction*/
+    int     imax;              /* number of cells x-direction*/
+    int     jmax;              /* number of cells y-direction*/
     double  alpha;             /* uppwind differencing factor*/
     double  omg;               /* relaxation factor */
     double  tau;               /* safety factor for time step*/
-    int     itermax;             /* max. number of iterations  */
-                                /* for pressure per time step */
+    int     itermax;           /* max. number of iterations  */
+                               /* for pressure per time step */
     double  eps;               /* accuracy bound for pressure*/
-    double  dt_value;           /* time for output */              
+    double  dt_value;          /* time for output */              
 
     double **U = NULL;
     double **V = NULL;
@@ -72,6 +73,24 @@ int main(int argn, char** args){
     double **F = NULL;
     double **G = NULL;
     double **RS = NULL;
+    
+    int iproc;
+    int jproc;
+    int omg_i;
+    int omg_j;
+
+    int il;
+    int ir;
+    int jt;
+    int jb;
+
+    int rank_l;
+    int rank_r;
+    int rank_t;
+    int rank_b;
+    
+    int num_proc;
+    int myrank;
     
     double t; 
     int n;
@@ -81,15 +100,12 @@ int main(int argn, char** args){
     int i;
     int j;
 
-    char write = 1;
+    char txt[256];
 
-    if(argn > 1)
-    {
-        if(args[1][0] == 0x30)
-            write = 0;
-        else
-            write = 1;
-    }
+    MPI_Init(&argn, &args);
+
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+    MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
 
     read_parameters(szFileName,
                     &Re,     
@@ -111,18 +127,44 @@ int main(int argn, char** args){
                     &tau,    
                     &itermax,
                     &eps,    
-                    &dt_value);
+                    &dt_value,
+                    &iproc,
+                    &jproc);
+
+    if (num_proc % (iproc*jproc) != 0) {
+        if (myrank == 0) {
+            printf("cannot execute the program: number of processes and subdomains should be coherent\n");
+        }
+        MPI_Finalize();
+        return 1;
+    }
+
+    init_parallel(iproc,
+                  jproc,
+                  imax,
+                  jmax,
+                  &myrank,
+                  &il,
+                  &ir,
+                  &jb,
+                  &jt,
+                  &rank_l,
+                  &rank_r,
+                  &rank_b,
+                  &rank_t,
+                  &omg_i,
+                  &omg_j,
+                  num_proc);
                     
     t = 0;
     n = 0;
 
-    U = matrix(0, imax + 1, 0, jmax + 1); 
-    V = matrix(0, imax + 1, 0, jmax + 1); 
-    /*P = matrix(1, imax, 1, jmax);*/
-    P = matrix(0, imax + 1, 0, jmax + 1);
-    F = matrix(0, imax + 1, 0, jmax + 1);
-    G = matrix(0, imax + 1, 0, jmax + 1);
-    RS = matrix(0, imax + 1, 0, jmax + 1); 
+    U = matrix(il - 2, ir + 1, jb - 1, jt + 1); 
+    V = matrix(il - 1, ir + 1, jb - 2, jt + 1); 
+    P = matrix(il - 1, ir + 1, jb - 1, jt + 1);
+    F = matrix(il - 2, ir + 1, jb - 1, jt + 1);
+    G = matrix(il - 1, ir + 1, jb - 2, jt + 1);
+    RS = matrix(il, ir, jb, jt); 
     init_uvp(UI, VI, PI, imax, jmax, U, V, P);
 
     /*t_end = 1;*/
@@ -139,8 +181,14 @@ int main(int argn, char** args){
                  U,
                  V);
                  
-        boundaryvalues(imax,
-                       jmax,
+        boundaryvalues(il,
+                       ir,
+                       jt,
+                       jb,
+                       omg_i,
+                       omg_j,
+                       iproc,
+                       jproc,
                        U,
                        V);
     
@@ -208,46 +256,46 @@ int main(int argn, char** args){
                  G,
                  P);
 
-        if(write)
-            write_vtkFile("files/file",
-		                  n,
-		                  xlength,
-                          ylength,
-                          imax,
-                          jmax,
-                		  dx,
-		                  dy,
-                          U,
-                          V,
-                          P);
+        write_vtkFile("files/file",
+		              n,
+		              xlength,
+                      ylength,
+                      imax,
+                      jmax,
+                	  dx,
+		              dy,
+                      U,
+                      V,
+                      P);
 
         t += dt;
         n++;
     }
 
-    if(write)
-        write_vtkFile("files/file",
-		                  n,
-		                  xlength,
-                          ylength,
-                          imax,
-                          jmax,
-                		  dx,
-		                  dy,
-                          U,
-                          V,
-                          P);
+    write_vtkFile("files/file",
+		          n,
+		          xlength,
+                  ylength,
+                  imax,
+                  jmax,
+                  dx,
+		          dy,
+                  U,
+                  V,
+                  P);
 
+    free_matrix(U, il - 2, ir + 1, jb - 1, jt + 1); 
+    free_matrix(V, il - 1, ir + 1, jb - 2, jt + 1); 
+    free_matrix(P, il - 1, ir + 1, jb - 1, jt + 1);
+    free_matrix(F, il - 2, ir + 1, jb - 1, jt + 1);
+    free_matrix(G, il - 1, ir + 1, jb - 2, jt + 1);
+    free_matrix(RS,il,     ir,     jb,     jt); 
 
+    Programm_Stop(txt);
 
-    free_matrix(U, 0, imax + 1, 0, jmax + 1);
-    free_matrix(V, 0, imax + 1, 0, jmax + 1);
-    free_matrix(P, 0, imax + 1, 0, jmax + 1);
-    free_matrix(F, 0, imax + 1, 0, jmax + 1);
-    free_matrix(G, 0, imax + 1, 0, jmax + 1);
-    free_matrix(RS, 0, imax + 1, 0, jmax + 1);
+    MPI_Finalize();
 
-    return 1;
+    return 0;
 }
 
 
