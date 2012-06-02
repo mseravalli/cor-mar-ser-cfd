@@ -44,10 +44,6 @@ void calculate_fg(
 
     /******** CALCULATE F START ********/
     
-    boundaryvalues(imax, jmax, U, V);
-
-    /******** Calculate the single derivatives ********/
-
     /******** Calculate F ********/
     
     for(i = 1; i <= imax-1; i++)
@@ -89,8 +85,6 @@ void calculate_fg(
     
 
     /******** CALCULATE G START ********/
-
-    boundaryvalues(imax, jmax, U, V);
 
     /******** Calculate G ********/
 
