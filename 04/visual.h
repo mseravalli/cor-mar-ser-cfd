@@ -73,6 +73,6 @@ void parallelContainer(double** U,
                        int iproc,
                        int jproc,
                        int nTS,             /* number of timestep */
-                       char* outputFile) 
+                       char* outputFile); 
 
 #endif
