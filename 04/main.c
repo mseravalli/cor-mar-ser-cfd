@@ -181,8 +181,14 @@ int main(int argn, char** args){
                  U,
                  V);
                  
-        boundaryvalues(imax,
-                       jmax,
+        boundaryvalues(il,
+                       ir,
+                       jt,
+                       jb,
+                       omg_i,
+                       omg_j,
+                       iproc,
+                       jproc,
                        U,
                        V);
     

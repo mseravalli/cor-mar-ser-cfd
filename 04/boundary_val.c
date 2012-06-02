@@ -5,8 +5,14 @@
  * The boundary values of the problem are set.
  */
 void boundaryvalues(
-  int imax,
-  int jmax,
+  int il,
+  int ir,
+  int jt,
+  int jb,
+  int omg_i,
+  int omg_j,
+  int iproc,
+  int jproc,
   double **U,
   double **V
 )
@@ -14,30 +20,37 @@ void boundaryvalues(
     int i = 0;
     int j = 0;
 
-    /** formula (14) **/
-    for(j = 1; j <= jmax; ++j)
-    {
-        U[0][j]    = 0;
-        U[imax][j] = 0;
+    /* set the boundaries only for the correct subdomains */
+
+    /* left */
+    if (omg_i == 0) {
+        for (j = 1; j <= jt - jb; ++j) {
+            U[0][j] = 0;
+            V[0][j] = -V[1][j];
+        }
     }
 
-    for(i = 1; i <= imax; ++i)
-    {
-        V[i][0]    = 0;
-        V[i][jmax] = 0;
+    /* right */
+    if (omg_i == iproc - 1) {
+        for (j = 1; j <= jt - jb; ++j) {
+            U[ir][j] = 0;
+            V[ir + 1][j] = -V[ir][j];
+        }
     }
 
-    /** formula (15) **/
-    for(j = 1; j <= jmax; ++j)
-    {
-        V[0][j]      = -1.0 * V[1][j];
-        V[imax+1][j] = -1.0 * V[imax][j];
+    /* bottom */
+    if (omg_j == 0) {
+        for (i = 1; i <= ir - il; ++i) {
+            U[i][0] = -U[i][1];
+            V[i][0] = 0;
+        }
     }
 
-    for(i = 1; i <= imax; ++i)
-    {
-        U[i][0]      = -1.0 * U[i][1];
-        U[i][jmax+1] = 2 - U[i][jmax];
+    /* top */
+    if (omg_j == jproc - 1) {
+        for (i = 1; i <= ir - il; ++i) {
+            U[i][jt + 1] = 2 - U[i][jt];
+            V[i][jt] = 0;
+        }
     }
-
 }
