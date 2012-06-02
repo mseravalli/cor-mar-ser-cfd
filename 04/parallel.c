@@ -76,8 +76,8 @@ void init_parallel(int iproc,
     /* TODO: differentiate for master?? */
 
     if ((*myrank) == 0) {
-        for (i = 0; i < iproc; ++i) {
-            for (j = 0; j < jproc; ++j) {
+        for (j = 0; j < jproc; ++j) {
+            for (i = 0; i < iproc; ++i) {
                 MPI_Send(&i, 1, MPI_INT, setProc, OMGI, MPI_COMM_WORLD);
                 MPI_Send(&j, 1, MPI_INT, setProc, OMGJ, MPI_COMM_WORLD);
 
@@ -89,7 +89,7 @@ void init_parallel(int iproc,
                 }
                 MPI_Send(&tmpNb, 1, MPI_INT, setProc, NBB, MPI_COMM_WORLD);
                 tmpBound = (jmax / jproc) * j + 1;
-                MPI_Send(&tmpBound, 2, MPI_INT, setProc, BOUNDB, MPI_COMM_WORLD);
+                MPI_Send(&tmpBound, 1, MPI_INT, setProc, BOUNDB, MPI_COMM_WORLD);
 
                 /* if in the top row */
                 if (j == jproc - 1) {
@@ -100,28 +100,28 @@ void init_parallel(int iproc,
                     tmpBound = (j + 1) * (jmax / jproc); 
                 }
                 MPI_Send(&tmpNb, 1, MPI_INT, setProc, NBT, MPI_COMM_WORLD);
-                MPI_Send(&tmpBound, 2, MPI_INT, setProc, BOUNDT, MPI_COMM_WORLD);
+                MPI_Send(&tmpBound, 1, MPI_INT, setProc, BOUNDT, MPI_COMM_WORLD);
 
                 /* if in the left column */
                 if (i == 0) {
                     tmpNb = MPI_PROC_NULL;
                 } else {
-                    tmpNb = setProc - jproc;
+                    tmpNb = setProc - 1;
                 }
                 MPI_Send(&tmpNb, 1, MPI_INT, setProc, NBL, MPI_COMM_WORLD);
                 tmpBound = (imax / iproc) * i + 1;
-                MPI_Send(&tmpBound, 2, MPI_INT, setProc, BOUNDL, MPI_COMM_WORLD);
+                MPI_Send(&tmpBound, 1, MPI_INT, setProc, BOUNDL, MPI_COMM_WORLD);
 
                 /* if in the right column */
                 if (i == iproc - 1) {
                     tmpNb = MPI_PROC_NULL;
                     tmpBound = imax; 
                 } else {
-                    tmpNb = setProc + jproc;
+                    tmpNb = setProc + 1;
                     tmpBound = (i + 1) * (imax / iproc); 
                 }
                 MPI_Send(&tmpNb, 1, MPI_INT, setProc, NBR, MPI_COMM_WORLD);
-                MPI_Send(&tmpBound, 2, MPI_INT, setProc, BOUNDR, MPI_COMM_WORLD);
+                MPI_Send(&tmpBound, 1, MPI_INT, setProc, BOUNDR, MPI_COMM_WORLD);
 
                 ++setProc;
             }
@@ -132,14 +132,14 @@ void init_parallel(int iproc,
     MPI_Recv(omg_j, 1, MPI_INT, 0, OMGJ, MPI_COMM_WORLD, &status);
 
     MPI_Recv(rank_b, 1, MPI_INT, 0, NBB, MPI_COMM_WORLD, &status);
-    MPI_Recv(rank_t, 1, MPI_INT, 0, NBT, MPI_COMM_WORLD, &status);
-    MPI_Recv(rank_l, 1, MPI_INT, 0, NBL, MPI_COMM_WORLD, &status);
-    MPI_Recv(rank_r, 1, MPI_INT, 0, NBR, MPI_COMM_WORLD, &status);
-
     MPI_Recv(jb, 1, MPI_INT, 0, BOUNDB, MPI_COMM_WORLD, &status);
+    MPI_Recv(rank_t, 1, MPI_INT, 0, NBT, MPI_COMM_WORLD, &status);
     MPI_Recv(jt, 1, MPI_INT, 0, BOUNDT, MPI_COMM_WORLD, &status);
+    MPI_Recv(rank_l, 1, MPI_INT, 0, NBL, MPI_COMM_WORLD, &status);
     MPI_Recv(il, 1, MPI_INT, 0, BOUNDL, MPI_COMM_WORLD, &status);
+    MPI_Recv(rank_r, 1, MPI_INT, 0, NBR, MPI_COMM_WORLD, &status);
     MPI_Recv(ir, 1, MPI_INT, 0, BOUNDR, MPI_COMM_WORLD, &status);
+
 
 }
 

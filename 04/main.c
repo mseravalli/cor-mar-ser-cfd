@@ -169,7 +169,7 @@ int main(int argn, char** args){
     F = matrix(il - 2, ir + 1, jb - 1, jt + 1);
     G = matrix(il - 1, ir + 1, jb - 2, jt + 1);
     RS = matrix(il, ir, jb, jt); 
-    init_uvp(UI, VI, PI, imax, jmax, U, V, P);
+    init_uvp(UI, VI, PI, ir - il + 1, jt - jb + 1, U, V, P);
     
     max_length = ir-il+1;
     if(max_length < jt-jb+1)
