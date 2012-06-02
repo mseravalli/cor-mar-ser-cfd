@@ -1,19 +1,19 @@
 #include "helper.h"
 #include "visual.h"
 #include <stdio.h>
-
+#include "string.h"
 
 void write_vtkFile(const char *szProblem,
-		 int    timeStepNumber,
-		 double xlength,
-                 double ylength,
-                 int    imax,
-                 int    jmax,
-		 double dx,
-		 double dy,
-                 double **U,
-                 double **V,
-                 double **P) {
+         		   int    timeStepNumber,
+		           double xlength,
+                   double ylength,
+                   int    imax,
+                   int    jmax,
+		           double dx,
+        		   double dy,
+                   double **U,
+                   double **V,
+                   double **P) {
   
   int i,j;
   char szFileName[80];
@@ -96,4 +96,78 @@ void write_vtkPointCoordinates( FILE *fp, int imax, int jmax,
   }
 }
 
+void parallelContainer(double** U, 
+                       double** V, 
+                       double** P, 
+                       int omg_i,
+                       int omg_j,
+                       int imax, 
+                       int jmax,
+                       int iproc,
+                       int jproc,
+                       int nTS,             /* number of timestep */
+                       char* outputFile) 
+{
+
+    char pieceExtend[256];
+    int i;
+    int j;
+
+    int il;
+    int ir;
+    int jt;
+    int jb;
+    
+    FILE* parallelContainer = NULL;
+    sprintf(outputFile, "files/P%s.%i.vtk", outputFile, nTS);
+    parallelContainer = fopen(outputFile, "w");
+
+    /* write header */
+    fprintf(parallelContainer, "<VTKFile type=\"PStructuredGrid\"");
+    fprintf(parallelContainer, 
+            "<PStructuredGrid WholeExtent=\"1 imax 1 jmax 0 0\" GhostLevel=\"0\">");
+
+    fprintf(parallelContainer, "<PPointData>");
+    fprintf(parallelContainer, "</PPointData>");
+
+    fprintf(parallelContainer, "<PCellData>");
+    fprintf(parallelContainer, "</PCellData>");
+
+    fprintf(parallelContainer, "<PPoints>");
+    fprintf(parallelContainer, "</PPoints>");
+    
+    for (i = 0; i < iproc; ++i) {
+        for (j = 0; j < jproc; ++j) {
+            sprintf(pieceExtend, "%s_%i%i.%i", outputFile, omg_i, omg_j, nTS);
+
+            il = (imax / iproc) * i + 1;
+            jb = (jmax / jproc) * j + 1;
+
+            if (i == iproc - 1) {
+                ir = imax; 
+            } else {
+                ir = (i + 1) * (imax / iproc); 
+            }
+
+            if (j == jproc - 1) {
+                jt = jmax; 
+            } else {
+                jt = (j + 1) * (jmax / jproc); 
+            }
+
+            fprintf(parallelContainer, 
+                    "<Piece Extent=\"%i %i %i %i 0 0\" Source=\"%s.vts\"/>", 
+                    il,
+                    ir,
+                    jb,
+                    jt,
+                    pieceExtend);
+
+        }
+    }
+
+    fprintf(parallelContainer, "</PStructuredGrid>");
+    fprintf(parallelContainer, "</VTKFile>");
+
+}
 
