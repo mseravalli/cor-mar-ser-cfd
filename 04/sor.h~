@@ -16,21 +16,7 @@ void sor(
   int    jmax,
   double **P,
   double **RS,
-  double *res,
-  int il,
-  int ir,
-  int jb,
-  int jt,
-  int my_rank,
-  int numProc,
-  int rank_l,
-  int rank_r,
-  int rank_b,
-  int rank_t,
-  double *bufSend,
-  double *bufRecv,
-  MPI Status *status,
-  int chunk
+  double *res
 );
 
 

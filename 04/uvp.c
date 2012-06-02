@@ -161,6 +161,8 @@ void calculate_dt(
 {
     double umax = 0;
     double vmax = 0;
+    double globUmax;
+    double globVmax;
     int i, j;
 
     double dtcond, dxcond, dycond;
@@ -177,11 +179,19 @@ void calculate_dt(
                 vmax = V[i][j];
         }
     }
-
+    
+    /* determines globan umax and vmax and places it in master thread */
+    MPI_Reduce(&umax, &globUmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&vmax, &globVmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    /* broadcasts umax nad vmax */
+    MPI_Bcast(&globUmax, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&globVmax, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    
+    
     /******** Calculate conditions ********/
     dtcond = Re/(2*(1/(dx*dx) + 1/(dy*dy)));
-    dxcond = dx/fabs(umax);
-    dycond = dy/fabs(vmax);
+    dxcond = dx/fabs(globUmax);
+    dycond = dy/fabs(globVmax);
 
     /******** Determine smalles condition ********/
     minval = dtcond;

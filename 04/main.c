@@ -5,6 +5,7 @@
 #include "boundary_val.h"
 #include "sor.h"
 #include <stdio.h>
+#include <mpi.h>
 
 
 /**
@@ -81,6 +82,11 @@ int main(int argn, char** args){
     int j;
 
     char write = 1;
+    
+    int nextSORiter;
+    
+    double *bufSend;
+    double *bufRecv;
 
     if(argn > 1)
     {
@@ -115,17 +121,14 @@ int main(int argn, char** args){
     t = 0;
     n = 0;
 
-    U = matrix(0, imax + 1, 0, jmax + 1); 
-    V = matrix(0, imax + 1, 0, jmax + 1); 
-    /*P = matrix(1, imax, 1, jmax);*/
+    U = matrix(0, imax + 1, 0, jmax + 1);
+    V = matrix(0, imax + 1, 0, jmax + 1);
     P = matrix(0, imax + 1, 0, jmax + 1);
     F = matrix(0, imax + 1, 0, jmax + 1);
     G = matrix(0, imax + 1, 0, jmax + 1);
-    RS = matrix(0, imax + 1, 0, jmax + 1); 
+    RS = matrix(0, imax + 1, 0, jmax + 1);
     init_uvp(UI, VI, PI, imax, jmax, U, V, P);
-
-    /*t_end = 1;*/
-
+    
     while (t < t_end)
     {
         calculate_dt(Re,
@@ -169,20 +172,9 @@ int main(int argn, char** args){
         it = 0;
         res = eps + 1;
         
-        while (it < itermax && res > eps)
+        nextSORiter = 0;
+        while (nextSORiter == 0)
         {
-            for (i = 1; i<=imax;i++)
-            {
-                P[i][0]= P[i][1];
-                P[i][jmax+1]= P[i][jmax];
-            }
-            
-            for (j = 1; j<=jmax;j++)
-            {
-                P[0][j]= P[1][j];
-                P[imax+1][j]= P[imax][j];
-            }
-
              sor(
                  omg,
                  dx,
@@ -191,8 +183,30 @@ int main(int argn, char** args){
                  jmax,
                  P,
                  RS,
-                 &res);
-                 
+                 &res,
+                 il,
+                 ir,
+                 jb,
+                 jt,
+                 my_rank,
+                 numProc,
+                 rank_l,
+                 rank_r,
+                 rank_b,
+                 rank_t,
+                 bufSend,
+                 bufRecv,
+                 status,
+                 it);
+            
+            /*master decides if another iteration in required*/
+            if(my_rank){
+              nextSORiter = ((it < itermax && res > eps)? 0 : 1);
+            }
+            
+            /*it broadcasts the decision to all other processes*/
+            MPI_Bcast(&nextSORiter, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+            
             it++;
         }
         
@@ -206,6 +220,22 @@ int main(int argn, char** args){
                  F,
                  G,
                  P);
+                 
+        void uv_comm(U,
+                    V,
+                    il,
+                    ir,
+                    jb,
+                    jt,
+                    rank_l,
+                    rank_r,
+                    rank_b,
+                    rank_t,
+                    bufSend,
+                    bufRecv,
+                    &status,
+                    n);
+        {
 
         if(write)
             write_vtkFile("files/file",

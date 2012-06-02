@@ -51,7 +51,8 @@ void sor(
                 bufSend,
                 bufRecv,
                 status,
-                chunk);
+                chunk)
+  {
 
   /* compute the residual */
   rloc = 0;
