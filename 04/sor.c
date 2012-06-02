@@ -1,6 +1,5 @@
 #include "sor.h"
 #include <math.h>
-#include <mpi.h>
 
 void sor(
   double omg,
@@ -23,7 +22,7 @@ void sor(
   int rank_t,
   double *bufSend,
   double *bufRecv,
-  MPI Status *status,
+  MPI_Status *status,
   int chunk
 ) {
   int i,j;

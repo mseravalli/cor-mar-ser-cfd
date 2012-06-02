@@ -1,3 +1,6 @@
+#include "mpi.h"
+#include "parallel.h"
+
 #ifndef __SOR_H_
 #define __SOR_H_
 
@@ -29,7 +32,7 @@ void sor(
   int rank_t,
   double *bufSend,
   double *bufRecv,
-  MPI Status *status,
+  MPI_Status *status,
   int chunk
 );
 

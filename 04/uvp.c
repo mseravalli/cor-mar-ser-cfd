@@ -2,6 +2,7 @@
 #include "helper.h"
 #include "uvp.h"
 #include <math.h>
+#include "mpi.h"
 
 
 void calculate_fg(

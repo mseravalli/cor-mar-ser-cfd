@@ -6,7 +6,7 @@
 #include "sor.h"
 #include "parallel.h"
 #include <stdio.h>
-#include <mpi.h>
+#include "mpi.h"
 
 
 /**
@@ -83,6 +83,7 @@ int main(int argn, char** args){
     int ir;
     int jt;
     int jb;
+    int max_length;
 
     int rank_l;
     int rank_r;
@@ -91,17 +92,13 @@ int main(int argn, char** args){
     
     int num_proc;
     int myrank;
+    MPI_Status status;
     
     double t; 
     int n;
     int it;
     double res;
-    
-    int i;
-    int j;
-
-    char write = 1;
-    
+        
     int nextSORiter;
     
     double *bufSend;
@@ -174,6 +171,15 @@ int main(int argn, char** args){
     RS = matrix(il, ir, jb, jt); 
     init_uvp(UI, VI, PI, imax, jmax, U, V, P);
     
+    max_length = ir-il+1;
+    if(max_length < jt-jb+1)
+    {
+      max_length = jt-jb+1;    
+    }
+    
+    bufSend = (double *) malloc((size_t)(max_length * sizeof(double)));
+    bufRecv = (double *) malloc((size_t)(max_length * sizeof(double)));
+    
     while (t < t_end)
     {
         calculate_dt(Re,
@@ -239,19 +245,19 @@ int main(int argn, char** args){
                  ir,
                  jb,
                  jt,
-                 my_rank,
-                 numProc,
+                 myrank,
+                 num_proc,
                  rank_l,
                  rank_r,
                  rank_b,
                  rank_t,
                  bufSend,
                  bufRecv,
-                 status,
+                 &status,
                  it);
             
             /*master decides if another iteration in required*/
-            if(my_rank){
+            if(myrank == 0){
               nextSORiter = ((it < itermax && res > eps)? 0 : 1);
             }
             
@@ -272,7 +278,7 @@ int main(int argn, char** args){
                  G,
                  P);
                  
-        void uv_comm(U,
+        uv_comm(U,
                     V,
                     il,
                     ir,
@@ -286,7 +292,6 @@ int main(int argn, char** args){
                     bufRecv,
                     &status,
                     n);
-        {
 
         write_vtkFile("files/file",
 		              n,
