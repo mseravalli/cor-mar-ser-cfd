@@ -239,12 +239,12 @@ void write_matrix( const char* szFileName,       /* filename */
                                                   at the beginning of the file,   
                                                   1 for whole region, no additional range information is written */         
 {
-  printf("write matrix %s", szFileName);
-   int i, j;
-   FILE * fh = 0;
-   int nSize = (nrh-nrl+1) * (nch-ncl+1);
-   float *tmp = (float *)malloc( (size_t)(nSize * sizeof(float)));
-   int k = 0;
+    int i, j;
+    FILE * fh = 0;
+    int nSize = (nrh-nrl+1) * (nch-ncl+1);
+    float *tmp = (float *)malloc( (size_t)(nSize * sizeof(float)));
+    int k = 0;
+    printf("write matrix %s", szFileName);
 
    if( fFirst )				/* first call of the function ? */
    {
