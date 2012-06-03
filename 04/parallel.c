@@ -232,6 +232,9 @@ void pressure_comm(double **P,
             P[i][jsize+1] = bufRecv[i-1];
         }
     }
+	/*ar str[50];
+	sprintf(str, "%d %lf %lf %lf %lf", P[isize][1], P[isize+1][1], P[1][1], P[0][1]);
+	Programm_Sync(str);*/
 }
 
 void uv_comm(double **U,

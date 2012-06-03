@@ -33,8 +33,8 @@ void boundaryvalues(
     /* right */
     if (omg_i == iproc - 1) {
         for (j = 1; j <= jt - jb; ++j) {
-            U[ir][j] = 0;
-            V[ir + 1][j] = -V[ir][j];
+            U[ir-il+1][j] = 0;
+            V[ir-il+2][j] = -V[ir-il+1][j];
         }
     }
 
@@ -49,8 +49,8 @@ void boundaryvalues(
     /* top */
     if (omg_j == jproc - 1) {
         for (i = 1; i <= ir - il; ++i) {
-            U[i][jt + 1] = 2 - U[i][jt];
-            V[i][jt] = 0;
+            U[i][jt-jb+2] = 2 - U[i][jt-jb+1];
+            V[i][jt-jb+1] = 0;
         }
     }
 }

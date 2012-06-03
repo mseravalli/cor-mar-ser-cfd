@@ -163,12 +163,12 @@ int main(int argn, char** args){
     t = 0;
     n = 0;
 
-    U = matrix(il - 2, ir + 1, jb - 1, jt + 1); 
-    V = matrix(il - 1, ir + 1, jb - 2, jt + 1); 
-    P = matrix(il - 1, ir + 1, jb - 1, jt + 1);
-    F = matrix(il - 2, ir + 1, jb - 1, jt + 1);
-    G = matrix(il - 1, ir + 1, jb - 2, jt + 1);
-    RS = matrix(il, ir, jb, jt); 
+    U = matrix(0, ir - il + 3, 0, jt - jb + 2); 
+    V = matrix(0, ir - il + 2, 0, jt - jb + 3); 
+    P = matrix(0, ir - il + 2, 0, jt - jb + 2);
+    F = matrix(0, ir - il + 3, 0, jt - jb + 2); 
+    G = matrix(0, ir - il + 2, 0, jt - jb + 3); 
+    RS = matrix(0, ir - il + 2, 0, jt - jb + 2); 
     init_uvp(UI, VI, PI, ir - il + 1, jt - jb + 1, U, V, P);
     
     max_length = ir-il+1;
@@ -187,8 +187,10 @@ int main(int argn, char** args){
                  &dt,
                  dx,
                  dy,
-                 imax,
-                 jmax,
+                 il,
+                 ir,
+                 jt,
+                 jb,
                  U,
                  V);
                  
@@ -210,8 +212,10 @@ int main(int argn, char** args){
                  dt,
                  dx,
                  dy,
-                 imax,
-                 jmax,
+                 il,
+                 ir,
+                 jt,
+                 jb,
                  U,
                  V,
                  F,
@@ -220,8 +224,10 @@ int main(int argn, char** args){
         calculate_rs(dt,
                  dx,
                  dy,
-                 imax,
-                 jmax,
+                 il,
+		 ir,
+                 jt,
+                 jb,
                  F,
                  G,
                  RS);
@@ -236,8 +242,6 @@ int main(int argn, char** args){
                  omg,
                  dx,
                  dy,
-                 imax,
-                 jmax,
                  P,
                  RS,
                  &res,
@@ -270,8 +274,10 @@ int main(int argn, char** args){
         calculate_uv(dt,
                  dx,
                  dy,
-                 imax,
-                 jmax,
+                 il,
+                 ir,
+                 jt,
+                 jb,
                  U,
                  V,
                  F,
@@ -293,7 +299,7 @@ int main(int argn, char** args){
                     &status,
                     n);
 
-        write_vtkFile("files/file",
+       write_vtkFile("files/file",
 		              n,
 		              xlength,
                       ylength,
@@ -308,8 +314,7 @@ int main(int argn, char** args){
         t += dt;
         n++;
     }
-
-    write_vtkFile("files/file",
+   write_vtkFile("files/file",
 		          n,
 		          xlength,
                   ylength,
@@ -321,12 +326,12 @@ int main(int argn, char** args){
                   V,
                   P);
 
-    free_matrix(U, il - 2, ir + 1, jb - 1, jt + 1); 
-    free_matrix(V, il - 1, ir + 1, jb - 2, jt + 1); 
-    free_matrix(P, il - 1, ir + 1, jb - 1, jt + 1);
-    free_matrix(F, il - 2, ir + 1, jb - 1, jt + 1);
-    free_matrix(G, il - 1, ir + 1, jb - 2, jt + 1);
-    free_matrix(RS,il,     ir,     jb,     jt); 
+    free_matrix(U, 0, ir - il + 3, 0, jt - jb + 2); 
+    free_matrix(V, 0, ir - il + 2, 0, jt - jb + 3); 
+    free_matrix(P, 0, ir - il + 2, 0, jt - jb + 2);
+    free_matrix(F, 0, ir - il + 3, 0, jt - jb + 2); 
+    free_matrix(G, 0, ir - il + 2, 0, jt - jb + 3); 
+    free_matrix(RS, 0, ir - il + 2, 0, jt - jb + 2); 
 
     Programm_Stop(txt);
 

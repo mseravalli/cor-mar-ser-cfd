@@ -13,8 +13,10 @@ void calculate_fg(
   double dt,
   double dx,
   double dy,
-  int imax,
-  int jmax,
+  int il,
+  int ir,
+  int jt,
+  int jb,
   double **U,
   double **V,
   double **F,
@@ -47,9 +49,9 @@ void calculate_fg(
     
     /******** Calculate F ********/
     
-    for(i = 1; i <= imax-1; i++)
+    for(i = 1; i <= ir-il; i++)
     {
-        for(j = 1; j <= jmax; j++)
+        for(j = 1; j <= jt-jb+1; j++)
         {
 
             /* du2dx */
@@ -89,9 +91,9 @@ void calculate_fg(
 
     /******** Calculate G ********/
 
-    for(i = 1; i <= imax; i++)
+    for(i = 1; i <= ir-il+1; i++)
     {
-        for(j = 1; j <= jmax-1; j++)
+        for(j = 1; j <= jt-jb; j++)
         {
 
            /* dv2dy */ 
@@ -128,16 +130,16 @@ void calculate_fg(
     /******** CALCULATE G END ********/
     
     /******** BOUNDARY VALUES START ********/
-    for(j=1; j<=jmax; j++)
+    for(j=1; j<=jt-jb+1; j++)
     {
         F[0][j]=U[0][j];
-        F[imax][j]=U[imax][j];
+        F[ir-il+1][j]=U[ir-il+1][j];
     }
     
-    for(i=1; i<=imax; i++)
+    for(i=1; i<=ir-il+1; i++)
     {
         G[i][0]=V[i][0];
-        G[i][jmax]=V[i][jmax];
+        G[i][jt-jb+1]=V[i][jt-jb+1];
     }
     /******** BOUNDARY VALUES END ********/
 }
@@ -148,8 +150,10 @@ void calculate_dt(
   double *dt,
   double dx,
   double dy,
-  int imax,
-  int jmax,
+  int il,
+  int ir,
+  int jt,
+  int jb,
   double **U,
   double **V
 )
@@ -164,9 +168,9 @@ void calculate_dt(
     double minval;
 
     /******** Determine umax and vmax *********/
-    for(i = 0; i < imax; i++)
+    for(i = 1; i <= ir-il+1; i++)
     {
-        for(j = 0; j < jmax; j++)
+        for(j = 1; j <= jt-jb+1; j++)
         {
             if(umax < U[i][j])
                 umax = U[i][j];
@@ -203,8 +207,10 @@ void calculate_uv(
   double dt,
   double dx,
   double dy,
-  int imax,
-  int jmax,
+  int il,
+  int ir,
+  int jt, 
+  int jb,
   double **U,
   double **V,
   double **F,
@@ -220,18 +226,18 @@ void calculate_uv(
     dtody = dt/dy;
     
     /******** Calculate u in step next step ********/
-    for(i = 1; i < imax; i++)
+    for(i = 1; i < ir-il+1; i++)
     {
-        for(j = 1; j < jmax+1; j++)
+        for(j = 1; j < jt-jb+2; j++)
         {
             U[i][j] = F[i][j] - dtodx*(P[i+1][j] - P[i][j]);
         }
     }
 
     /******** Calculate v in step next step ********/
-    for(i = 1; i < imax + 1; i++)
+    for(i = 1; i < ir-il+2; i++)
     {
-        for(j = 1; j < jmax; j++)
+        for(j = 1; j < ir-il+1; j++)
         {
             V[i][j] = G[i][j] - dtody*(P[i][j+1] - P[i][j]);
         }
@@ -242,8 +248,10 @@ void calculate_rs(
   double dt,
   double dx,
   double dy,
-  int imax,
-  int jmax,
+  int il,
+  int ir,
+  int jt,
+  int jb,
   double **F,
   double **G,
   double **RS
@@ -253,9 +261,9 @@ void calculate_rs(
    
     /******** Calculate RS ********/
 
-    for(i = 1; i <= imax; i++)
+    for(i = 1; i <= ir-il+1; i++)
     {
-        for(j = 1; j <= jmax; j++)
+        for(j = 1; j <= jt-jb+1; j++)
         {
             RS[i][j]= 1/dt*((F[i][j]-F[i-1][j])/dx+(G[i][j]-G[i][j-1])/dy);
             }

@@ -5,8 +5,6 @@ void sor(
   double omg,
   double dx,
   double dy,
-  int    imax,
-  int    jmax,
   double **P,
   double **RS,
   double *res,
@@ -30,8 +28,8 @@ void sor(
   double coeff = omg/(2.0*(1.0/(dx*dx)+1.0/(dy*dy)));
 
   /* SOR iteration */
-  for(i = 1; i <= imax; i++) {
-    for(j = 1; j<=jmax; j++) {
+  for(i = 1; i <= ir-il+1; i++) {
+    for(j = 1; j<=jt-jb+1; j++) {
       P[i][j] = (1.0-omg)*P[i][j]
               + coeff*(( P[i+1][j]+P[i-1][j])/(dx*dx) + ( P[i][j+1]+P[i][j-1])/(dy*dy) - RS[i][j]);
     }
@@ -54,13 +52,13 @@ void sor(
 
   /* compute the residual */
   rloc = 0;
-  for(i = 1; i <= imax; i++) {
-    for(j = 1; j <= jmax; j++) {
+  for(i = 1; i <= ir-il+1; i++) {
+    for(j = 1; j <= jt-jb+1; j++) {
       rloc += ( (P[i+1][j]-2.0*P[i][j]+P[i-1][j])/(dx*dx) + ( P[i][j+1]-2.0*P[i][j]+P[i][j-1])/(dy*dy) - RS[i][j])*
               ( (P[i+1][j]-2.0*P[i][j]+P[i-1][j])/(dx*dx) + ( P[i][j+1]-2.0*P[i][j]+P[i][j-1])/(dy*dy) - RS[i][j]);
     }
   }
-  rloc = rloc/(imax*jmax);
+  rloc = rloc/((ir-il+1)*(jt-jb+1));
   rloc = sqrt(rloc);
   /* set residual */
 
@@ -79,15 +77,15 @@ void sor(
 	/* top row */
 	if(rank_t == MPI_PROC_NULL)
 	{
-		for(i = 1; i <= imax; i++)
+		for(i = 1; i <= ir-il+1; i++)
 		{
-			P[i][jmax+1] = P[i][jmax];
+			P[i][jt-jb+2] = P[i][jt-jb+1];
 		}
 	}
 	/* left column */
 	if(rank_l == MPI_PROC_NULL)
 	{
-		for(j = 0; j <= jmax; j++)
+		for(j = 0; j <= ir-il+1; j++)
 		{
 			P[0][j] = P[1][j];
 		}
@@ -95,9 +93,9 @@ void sor(
 	/* right column */
 	if(rank_r == MPI_PROC_NULL)
 	{
-		for(j = 0; j <= jmax; j++)
+		for(j = 0; j <= jt-jb+1; j++)
 		{
-			P[imax+1][j] = P[imax][j];
+			P[ir-il+2][j] = P[ir-il+1][j];
 		}
 	}
 }
