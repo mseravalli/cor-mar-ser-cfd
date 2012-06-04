@@ -321,20 +321,6 @@ int main(int argn, char** args){
         t += dt;
     }
 
-    if (myrank == 0) {
-        parallelContainer(U, 
-                          V, 
-                          P, 
-                          omg_i, 
-                          omg_j, 
-                          imax, 
-                          jmax, 
-                          iproc, 
-                          jproc, 
-                          n, 
-                          "cavity");
-    }
-
     output_vtk(U, 
                V, 
                P, 
