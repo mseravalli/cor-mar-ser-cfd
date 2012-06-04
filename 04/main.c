@@ -299,32 +299,66 @@ int main(int argn, char** args){
                     &status,
                     n);
 
-       write_vtkFile("files/file",
-		              n,
-		              xlength,
-                      ylength,
-                      imax,
-                      jmax,
-                	  dx,
-		              dy,
-                      U,
-                      V,
-                      P);
+        if (n % 10 == 0) {
+            parallelContainer(U, 
+                              V, 
+                              P, 
+                              omg_i, 
+                              omg_j, 
+                              imax, 
+                              jmax, 
+                              iproc, 
+                              jproc, 
+                              n, 
+                              "cavity");
+            output_vtk(U, 
+                       V, 
+                       P, 
+                       il, 
+                       ir, 
+                       jb, 
+                       jt, 
+                       imax, 
+                       jmax, 
+                       omg_i, 
+                       omg_j, 
+                       dx, 
+                       dy, 
+                       n, 
+                       "cavity");
+            ++n;
+        }
 
         t += dt;
-        n++;
     }
-   write_vtkFile("files/file",
-		          n,
-		          xlength,
-                  ylength,
-                  imax,
-                  jmax,
-                  dx,
-		          dy,
-                  U,
-                  V,
-                  P);
+
+
+    parallelContainer(U, 
+                      V, 
+                      P, 
+                      omg_i, 
+                      omg_j, 
+                      imax, 
+                      jmax, 
+                      iproc, 
+                      jproc, 
+                      n, 
+                      "cavity");
+    output_vtk(U, 
+               V, 
+               P, 
+               il, 
+               ir, 
+               jb, 
+               jt, 
+               imax, 
+               jmax, 
+               omg_i, 
+               omg_j, 
+               dx, 
+               dy, 
+               n, 
+               "cavity");
 
     free_matrix(U, 0, ir - il + 3, 0, jt - jb + 2); 
     free_matrix(V, 0, ir - il + 2, 0, jt - jb + 3); 

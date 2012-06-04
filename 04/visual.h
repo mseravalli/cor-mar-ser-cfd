@@ -75,4 +75,21 @@ void parallelContainer(double** U,
                        int nTS,             /* number of timestep */
                        char* outputFile); 
 
+void output_vtk(double** U,
+                double** V,
+                double** P,
+                int il,
+                int ir,
+                int jb,
+                int jt,
+                int imax, 
+                int jmax,
+                int omg_i,
+                int omg_j,
+                double dx,
+                double dy,
+                int timeStepNumber,
+                char* outputFile
+                );
+
 #endif

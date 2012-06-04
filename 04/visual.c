@@ -176,6 +176,8 @@ void parallelHeader(FILE *fp,
                     int ir, 
                     int jb,
                     int jt,
+                    int imax,
+                    int jmax,
                     double dx, 
                     double dy)
 {
@@ -227,8 +229,13 @@ void output_vtk(double** U,
                 int ir,
                 int jb,
                 int jt,
+                int imax, 
+                int jmax,
                 int omg_i,
                 int omg_j,
+                double dx,
+                double dy,
+                int timeStepNumber,
                 char* outputFile
                 )
 {
@@ -236,7 +243,7 @@ void output_vtk(double** U,
     int i,j;
     char szFileName[80];
     FILE *fp=NULL;
-    sprintf( szFileName, "%s.%i.vtk", szProblem, timeStepNumber );
+    sprintf( szFileName, "files/%s.%i.vtk", outputFile, timeStepNumber );
     fp = fopen( szFileName, "w");
     if( fp == NULL )		       
     {
@@ -245,21 +252,37 @@ void output_vtk(double** U,
       ERROR( szBuff );
       return;
     }
+  
+    parallelHeader(fp, il, ir, jb, jt, imax, jmax, dx, dy);
+    parallelCoords(fp, il, ir, jb, jt, dx, dy);
 
-    parallelHeader(fp,  
-                   il, 
-                   ir, 
-                   jb,
-                   jt,
-                   dx, 
-                   dy);
 
-    parallelCoords(fp,
-                   il, 
-                   ir, 
-                   jb,
-                   jt,
-                   dx, 
-                   dy);
+    fprintf(fp,"POINT_DATA %i \n", (imax+1)*(jmax+1) );
+    
+    fprintf(fp,"\n");
+    fprintf(fp, "VECTORS velocity float\n");
+    for(j = 0; j < (jt-jb)+1; j++) {
+        for(i = 0; i < (ir-il)+1; i++) {
+            fprintf(fp, "%f %f 0\n", (U[i][j] + U[i][j+1]) * 0.5, (V[i][j] + V[i+1][j]) * 0.5 );
+        }
+    }
+
+    fprintf(fp,"\n");
+    fprintf(fp,"CELL_DATA %i \n", ((imax)*(jmax)) );
+    fprintf(fp, "SCALARS pressure float 1 \n"); 
+    fprintf(fp, "LOOKUP_TABLE default \n");
+    for(j = 1; j < (jt-jb)+1; j++) {
+        for(i = 1; i < (ir-il)+1; i++) {
+            fprintf(fp, "%f\n", P[i][j] );
+        }
+    }
+
+    if( fclose(fp) )
+    {
+        char szBuff[80];
+        sprintf( szBuff, "Failed to close %s", szFileName );
+        ERROR( szBuff );
+    }
+
 }
 
