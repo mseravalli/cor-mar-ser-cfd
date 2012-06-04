@@ -81,14 +81,14 @@ int main(int argn, char** args){
 
     int il;
     int ir;
-    int jt;
     int jb;
+    int jt;
     int max_length;
 
     int rank_l;
     int rank_r;
-    int rank_t;
     int rank_b;
+    int rank_t;
     
     int num_proc;
     int myrank;
@@ -299,18 +299,7 @@ int main(int argn, char** args){
                     &status,
                     n);
 
-        if (n % 10 == 0) {
-            parallelContainer(U, 
-                              V, 
-                              P, 
-                              omg_i, 
-                              omg_j, 
-                              imax, 
-                              jmax, 
-                              iproc, 
-                              jproc, 
-                              n, 
-                              "cavity");
+        if (n % 1000 == 0) {
             output_vtk(U, 
                        V, 
                        P, 
@@ -332,18 +321,20 @@ int main(int argn, char** args){
         t += dt;
     }
 
+    if (myrank == 0) {
+        parallelContainer(U, 
+                          V, 
+                          P, 
+                          omg_i, 
+                          omg_j, 
+                          imax, 
+                          jmax, 
+                          iproc, 
+                          jproc, 
+                          n, 
+                          "cavity");
+    }
 
-    parallelContainer(U, 
-                      V, 
-                      P, 
-                      omg_i, 
-                      omg_j, 
-                      imax, 
-                      jmax, 
-                      iproc, 
-                      jproc, 
-                      n, 
-                      "cavity");
     output_vtk(U, 
                V, 
                P, 
@@ -365,7 +356,7 @@ int main(int argn, char** args){
     free_matrix(P, 0, ir - il + 2, 0, jt - jb + 2);
     free_matrix(F, 0, ir - il + 3, 0, jt - jb + 2); 
     free_matrix(G, 0, ir - il + 2, 0, jt - jb + 3); 
-    free_matrix(RS, 0, ir - il + 2, 0, jt - jb + 2); 
+    /*free_matrix(RS, 0, ir - il + 2, 0, jt - jb + 2); */
 
     Programm_Stop(txt);
 
