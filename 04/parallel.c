@@ -259,10 +259,10 @@ void uv_comm(double **U,
 
     /* Velocity U*/
 
-    /* Send-Recv Left-Right */
+    /* Send-Recv from right to left */
 
     if (rank_l != MPI_PROC_NULL){
-        for (j= 1;j <= jmax;j++)
+        for (j = 1; j <= jmax; j++)
         {
             bufSend[j-1] = U[2][j];
         }
@@ -270,18 +270,18 @@ void uv_comm(double **U,
 
         MPI_Sendrecv(bufSend, jmax, MPI_DOUBLE, rank_l, chunk, bufRecv, jmax, MPI_DOUBLE, rank_r, chunk, MPI_COMM_WORLD, status);
 
-    if (rank_r !=MPI_PROC_NULL){
-        for (j= 1;j <= jmax;j++){
-             U[imax+1][j]=bufRecv[j-1];
+    if (rank_r != MPI_PROC_NULL){
+        for (j = 1; j <= jmax; j++){
+             U[imax+2][j]=bufRecv[j-1];
         }
     }
 
-     /* Send-Recv Right-Left */
+     /* Send-Recv from left to right */
 
     if (rank_r != MPI_PROC_NULL){
-        for (j= 1;j <= jmax;j++)
+        for (j = 1; j <= jmax; j++)
         {
-            bufSend[j-1] = U[imax-1][j];
+            bufSend[j-1] = U[imax][j];
         }
     }
 
@@ -293,35 +293,35 @@ void uv_comm(double **U,
         }
     }
 
-     /* Send-Recv Top-Bot */
+     /* Send-Recv from bottom to top */
 
     if (rank_t != MPI_PROC_NULL){
-        for (i= 1; i <= imax; i++)
+        for (i = 1; i <= imax + 1; i++)
         {
             bufSend[i-1] = U[i][jmax];
         }
     }
-       MPI_Sendrecv(bufSend, jmax, MPI_DOUBLE, rank_t, chunk, bufRecv, jmax, MPI_DOUBLE, rank_b, chunk, MPI_COMM_WORLD, status);
+       MPI_Sendrecv(bufSend, imax+1, MPI_DOUBLE, rank_t, chunk, bufRecv, imax+1, MPI_DOUBLE, rank_b, chunk, MPI_COMM_WORLD, status);
 
     if (rank_b !=MPI_PROC_NULL){
-        for (i= 1;i <= imax;i++){
+        for (i = 1; i <= imax+1; i++){
              U[i][0]=bufRecv[i-1];
         }
     }
 
-    /* Send-Recv Bot-Top */
+    /* Send-Recv form top to bottom */
 
     if (rank_b != MPI_PROC_NULL){
-        for (i= 1; i <= imax; i++)
+        for (i = 1; i <= imax+1; i++)
         {
             bufSend[i-1] = U[i][1];
         }
     }
 
-        MPI_Sendrecv(bufSend, jmax, MPI_DOUBLE, rank_b, chunk, bufRecv, jmax, MPI_DOUBLE, rank_t, chunk, MPI_COMM_WORLD, status);
+        MPI_Sendrecv(bufSend, imax+1, MPI_DOUBLE, rank_b, chunk, bufRecv, imax+1, MPI_DOUBLE, rank_t, chunk, MPI_COMM_WORLD, status);
 
     if (rank_t !=MPI_PROC_NULL){
-        for (i= 1;i <= imax;i++){
+        for (i = 1; i <= imax+1;i++){
              U[i][jmax+1]=bufRecv[i-1];
         }
     }
@@ -329,41 +329,41 @@ void uv_comm(double **U,
 
      /* Velocity V */
 
-    /* Send-Recv Left-Right */
+    /* Send-Recv from Right to Left  */
 
     if (rank_l != MPI_PROC_NULL){
-        for (j= 0; j <= jmax + 1 ; j++)
+        for (j = 1; j <= jmax + 1 ; j++)
         {
-            bufSend[j] = V[1][j];
+            bufSend[j-1] = V[1][j];
         }
     }
 
-        MPI_Sendrecv(bufSend, jmax, MPI_DOUBLE, rank_l, chunk, bufRecv, jmax, MPI_DOUBLE, rank_r, chunk, MPI_COMM_WORLD, status);
+        MPI_Sendrecv(bufSend, jmax+1, MPI_DOUBLE, rank_l, chunk, bufRecv, jmax+1, MPI_DOUBLE, rank_r, chunk, MPI_COMM_WORLD, status);
 
     if (rank_r !=MPI_PROC_NULL){
-        for (j= 0; j <= jmax + 1; j++){
-             V[imax+1][j]=bufRecv[j];
+        for (j = 1; j <= jmax + 1; j++){
+             V[imax+1][j]=bufRecv[j-1];
         }
     }
     
-     /* Send-Recv Right-Left */
+     /* Send-Recv from left to right */
 
     if (rank_r != MPI_PROC_NULL){
-        for (j= 0; j <= jmax + 1; j++)
+        for (j = 1; j <= jmax + 1; j++)
         {
-            bufSend[j] = V[imax][j];
+            bufSend[j-1] = V[imax][j];
         }
     }
 
-        MPI_Sendrecv(bufSend, jmax, MPI_DOUBLE, rank_r, chunk, bufRecv, jmax, MPI_DOUBLE, rank_l, chunk, MPI_COMM_WORLD, status);
+        MPI_Sendrecv(bufSend, jmax+1, MPI_DOUBLE, rank_r, chunk, bufRecv, jmax+1, MPI_DOUBLE, rank_l, chunk, MPI_COMM_WORLD, status);
 
     if (rank_r !=MPI_PROC_NULL){
-        for (j = 0 ; j <= jmax +1; j++){
-             V[0][j] = bufRecv[j];
+        for (j = 1 ; j <= jmax + 1; j++){
+             V[0][j] = bufRecv[j-1];
         }
     }
 
-     /* Send-Recv Top-Bot */
+     /* Send-Recv from bottom to top */
 
     if (rank_t != MPI_PROC_NULL){
         for (i = 1; i <= imax; i++)
@@ -372,7 +372,7 @@ void uv_comm(double **U,
         }
     }
 
-        MPI_Sendrecv(bufSend, jmax, MPI_DOUBLE, rank_t, chunk, bufRecv, jmax, MPI_DOUBLE, rank_b, chunk, MPI_COMM_WORLD, status);
+        MPI_Sendrecv(bufSend, imax, MPI_DOUBLE, rank_t, chunk, bufRecv, imax, MPI_DOUBLE, rank_b, chunk, MPI_COMM_WORLD, status);
 
     if (rank_b != MPI_PROC_NULL){
         for (i= 1;i <= imax;i++){
@@ -389,11 +389,11 @@ void uv_comm(double **U,
         }
     }
 
-        MPI_Sendrecv(bufSend, jmax, MPI_DOUBLE, rank_b, chunk, bufRecv, jmax, MPI_DOUBLE, rank_t, chunk, MPI_COMM_WORLD, status);
+        MPI_Sendrecv(bufSend, imax, MPI_DOUBLE, rank_b, chunk, bufRecv, imax, MPI_DOUBLE, rank_t, chunk, MPI_COMM_WORLD, status);
 
     if (rank_t !=MPI_PROC_NULL){
-        for (i= 1;i <= imax;i++){
-             V[i][jmax+1] = bufRecv[i-1];
+        for (i = 1; i <= imax; i++){
+             V[i][jmax+2] = bufRecv[i-1];
         }
     }
 
