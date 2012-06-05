@@ -24,7 +24,7 @@ void boundaryvalues(
 
     /* left */
     if (omg_i == 0) {
-        for (j = 1; j <= jt - jb; ++j) {
+        for (j = 1; j <= jt - jb + 1; ++j) {
             U[0][j] = 0;
             V[0][j] = -V[1][j];
         }
@@ -32,7 +32,7 @@ void boundaryvalues(
 
     /* right */
     if (omg_i == iproc - 1) {
-        for (j = 1; j <= jt - jb; ++j) {
+        for (j = 1; j <= jt - jb + 1; ++j) {
             U[ir-il+1][j] = 0;
             V[ir-il+2][j] = -V[ir-il+1][j];
         }
@@ -40,7 +40,7 @@ void boundaryvalues(
 
     /* bottom */
     if (omg_j == 0) {
-        for (i = 1; i <= ir - il; ++i) {
+        for (i = 1; i <= ir - il + 1; ++i) {
             U[i][0] = -U[i][1];
             V[i][0] = 0;
         }
@@ -48,7 +48,7 @@ void boundaryvalues(
 
     /* top */
     if (omg_j == jproc - 1) {
-        for (i = 1; i <= ir - il; ++i) {
+        for (i = 1; i <= ir - il + 1        ; ++i) {
             U[i][jt-jb+2] = 2 - U[i][jt-jb+1];
             V[i][jt-jb+1] = 0;
         }
