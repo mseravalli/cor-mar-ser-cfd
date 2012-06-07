@@ -260,34 +260,34 @@ void output_vtk(double** U,
   }
 
   write_vtkHeader( fp, 
-                   ir - il + 1, 
-                   jt - jb + 1, 
+                   ir - il - 1, 
+                   jt - jb - 1, 
                    dx, 
                    dy);
   write_vtkPointCoordinates( fp, 
-                             ir - il + 1, 
-                             jt - jb + 1, 
+                             ir - il - 1, 
+                             jt - jb - 1, 
                              omg_i,
                              omg_j,
                              dx, 
                              dy);
 
-  fprintf(fp,"POINT_DATA %i \n", (ir - il + 2)*(jt - jb + 2) );
+  fprintf(fp,"POINT_DATA %i \n", (ir - il)*(jt - jb) );
 	
   fprintf(fp,"\n");
   fprintf(fp, "VECTORS velocity float\n");
-  for(j = 0; j < (jt - jb + 2); j++) {
-    for(i = 0; i < (ir - il + 2); i++) {
-      fprintf(fp, "%f %f 0\n", (U[i][j] + U[i][j+1]) * 0.5, (V[i][j] + V[i+1][j]) * 0.5 );
+  for(j = 2; j < (jt - jb + 2); j++) {
+    for(i = 2; i < (ir - il + 2); i++) {
+      fprintf(fp, "%f %f 0\n", (U[i][j-1] + U[i][j]) * 0.5, (V[i-1][j] + V[i][j]) * 0.5 );
     }
   }
 
   fprintf(fp,"\n");
-  fprintf(fp,"CELL_DATA %i \n", ((ir - il + 1)*(jt - jb + 1)) );
+  fprintf(fp,"CELL_DATA %i \n", ((ir - il - 1)*(jt - jb - 1)) );
   fprintf(fp, "SCALARS pressure float 1 \n"); 
   fprintf(fp, "LOOKUP_TABLE default \n");
-  for(j = 1; j < (jt - jb + 2); j++) {
-    for(i = 1; i < (ir - il + 2); i++) {
+  for(j = 2; j < (jt - jb + 1); j++) {
+    for(i = 2; i < (ir - il + 1); i++) {
       fprintf(fp, "%f\n", P[i][j] );
     }
   }
