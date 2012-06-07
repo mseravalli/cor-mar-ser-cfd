@@ -202,7 +202,7 @@ void pressure_comm(double **P,
     /*** SEND UP, receive from bottom ***/
     if(rank_t != MPI_PROC_NULL)
     {
-        for(i=1; i <= jsize; i++)
+        for(i=1; i <= isize; i++)
         {
             bufSend[i-1] = P[i][jsize];
         }
@@ -210,7 +210,7 @@ void pressure_comm(double **P,
     MPI_Sendrecv(bufSend, isize, MPI_DOUBLE, rank_t, chunk, bufRecv, isize, MPI_DOUBLE, rank_b, chunk, MPI_COMM_WORLD, status);
     if(rank_b != MPI_PROC_NULL)
     {
-        for(i=1; i <= jsize; i++)
+        for(i=1; i <= isize; i++)
         {
             P[i][0] = bufRecv[i-1];
         }
@@ -219,7 +219,7 @@ void pressure_comm(double **P,
     /*** SEND DOWN, receive from up ***/
     if(rank_b != MPI_PROC_NULL)
     {
-        for(i=1; i <= jsize; i++)
+        for(i=1; i <= isize; i++)
         {
             bufSend[i-1] = P[1][jsize];
         }
@@ -227,7 +227,7 @@ void pressure_comm(double **P,
     MPI_Sendrecv(bufSend, isize, MPI_DOUBLE, rank_t, chunk, bufRecv, isize, MPI_DOUBLE, rank_b, chunk, MPI_COMM_WORLD, status);
     if(rank_t != MPI_PROC_NULL)
     {
-        for(i=1; i <= jsize; i++)
+        for(i=1; i <= isize; i++)
         {
             P[i][jsize+1] = bufRecv[i-1];
         }

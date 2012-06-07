@@ -272,7 +272,7 @@ void calculate_uv(
     {
         for(j = 1; j < jt-jb+2; j++)
         {
-            U[i][j] = F[i][j] - dtodx*(P[i+1][j] - P[i][j]);
+            U[i][j] = F[i][j] - dtodx*(P[i][j] - P[i-1][j]);
         }
     }
 
@@ -283,7 +283,7 @@ void calculate_uv(
     {
         for(j = jstart; j < jend; j++)
         {
-            V[i][j] = G[i][j] - dtody*(P[i][j+1] - P[i][j]);
+            V[i][j] = G[i][j] - dtody*(P[i][j] - P[i][j-1]);
         }
     }
 }
