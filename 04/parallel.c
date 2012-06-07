@@ -167,9 +167,9 @@ void pressure_comm(double **P,
     /*copying data to be send prom pressure matrix to send buffer*/
     if(rank_l != MPI_PROC_NULL) /*if there is no left neighbour there is not need to copy data, since it will not be sent anyway*/
     {
-        for(j=1; j <= jsize; j++)
+        for(j=0; j <= jsize+1; j++)
         {
-            bufSend[j-1] = P[1][j];
+            bufSend[j] = P[1][j];
         }
     }
     /*trasfering data*/
@@ -177,59 +177,59 @@ void pressure_comm(double **P,
     /*copying received data from receive buffer to pressure matric*/
     if(rank_r != MPI_PROC_NULL) /*if there is no right neighbour there is no need to copy data. Since this is a system boundary it will not be changed anyway*/
     {
-        for(j=1; j <= jsize; j++)
+        for(j=0; j <= jsize+1; j++)
         {
-            P[isize+1][j] = bufRecv[j-1];
+            P[isize+1][j] = bufRecv[j];
         }
     }
     
     /*** SEND RIGHT, receive from left ***/
     if(rank_r != MPI_PROC_NULL)
     {
-        for(j=1; j <= jsize; j++)
+        for(j=0; j <= jsize+1; j++)
         {
-            bufSend[j-1] = P[isize][j];
+            bufSend[j] = P[isize][j];
         }
     }
     MPI_Sendrecv(bufSend, jsize, MPI_DOUBLE, rank_r, chunk, bufRecv, jsize, MPI_DOUBLE, rank_l, chunk, MPI_COMM_WORLD, status);
     if(rank_l != MPI_PROC_NULL){
-        for(j=1; j <= jsize; j++)
+        for(j=0; j <= jsize+1; j++)
         {
-            P[0][j] = bufRecv[j-1];
+            P[0][j] = bufRecv[j];
         }
     }
     
     /*** SEND UP, receive from bottom ***/
     if(rank_t != MPI_PROC_NULL)
     {
-        for(i=1; i <= isize; i++)
+        for(i=0; i <= isize+1; i++)
         {
-            bufSend[i-1] = P[i][jsize];
+            bufSend[i] = P[i][jsize];
         }
     }
     MPI_Sendrecv(bufSend, isize, MPI_DOUBLE, rank_t, chunk, bufRecv, isize, MPI_DOUBLE, rank_b, chunk, MPI_COMM_WORLD, status);
     if(rank_b != MPI_PROC_NULL)
     {
-        for(i=1; i <= isize; i++)
+        for(i=0; i <= isize+1; i++)
         {
-            P[i][0] = bufRecv[i-1];
+            P[i][0] = bufRecv[i];
         }
     }
     
     /*** SEND DOWN, receive from up ***/
     if(rank_b != MPI_PROC_NULL)
     {
-        for(i=1; i <= isize; i++)
+        for(i=0; i <= isize+1; i++)
         {
-            bufSend[i-1] = P[1][jsize];
+            bufSend[i] = P[1][jsize];
         }
     }
     MPI_Sendrecv(bufSend, isize, MPI_DOUBLE, rank_t, chunk, bufRecv, isize, MPI_DOUBLE, rank_b, chunk, MPI_COMM_WORLD, status);
     if(rank_t != MPI_PROC_NULL)
     {
-        for(i=1; i <= isize; i++)
+        for(i=0; i <= isize+1; i++)
         {
-            P[i][jsize+1] = bufRecv[i-1];
+            P[i][jsize+1] = bufRecv[i];
         }
     }
 	/*ar str[50];
@@ -287,7 +287,7 @@ void uv_comm(double **U,
 
         MPI_Sendrecv(bufSend, jmax, MPI_DOUBLE, rank_r, chunk, bufRecv, jmax, MPI_DOUBLE, rank_l, chunk, MPI_COMM_WORLD, status);
 
-    if (rank_r !=MPI_PROC_NULL){
+    if (rank_l !=MPI_PROC_NULL){
         for (j= 1;j <= jmax;j++){
              U[0][j]=bufRecv[j-1];
         }
@@ -296,33 +296,33 @@ void uv_comm(double **U,
      /* Send-Recv from bottom to top */
 
     if (rank_t != MPI_PROC_NULL){
-        for (i = 1; i <= imax + 1; i++)
+        for (i = 0; i <= imax + 2; i++)
         {
-            bufSend[i-1] = U[i][jmax];
+            bufSend[i] = U[i][jmax];
         }
     }
        MPI_Sendrecv(bufSend, imax+1, MPI_DOUBLE, rank_t, chunk, bufRecv, imax+1, MPI_DOUBLE, rank_b, chunk, MPI_COMM_WORLD, status);
 
     if (rank_b !=MPI_PROC_NULL){
-        for (i = 1; i <= imax+1; i++){
-             U[i][0]=bufRecv[i-1];
+        for (i = 0; i <= imax+2; i++){
+             U[i][0]=bufRecv[i];
         }
     }
 
     /* Send-Recv form top to bottom */
 
     if (rank_b != MPI_PROC_NULL){
-        for (i = 1; i <= imax+1; i++)
+        for (i = 0; i <= imax+2; i++)
         {
-            bufSend[i-1] = U[i][1];
+            bufSend[i] = U[i][1];
         }
     }
 
         MPI_Sendrecv(bufSend, imax+1, MPI_DOUBLE, rank_b, chunk, bufRecv, imax+1, MPI_DOUBLE, rank_t, chunk, MPI_COMM_WORLD, status);
 
     if (rank_t !=MPI_PROC_NULL){
-        for (i = 1; i <= imax+1;i++){
-             U[i][jmax+1]=bufRecv[i-1];
+        for (i = 0; i <= imax+2;i++){
+             U[i][jmax+1]=bufRecv[i];
         }
     }
 
@@ -332,34 +332,34 @@ void uv_comm(double **U,
     /* Send-Recv from Right to Left  */
 
     if (rank_l != MPI_PROC_NULL){
-        for (j = 1; j <= jmax + 1 ; j++)
+        for (j = 0; j <= jmax + 2; j++)
         {
-            bufSend[j-1] = V[1][j];
+            bufSend[j] = V[1][j];
         }
     }
 
         MPI_Sendrecv(bufSend, jmax+1, MPI_DOUBLE, rank_l, chunk, bufRecv, jmax+1, MPI_DOUBLE, rank_r, chunk, MPI_COMM_WORLD, status);
 
     if (rank_r !=MPI_PROC_NULL){
-        for (j = 1; j <= jmax + 1; j++){
-             V[imax+1][j]=bufRecv[j-1];
+        for (j = 0; j <= jmax + 2; j++){
+             V[imax+1][j]=bufRecv[j];
         }
     }
     
      /* Send-Recv from left to right */
 
     if (rank_r != MPI_PROC_NULL){
-        for (j = 1; j <= jmax + 1; j++)
+        for (j = 0; j <= jmax + 2; j++)
         {
-            bufSend[j-1] = V[imax][j];
+            bufSend[j] = V[imax][j];
         }
     }
 
         MPI_Sendrecv(bufSend, jmax+1, MPI_DOUBLE, rank_r, chunk, bufRecv, jmax+1, MPI_DOUBLE, rank_l, chunk, MPI_COMM_WORLD, status);
 
-    if (rank_r !=MPI_PROC_NULL){
-        for (j = 1 ; j <= jmax + 1; j++){
-             V[0][j] = bufRecv[j-1];
+    if (rank_l !=MPI_PROC_NULL){
+        for (j = 0 ; j <= jmax + 2; j++){
+             V[0][j] = bufRecv[j];
         }
     }
 

@@ -77,12 +77,12 @@ void calculate_fg(
             
             /* duvdy */
             firstOperand = ( 1 / dy )*
-            ( ( (V[i-istart+1][j] + V[i-istart+1+1][j]) / 2 ) * ( (U[i][j] + U[i][j+1]) / 2 )
-            - ( (V[i-istart+1][j-1] + V[i-istart+1+1][j-1]) / 2 ) * ( (U[i][j-1] + U[i][j]) / 2 ) );
+            ( ( (V[i-istart+1][j+1] + V[i-istart+1+1][j+1]) / 2 ) * ( (U[i][j] + U[i][j+1]) / 2 )
+            - ( (V[i-istart+1][j] + V[i-istart+1+1][j]) / 2 ) * ( (U[i][j-1] + U[i][j]) / 2 ) );
 
             secondOperand = ( alpha / dy )*
-            ( ( (abs(V[i-istart+1][j] + V[i-istart+1+1][j])/2) * ((U[i][j] - U[i][j+1])/2) )
-            - ( (abs(V[i-istart+1][j-1] + V[i-istart+1+1][j-1])/2) * ((U[i][j-1] - U[i][j])/2) ));
+            ( ( (abs(V[i-istart+1][j+1] + V[i-istart+1+1][j+1])/2) * ((U[i][j] - U[i][j+1])/2) )
+            - ( (abs(V[i-istart+1][j] + V[i-istart+1+1][j])/2) * ((U[i][j-1] - U[i][j])/2) ));
             duvdy = firstOperand + secondOperand;
 
             /* d2udx2 */
@@ -121,12 +121,12 @@ void calculate_fg(
 
             /* duvdx */
             firstOperand = ( 1 / dx )*
-            ( ( (U[i][j-jstart+1] + U[i][j-jstart+1+1]) / 2 ) * ( (V[i][j] + V[i+1][j]) / 2 )
-            - ( (U[i-1][j-jstart+1] + U[i-1][j-jstart+1+1]) / 2 ) * ( (V[i-1][j] + V[i][j]) / 2 ) );
+            ( ( (U[i+1][j-jstart+1] + U[i+1][j-jstart+1+1]) / 2 ) * ( (V[i][j] + V[i+1][j]) / 2 )
+            - ( (U[i][j-jstart+1] + U[i][j-jstart+1+1]) / 2 ) * ( (V[i-1][j] + V[i][j]) / 2 ) );
 
             secondOperand = ( alpha / dx )*
-            ( ( (abs(U[i][j-jstart+1] + U[i][j-jstart+1+1])/2) * ((V[i][j] - V[i+1][j])/2) )
-            - ( (abs(U[i-1][j-jstart+1] + U[i-1][j-jstart+1+1])/2) * ((V[i-1][j] - V[i][j])/2) ));
+            ( ( (abs(U[i+1][j-jstart+1] + U[i+1][j-jstart+1+1])/2) * ((V[i][j] - V[i+1][j])/2) )
+            - ( (abs(U[i][j-jstart+1] + U[i][j-jstart+1+1])/2) * ((V[i-1][j] - V[i][j])/2) ));
 
             duvdx = firstOperand + secondOperand;
 
@@ -145,7 +145,7 @@ void calculate_fg(
     /******** BOUNDARY VALUES START ********/
     if(rank_l == MPI_PROC_NULL)
     {  
-      for(j=1; j<=jt-jb+1; j++)
+      for(j=0; j<=jt-jb+2; j++)
       {
         F[1][j]=U[1][j];
       }
@@ -153,7 +153,7 @@ void calculate_fg(
 
     if(rank_r == MPI_PROC_NULL)
     {  
-      for(j=1; j<=jt-jb+1; j++)
+      for(j=0; j<=jt-jb+2; j++)
       {
         F[ir-il+2][j]=U[ir-il+2][j];
       }
@@ -162,7 +162,7 @@ void calculate_fg(
     
     if(rank_b == MPI_PROC_NULL)
     {
-        for(i=1; i<=ir-il+1; i++)
+        for(i=0; i<=ir-il+2; i++)
         {
            G[i][1]=V[i][1];
         }
@@ -170,7 +170,7 @@ void calculate_fg(
     
     if(rank_t == MPI_PROC_NULL)
     {
-      for(i=1; i<=ir-il+1; i++)
+      for(i=0; i<=ir-il+2; i++)
       {
           G[i][jt-jb+2]=V[i][jt-jb+2];
       }
@@ -272,7 +272,7 @@ void calculate_uv(
     {
         for(j = 1; j < jt-jb+2; j++)
         {
-            U[i][j] = F[i][j] - dtodx*(P[i][j] - P[i-1][j]);
+            U[i][j] = F[i][j] - dtodx*(P[i-istart+1][j] - P[i-istart+1-1][j]);
         }
     }
 
@@ -283,7 +283,7 @@ void calculate_uv(
     {
         for(j = jstart; j < jend; j++)
         {
-            V[i][j] = G[i][j] - dtody*(P[i][j] - P[i][j-1]);
+            V[i][j] = G[i][j] - dtody*(P[i][j-jstart+1] - P[i][j-jstart+1-1]);
         }
     }
 }
@@ -296,20 +296,29 @@ void calculate_rs(
   int ir,
   int jt,
   int jb,
+  int rank_l,
+  int rank_r,
+  int rank_b,
+  int rank_t,
   double **F,
   double **G,
   double **RS
 )
 {
-    int i, j;
+    int i, j, istart, jstart, iend, jend;
    
     /******** Calculate RS ********/
+    istart = (rank_l == MPI_PROC_NULL ? 2 : 1);
+    iend = (rank_r == MPI_PROC_NULL ? ir-il+1 : ir-il+2);
 
-    for(i = 1; i <= ir-il+1; i++)
+    jstart = (rank_b == MPI_PROC_NULL ? 2 : 1);
+    jend = (rank_t == MPI_PROC_NULL ? jt-jb+1 : jt-jb+2);
+ 
+    for(i = istart; i <= iend; i++)
     {
-        for(j = 1; j <= jt-jb+1; j++)
+        for(j = jstart; j <= jend; j++)
         {
-            RS[i][j]= 1/dt*((F[i+1][j]-F[i][j])/dx+(G[i][j+1]-G[i][j])/dy);
+            RS[i-istart+1][j-jstart+1]= 1/dt*((F[i+1][j-jstart+1]-F[i][j-jstart+1])/dx+(G[i-istart+1][j+1]-G[i-istart+1][j])/dy);
             }
         }
 }

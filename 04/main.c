@@ -171,10 +171,10 @@ int main(int argn, char** args){
     RS = matrix(0, ir - il + 2, 0, jt - jb + 2); 
     init_uvp(UI, VI, PI, ir - il + 1, jt - jb + 1, U, V, P);
     
-    max_length = ir-il+1;
-    if(max_length < jt-jb+1)
+    max_length = ir-il+3;
+    if(max_length < jt-jb+3)
     {
-      max_length = jt-jb+1;    
+      max_length = jt-jb+3;    
     }
     
     bufSend = (double *) malloc((size_t)(max_length * sizeof(double)));
@@ -229,9 +229,13 @@ int main(int argn, char** args){
                  dx,
                  dy,
                  il,
-		             ir,
+		 ir,
                  jt,
                  jb,
+  		 rank_l,
+  		 rank_r,
+  		 rank_b,
+  		 rank_t,
                  F,
                  G,
                  RS);

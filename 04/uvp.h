@@ -61,6 +61,10 @@ void calculate_rs(
   int ir,
   int jt,
   int jb,
+  int rank_l,
+  int rank_r,
+  int rank_b,
+  int rank_t,
   double **F,
   double **G,
   double **RS
