@@ -197,19 +197,22 @@ int main(int argn, char** args){
                  U,
                  V);
 
+        boundaryvalues(imax,
+                       jmax,
+                       rank_l,
+                       rank_r,
+                       rank_b,
+                       rank_t,
+                       U,
+                       V);
 
         {
             char txt[1024];
-            sprintf(txt, " %f ", dt);
+            sprintf(txt, " %f ", U[imax+1][jmax+1]);
             Program_Message(txt); 
         }
 
         break;
-
-        boundaryvalues(imax,
-                       jmax,
-                       U,
-                       V);
 
         calculate_fg(Re,
                  GX,
