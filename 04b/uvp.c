@@ -14,6 +14,10 @@ void calculate_fg(
   double dy,
   int imax,
   int jmax,
+  int rank_l,
+  int rank_r,
+  int rank_b,
+  int rank_t,
   double **U,
   double **V,
   double **F,
@@ -39,12 +43,20 @@ void calculate_fg(
     int i;
     int j;
 
+    int istart;
+    int jstart;
+    int iend;
+    int jend;
+
     /******** VARIABLE DECLARATION END ********/
 
 
     /******** CALCULATE F START ********/
     
-    for(i = 1; i <= imax-1; i++)
+    istart = (rank_l == MPI_PROC_NULL? 2 : 1 );
+    iend = (rank_r == MPI_PROC_NULL ? imax : imax + 1);
+
+    for(i = istart; i <= iend; i++)
     {
         for(j = 1; j <= jmax; j++)
         {
@@ -61,12 +73,12 @@ void calculate_fg(
             
             /* duvdy */
             firstOperand = ( 1 / dy )*
-            ( ( (V[i][j] + V[i+1][j]) / 2 ) * ( (U[i][j] + U[i][j+1]) / 2 )
-            - ( (V[i][j-1] + V[i+1][j-1]) / 2 ) * ( (U[i][j-1] + U[i][j]) / 2 ) );
+            ( ( (V[i-1][j+1] + V[i][j+1]) / 2 ) * ( (U[i][j] + U[i][j+1]) / 2 )
+            - ( (V[i-1][j] + V[i][j]) / 2 ) * ( (U[i][j-1] + U[i][j]) / 2 ) );
 
             secondOperand = ( alpha / dy )*
-            ( ( (abs(V[i][j] + V[i+1][j])/2) * ((U[i][j] - U[i][j+1])/2) )
-            - ( (abs(V[i][j-1] + V[i+1][j-1])/2) * ((U[i][j-1] - U[i][j])/2) ));
+            ( ( (abs(V[i-1][j+1] + V[i][j+1])/2) * ((U[i][j] - U[i][j+1])/2) )
+            - ( (abs(V[i-1][j] + V[i][j])/2) * ((U[i][j-1] - U[i][j])/2) ));
             duvdy = firstOperand + secondOperand;
 
             /* d2udx2 */
@@ -84,9 +96,12 @@ void calculate_fg(
 
     /******** CALCULATE G START ********/
 
+    jstart = (rank_b == MPI_PROC_NULL ? 2 : 1 );
+    jend = (rank_t == MPI_PROC_NULL ? jmax : jmax + 1);
+
     for(i = 1; i <= imax; i++)
     {
-        for(j = 1; j <= jmax-1; j++)
+        for(j = jstart; j <= jend; j++)
         {
 
            /* dv2dy */ 
@@ -101,12 +116,12 @@ void calculate_fg(
 
             /* duvdx */
             firstOperand = ( 1 / dx )*
-            ( ( (U[i][j] + U[i][j+1]) / 2 ) * ( (V[i][j] + V[i+1][j]) / 2 )
-            - ( (U[i-1][j] + U[i-1][j+1]) / 2 ) * ( (V[i-1][j] + V[i][j]) / 2 ) );
+            ( ( (U[i+1][j-1] + U[i+1][j]) / 2 ) * ( (V[i][j] + V[i+1][j]) / 2 )
+            - ( (U[i][j-1] + U[i][j]) / 2 ) * ( (V[i-1][j] + V[i][j]) / 2 ) );
 
             secondOperand = ( alpha / dx )*
-            ( ( (abs(U[i][j] + U[i][j+1])/2) * ((V[i][j] - V[i+1][j])/2) )
-            - ( (abs(U[i-1][j] + U[i-1][j+1])/2) * ((V[i-1][j] - V[i][j])/2) ));
+            ( ( (abs(U[i+1][j-1] + U[i+1][j])/2) * ((V[i][j] - V[i+1][j])/2) )
+            - ( (abs(U[i][j-1] + U[i][j])/2) * ((V[i-1][j] - V[i][j])/2) ));
 
             duvdx = firstOperand + secondOperand;
 
@@ -125,14 +140,14 @@ void calculate_fg(
     /******** BOUNDARY VALUES START ********/
     for(j=1; j<=jmax; j++)
     {
-        F[0][j]=U[0][j];
-        F[imax][j]=U[imax][j];
+        F[istart-1][j]=U[istart-1][j];
+        F[iend+1][j]=U[iend+1][j];
     }
     
     for(i=1; i<=imax; i++)
     {
-        G[i][0]=V[i][0];
-        G[i][jmax]=V[i][jmax];
+        G[i][jstart-1]=V[i][jstart-1];
+        G[i][jend+1]=V[i][jend+1];
     }
     /******** BOUNDARY VALUES END ********/
 }

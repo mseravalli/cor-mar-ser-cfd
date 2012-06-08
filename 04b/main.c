@@ -206,14 +206,6 @@ int main(int argn, char** args){
                        U,
                        V);
 
-        {
-            char txt[1024];
-            sprintf(txt, " %f ", U[imax+1][jmax+1]);
-            Program_Message(txt); 
-        }
-
-        break;
-
         calculate_fg(Re,
                  GX,
                  GY,
@@ -223,10 +215,22 @@ int main(int argn, char** args){
                  dy,
                  imax,
                  jmax,
+                 rank_l,
+                 rank_r,
+                 rank_b,
+                 rank_t,
                  U,
                  V,
                  F,
                  G);
+
+        {
+            char txt[1024];
+            sprintf(txt, " %f ", U[imax+1][jmax+1]);
+            Program_Message(txt); 
+        }
+
+        break;
         
         calculate_rs(dt,
                  dx,
