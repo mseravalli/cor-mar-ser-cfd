@@ -79,9 +79,6 @@ int main(int argn, char** args){
     int it;
     double res;
     
-    int i;
-    int j;
-
     int iproc;
     int jproc;
     int omg_i;
@@ -104,8 +101,7 @@ int main(int argn, char** args){
     double *bufSend;
     double *bufRecv;
 
-    char txt[1024];
-
+    /**** initialise all the variables ****/
     MPI_Init(&argn, &args);
 
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
@@ -135,6 +131,7 @@ int main(int argn, char** args){
                     &iproc,
                     &jproc);
                     
+    /* if the number of processes is not coherent with the subdomains, exit */
     if (num_proc % (iproc*jproc) != 0) {
         if (myrank == 0) {
             printf("cannot execute : number of processes and subdomains should be coherent\n");
@@ -166,14 +163,13 @@ int main(int argn, char** args){
     t = 0;
     n = 0;
 
+    /**** allocate all the matrices and the vectores ****/
     U = matrix(0, imax + 2, 0, jmax + 1); 
     F = matrix(0, imax + 2, 0, jmax + 1);
     V = matrix(0, imax + 1, 0, jmax + 2); 
     G = matrix(0, imax + 1, 0, jmax + 2);
     P = matrix(0, imax + 1, 0, jmax + 1);
     RS = matrix(0, imax + 1, 0, jmax + 1); 
-    /*TODO: change this shit, cannot work like this!! */
-    init_uvp(UI, VI, PI, imax, jmax, U, V, P);
 
     max_length = imax+3;
     if(max_length < jmax+3)
@@ -184,10 +180,12 @@ int main(int argn, char** args){
     bufSend = (double *) malloc((size_t)(max_length * sizeof(double)));
     bufRecv = (double *) malloc((size_t)(max_length * sizeof(double)));
 
-    sprintf(txt, "%i %i, %i %i", rank_l, rank_r, rank_b, rank_t);
-    Program_Message(txt); 
+    /**** initialise the matrices ****/
+    init_matrix(U, 0, imax + 2, 0, jmax + 1, UI); 
+    init_matrix(V, 0, imax + 1, 0, jmax + 2, VI); 
+    init_matrix(P, 0, imax + 1, 0, jmax + 1, PI);
 
-    while ( 0 && t < t_end)
+    while (t < t_end)
     {
         calculate_dt(Re,
                  tau,
@@ -198,12 +196,21 @@ int main(int argn, char** args){
                  jmax,
                  U,
                  V);
-                 
+
+
+        {
+            char txt[1024];
+            sprintf(txt, " %f ", dt);
+            Program_Message(txt); 
+        }
+
+        break;
+
         boundaryvalues(imax,
                        jmax,
                        U,
                        V);
-    
+
         calculate_fg(Re,
                  GX,
                  GY,

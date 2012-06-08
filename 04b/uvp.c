@@ -2,7 +2,7 @@
 #include "helper.h"
 #include "uvp.h"
 #include <math.h>
-
+#include "parallel.h"
 
 void calculate_fg(
   double Re,
@@ -44,12 +44,6 @@ void calculate_fg(
 
     /******** CALCULATE F START ********/
     
-    boundaryvalues(imax, jmax, U, V);
-
-    /******** Calculate the single derivatives ********/
-
-    /******** Calculate F ********/
-    
     for(i = 1; i <= imax-1; i++)
     {
         for(j = 1; j <= jmax; j++)
@@ -89,10 +83,6 @@ void calculate_fg(
     
 
     /******** CALCULATE G START ********/
-
-    boundaryvalues(imax, jmax, U, V);
-
-    /******** Calculate G ********/
 
     for(i = 1; i <= imax; i++)
     {
@@ -161,6 +151,8 @@ void calculate_dt(
 {
     double umax = 0;
     double vmax = 0;
+    double globUmax = 0;
+    double globVmax = 0;
     int i, j;
 
     double dtcond, dxcond, dycond;
@@ -177,6 +169,14 @@ void calculate_dt(
                 vmax = V[i][j];
         }
     }
+
+    /* determines global umax and vmax and places it in master thread */
+    MPI_Reduce(&umax, &globUmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&vmax, &globVmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+    /* broadcasts umax nad vmax */
+    MPI_Bcast(&globUmax, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&globVmax, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     /******** Calculate conditions ********/
     dtcond = Re/(2*(1/(dx*dx) + 1/(dy*dy)));
