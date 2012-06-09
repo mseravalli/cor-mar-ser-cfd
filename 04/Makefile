@@ -1,6 +1,6 @@
 IDIR =./
 CC=mpicc
-CFLAGS = -Wall -pedantic -O3 #-g
+CFLAGS = -Wall -pedantic -O3 -funroll-loops
 
 ODIR=obj
 LDIR =../lib

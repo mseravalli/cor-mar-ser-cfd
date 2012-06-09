@@ -299,7 +299,7 @@ void calculate_rs(
   double **RS
 )
 {
-    int i, j, istart, jstart, iend, jend;
+    int i, j;
 
     int imax, jmax;
 
