@@ -311,7 +311,7 @@ int main(int argn, char** args){
                     &status,
                     n);
 
-        if (n % 1000 == 0) {
+        if( n % (int)dt_value == 0 ){
             output_vtk(U, 
                        V, 
                        P, 
@@ -327,8 +327,9 @@ int main(int argn, char** args){
                        dy, 
                        n, 
                        "cavity");
-            ++n;
         }
+
+        ++n;
 
         t += dt;
     }

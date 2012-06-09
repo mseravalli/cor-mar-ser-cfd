@@ -193,10 +193,10 @@ void calculate_dt(
     {
         for(j = 1; j <= jmax+1; j++)
         {
-            if(umax < abs(U[i][j]))
-                umax = abs(U[i][j]);
-            if(vmax < abs(V[i][j]))
-                vmax = abs(V[i][j]);
+            if(umax < fabs(U[i][j]))
+                umax = fabs(U[i][j]);
+            if(vmax < fabs(V[i][j]))
+                vmax = fabs(V[i][j]);
         }
     }
     
