@@ -179,7 +179,7 @@ void pressure_comm(double **P,
     {
         for(j=0; j < jsize+1; j++)
         {
-            P[isize][j] = bufRecv[j];
+            P[isize+1][j] = bufRecv[j];
         }
     }
     
@@ -188,7 +188,7 @@ void pressure_comm(double **P,
     {
         for(j=0; j < jsize+1; j++)
         {
-            bufSend[j] = P[isize-1][j];
+            bufSend[j] = P[isize][j];
         }
     }
     MPI_Sendrecv(bufSend, jsize+1, MPI_DOUBLE, rank_r, chunk, bufRecv, jsize+1, MPI_DOUBLE, rank_l, chunk, MPI_COMM_WORLD, status);
@@ -204,7 +204,7 @@ void pressure_comm(double **P,
     {
         for(i=0; i < isize+1; i++)
         {
-            bufSend[i] = P[i][jsize-1];
+            bufSend[i] = P[i][jsize];
         }
     }
     MPI_Sendrecv(bufSend, isize+1, MPI_DOUBLE, rank_t, chunk, bufRecv, isize+1, MPI_DOUBLE, rank_b, chunk, MPI_COMM_WORLD, status);
@@ -229,7 +229,7 @@ void pressure_comm(double **P,
     {
         for(i=0; i < isize+1; i++)
         {
-            P[i][jsize] = bufRecv[i];
+            P[i][jsize+1] = bufRecv[i];
         }
     }
 	/*ar str[50];
