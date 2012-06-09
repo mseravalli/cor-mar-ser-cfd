@@ -355,7 +355,10 @@ int main(int argn, char** args){
     free_matrix(P, 0, ir - il + 2, 0, jt - jb + 2);
     free_matrix(F, 0, ir - il + 3, 0, jt - jb + 2); 
     free_matrix(G, 0, ir - il + 2, 0, jt - jb + 3); 
-    /*free_matrix(RS, 0, ir - il + 2, 0, jt - jb + 2); */
+    free_matrix(RS, 0, ir - il + 2, 0, jt - jb + 2);
+    
+    free(bufSend);
+    free(bufRecv);
 
     Programm_Stop(txt);
 
