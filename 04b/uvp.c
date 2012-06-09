@@ -174,14 +174,14 @@ void calculate_dt(
     double minval;
 
     /******** Determine umax and vmax *********/
-    for(i = 0; i < imax; i++)
+    for(i = 0; i <= imax+1; i++)
     {
-        for(j = 0; j < jmax; j++)
+        for(j = 0; j <= jmax+1; j++)
         {
-            if(umax < U[i][j])
-                umax = U[i][j];
-            if(vmax < V[i][j])
-                vmax = V[i][j];
+            if(umax < fabs(U[i][j]))
+                umax = fabs(U[i][j]);
+            if(vmax < fabs(V[i][j]))
+                vmax = fabs(V[i][j]);
         }
     }
 
