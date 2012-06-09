@@ -224,14 +224,6 @@ int main(int argn, char** args){
                  F,
                  G);
 
-        {
-            char txt[1024];
-            sprintf(txt, " %f ", U[imax+1][jmax+1]);
-            Program_Message(txt); 
-        }
-
-        break;
-        
         calculate_rs(dt,
                  dx,
                  dy,
@@ -240,6 +232,14 @@ int main(int argn, char** args){
                  F,
                  G,
                  RS);
+
+        {
+            char txt[1024];
+            sprintf(txt, " %f ", U[imax+1][jmax+1]);
+            Program_Message(txt); 
+        }
+
+        break;
                  
         it = 0;
         res = eps + 1;

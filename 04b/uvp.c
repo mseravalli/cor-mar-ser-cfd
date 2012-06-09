@@ -263,11 +263,11 @@ void calculate_rs(
    
     /******** Calculate RS ********/
 
-    for(i = 1; i <= imax; i++)
+    for(i = 2; i <= imax+1; i++)
     {
-        for(j = 1; j <= jmax; j++)
+        for(j = 2; j <= jmax+1; j++)
         {
-            RS[i][j]= 1/dt*((F[i][j]-F[i-1][j])/dx+(G[i][j]-G[i][j-1])/dy);
-            }
+            RS[i][j]= 1/dt*((F[i][j-1]-F[i-1][j-1])/dx+(G[i-1][j]-G[i-1][j-1])/dy);
         }
+    }
 }
