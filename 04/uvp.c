@@ -48,7 +48,10 @@ void calculate_fg(
 
     int istart, iend;
     int jstart, jend;
-
+    
+    int imax, jmax;
+    imax = ir-il+1;
+    jmax = jt-jb+1;
     
     /******** VARIABLE DECLARATION END ********/
 
@@ -57,12 +60,12 @@ void calculate_fg(
     
     /******** Calculate F ********/
 
-    istart = (rank_l == MPI_PROC_NULL ? 1 : 1);
-    iend = (rank_r == MPI_PROC_NULL ? ir-il+1 : ir-il+1);
+    istart = (rank_l == MPI_PROC_NULL? 2 : 1 );
+    iend = (rank_r == MPI_PROC_NULL ? imax : imax + 1);
 
     for(i = istart; i <= iend; i++)
     {
-        for(j = 1; j <= jt-jb+1; j++)
+        for(j = 1; j <= jmax; j++)
         {
 
             /* du2dx */
@@ -77,12 +80,12 @@ void calculate_fg(
             
             /* duvdy */
             firstOperand = ( 1 / dy )*
-            ( ( (V[i-istart+1][j+1] + V[i-istart+1+1][j+1]) / 2 ) * ( (U[i][j] + U[i][j+1]) / 2 )
-            - ( (V[i-istart+1][j] + V[i-istart+1+1][j]) / 2 ) * ( (U[i][j-1] + U[i][j]) / 2 ) );
+            ( ( (V[i-1][j+1] + V[i][j+1]) / 2 ) * ( (U[i][j] + U[i][j+1]) / 2 )
+            - ( (V[i-1][j] + V[i][j]) / 2 ) * ( (U[i][j-1] + U[i][j]) / 2 ) );
 
             secondOperand = ( alpha / dy )*
-            ( ( (abs(V[i-istart+1][j+1] + V[i-istart+1+1][j+1])/2) * ((U[i][j] - U[i][j+1])/2) )
-            - ( (abs(V[i-istart+1][j] + V[i-istart+1+1][j])/2) * ((U[i][j-1] - U[i][j])/2) ));
+            ( ( (abs(V[i-1][j+1] + V[i][j+1])/2) * ((U[i][j] - U[i][j+1])/2) )
+            - ( (abs(V[i-1][j] + V[i][j])/2) * ((U[i][j-1] - U[i][j])/2) ));
             duvdy = firstOperand + secondOperand;
 
             /* d2udx2 */
@@ -101,10 +104,10 @@ void calculate_fg(
 
     /******** Calculate G ********/
 
-    jstart = (rank_b == MPI_PROC_NULL ? 1 : 1);
-    jend = (rank_t == MPI_PROC_NULL ? jt-jb+1 : jt-jb+1);
-    
-    for(i = 1; i <= ir-il+1; i++)
+    jstart = (rank_b == MPI_PROC_NULL ? 2 : 1 );
+    jend = (rank_t == MPI_PROC_NULL ? jmax : jmax + 1);
+
+    for(i = 1; i <= imax; i++)
     {
         for(j = jstart; j <= jend; j++)
         {
@@ -121,12 +124,12 @@ void calculate_fg(
 
             /* duvdx */
             firstOperand = ( 1 / dx )*
-            ( ( (U[i+1][j-jstart+1] + U[i+1][j-jstart+1+1]) / 2 ) * ( (V[i][j] + V[i+1][j]) / 2 )
-            - ( (U[i][j-jstart+1] + U[i][j-jstart+1+1]) / 2 ) * ( (V[i-1][j] + V[i][j]) / 2 ) );
+            ( ( (U[i+1][j-1] + U[i+1][j]) / 2 ) * ( (V[i][j] + V[i+1][j]) / 2 )
+            - ( (U[i][j-1] + U[i][j]) / 2 ) * ( (V[i-1][j] + V[i][j]) / 2 ) );
 
             secondOperand = ( alpha / dx )*
-            ( ( (abs(U[i+1][j-jstart+1] + U[i+1][j-jstart+1+1])/2) * ((V[i][j] - V[i+1][j])/2) )
-            - ( (abs(U[i][j-jstart+1] + U[i][j-jstart+1+1])/2) * ((V[i-1][j] - V[i][j])/2) ));
+            ( ( (abs(U[i+1][j-1] + U[i+1][j])/2) * ((V[i][j] - V[i+1][j])/2) )
+            - ( (abs(U[i][j-1] + U[i][j])/2) * ((V[i-1][j] - V[i][j])/2) ));
 
             duvdx = firstOperand + secondOperand;
 
@@ -143,37 +146,16 @@ void calculate_fg(
     /******** CALCULATE G END ********/
     
     /******** BOUNDARY VALUES START ********/
-    if(rank_l == MPI_PROC_NULL)
-    {  
-      for(j=0; j<=jt-jb+2; j++)
-      {
-        F[0][j]=U[0][j];
-      }
-    }
-
-    if(rank_r == MPI_PROC_NULL)
-    {  
-      for(j=0; j<=jt-jb+2; j++)
-      {
-        F[ir-il+2][j]=U[ir-il+2][j];
-      }
-    }
-    
-    
-    if(rank_b == MPI_PROC_NULL)
+    for(j=1; j<=jmax; j++)
     {
-        for(i=0; i<=ir-il+2; i++)
-        {
-           G[i][0]=V[i][0];
-        }
+        F[istart-1][j]=U[istart-1][j];
+        F[iend+1][j]=U[iend+1][j];
     }
     
-    if(rank_t == MPI_PROC_NULL)
+    for(i=1; i<=imax; i++)
     {
-      for(i=0; i<=ir-il+2; i++)
-      {
-          G[i][jt-jb+2]=V[i][jt-jb+2];
-      }
+        G[i][jstart-1]=V[i][jstart-1];
+        G[i][jend+1]=V[i][jend+1];
     }
     /******** BOUNDARY VALUES END ********/
 }
@@ -201,24 +183,29 @@ void calculate_dt(
     double dtcond, dxcond, dycond;
     double minval;
 
+    int imax, jmax;
+
+    imax = ir-il+1;
+    jmax = jt-jb+1;
+
     /******** Determine umax and vmax *********/
-    for(i = 1; i <= ir-il+1; i++)
+    for(i = 1; i <= imax+1; i++)
     {
-        for(j = 1; j <= jt-jb+1; j++)
+        for(j = 1; j <= jmax+1; j++)
         {
-            if(umax < U[i][j])
-                umax = U[i][j];
-            if(vmax < V[i][j])
-                vmax = V[i][j];
+            if(umax < abs(U[i][j]))
+                umax = abs(U[i][j]);
+            if(vmax < abs(V[i][j]))
+                vmax = abs(V[i][j]);
         }
     }
     
     /* determines globan umax and vmax and places it in master thread */
     MPI_Reduce(&umax, &globUmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&vmax, &globVmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&vmax, &globVmax, 1, MPI_DOUBLE, MPI_MAX, 1, MPI_COMM_WORLD);
     /* broadcasts umax nad vmax */
-    MPI_Bcast(&globUmax, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&globVmax, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&globUmax, 1, MPI_DOUBLE, 2, MPI_COMM_WORLD);
+    MPI_Bcast(&globVmax, 1, MPI_DOUBLE, 3, MPI_COMM_WORLD);
     
     
     /******** Calculate conditions ********/
@@ -260,30 +247,37 @@ void calculate_uv(
     int istart, iend;
     int jstart, jend;
     double dtodx, dtody;  
+
+    int imax, jmax;
+
+    imax = ir-il+1;
+    jmax = jt-jb+1;
     
     /******** Calculate dt/dx and dt/dy (it is the same for each element) ********/
     dtodx = dt/dx;
     dtody = dt/dy;
     
     /******** Calculate u in step next step ********/
-    istart = (rank_l == MPI_PROC_NULL ? 1 : 1);
-    iend = (rank_r == MPI_PROC_NULL ? ir - il + 2 : ir - il + 2 );
-    for(i = istart; i < iend; i++)
+    istart = (rank_l == MPI_PROC_NULL? 2 : 1 );
+    iend = (rank_r == MPI_PROC_NULL ? imax : imax + 1);
+
+    for(i = istart; i <= iend; i++)
     {
-        for(j = 1; j < jt-jb+2; j++)
+        for(j = 1; j <= jmax; j++)
         {
-            U[i][j] = F[i][j] - dtodx*(P[i-istart+1][j] - P[i-istart][j]);
+            U[i][j] = F[i][j] - dtodx*(P[i][j] - P[i-1][j]);
         }
     }
 
     /******** Calculate v in step next step ********/
-    jstart = (rank_b == MPI_PROC_NULL ? 1 : 1);
-    jend = (rank_t == MPI_PROC_NULL ? jt - jb + 2 : jt - jb +2);
-    for(i = 1; i < ir-il+2; i++)
+    jstart = (rank_b == MPI_PROC_NULL ? 2 : 1 );
+    jend = (rank_t == MPI_PROC_NULL ? jmax : jmax + 1);
+
+    for(i = 1; i <= imax; i++)
     {
-        for(j = jstart; j < jend; j++)
+        for(j = jstart; j <= jend; j++)
         {
-            V[i][j] = G[i][j] - dtody*(P[i][j-jstart+1] - P[i][j-jstart]);
+            V[i][j] = G[i][j] - dtody*(P[i][j] - P[i][j-1]);
         }
     }
 }
@@ -306,19 +300,18 @@ void calculate_rs(
 )
 {
     int i, j, istart, jstart, iend, jend;
+
+    int imax, jmax;
+
+    imax = ir-il+1;
+    jmax = jt-jb+1;
    
     /******** Calculate RS ********/
-    istart = (rank_l == MPI_PROC_NULL ? 1 : 1);
-    iend = (rank_r == MPI_PROC_NULL ? ir-il+1 : ir-il+1);
-
-    jstart = (rank_b == MPI_PROC_NULL ? 1 : 1);
-    jend = (rank_t == MPI_PROC_NULL ? jt-jb+1 : jt-jb+1);
- 
-    for(i = istart; i <= iend; i++)
+    for(i = 2; i <= imax+1; i++)
     {
-        for(j = jstart; j <= jend; j++)
+        for(j = 2; j <= jmax+1; j++)
         {
-            RS[i-istart+1][j-jstart+1]= 1/dt*((F[i+1][j-jstart+1]-F[i][j-jstart+1])/dx+(G[i-istart+1][j+1]-G[i-istart+1][j])/dy);
-            }
+            RS[i-1][j-1]= 1/dt*((F[i][j-1]-F[i-1][j-1])/dx+(G[i-1][j]-G[i-1][j-1])/dy);
         }
+    }
 }
