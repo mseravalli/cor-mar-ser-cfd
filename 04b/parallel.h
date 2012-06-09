@@ -45,10 +45,8 @@ void init_parallel(int iproc,
 
 /* Exchanges pressure between nighbouring processes */
 void pressure_comm(double **P,
-                   int il,
-                   int ir,
-                   int jb,
-                   int jt,
+                   int imax,
+                   int jmax,
                    int rank_l,
                    int rank_r,
                    int rank_b,

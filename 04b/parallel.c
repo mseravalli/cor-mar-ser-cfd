@@ -140,10 +140,8 @@ void init_parallel(int iproc,
 }
 
 void pressure_comm(double **P,
-                   int il,
-                   int ir,
-                   int jb,
-                   int jt,
+                   int imax,
+                   int jmax,
                    int rank_l,
                    int rank_r,
                    int rank_b,
@@ -153,6 +151,80 @@ void pressure_comm(double **P,
                    MPI_Status *status,
                    int chunk)
 {
+    int i;
+    int j;
+
+    /*** SEND LEFT, receive from right ***/
+    /*copying data to be send prom pressure matrix to send buffer*/
+    /*if there is no left neighbour there is not need to copy data, since it will not be sent anyway*/
+    if(rank_l != MPI_PROC_NULL) 
+    {
+        for(j = 0; j <= jmax+1; j++)
+        {
+            bufSend[j] = P[1][j];
+        }
+    }
+    /*trasfering data*/
+    MPI_Sendrecv(bufSend, jmax+2, MPI_DOUBLE, rank_l, chunk, bufRecv, jmax+2, MPI_DOUBLE, rank_r, chunk, MPI_COMM_WORLD, status);
+    /*copying received data from receive buffer to pressure matric*/
+    if(rank_r != MPI_PROC_NULL) /*if there is no right neighbour there is no need to copy data. Since this is a system boundary it will not be changed anyway*/
+    {
+        for(j = 0; j <= jmax+1; j++)
+        {
+            P[imax+1][j] = bufRecv[j];
+        }
+    }
+    
+    /*** SEND RIGHT, receive from left ***/
+    if(rank_r != MPI_PROC_NULL)
+    {
+        for(j = 0; j <= jmax+1; j++)
+        {
+            bufSend[j] = P[imax][j];
+        }
+    }
+    MPI_Sendrecv(bufSend, jmax+2, MPI_DOUBLE, rank_r, chunk, bufRecv, jmax+2, MPI_DOUBLE, rank_l, chunk, MPI_COMM_WORLD, status);
+    if(rank_l != MPI_PROC_NULL){
+        for(j = 0; j <= jmax+1; j++)
+        {
+            P[0][j] = bufRecv[j];
+        }
+    }
+    
+    /*** SEND UP, receive from bottom ***/
+    if(rank_t != MPI_PROC_NULL)
+    {
+        for(i = 0; i <= imax+1; i++)
+        {
+            bufSend[i] = P[i][jmax];
+        }
+    }
+    MPI_Sendrecv(bufSend, imax+2, MPI_DOUBLE, rank_t, chunk, bufRecv, imax+2, MPI_DOUBLE, rank_b, chunk, MPI_COMM_WORLD, status);
+    if(rank_b != MPI_PROC_NULL)
+    {
+        for(i = 0; i <= imax+1; i++)
+        {
+            P[i][0] = bufRecv[i];
+        }
+    }
+    
+    /*** SEND DOWN, receive from up ***/
+    if(rank_b != MPI_PROC_NULL)
+    {
+        for(i = 0; i <= imax+1; i++)
+        {
+            bufSend[i] = P[i][1];
+        }
+    }
+    MPI_Sendrecv(bufSend, imax+2, MPI_DOUBLE, rank_b, chunk, bufRecv, imax+2, MPI_DOUBLE, rank_t, chunk, MPI_COMM_WORLD, status);
+    if(rank_t != MPI_PROC_NULL)
+    {
+        for(i = 0; i <= imax+1; i++)
+        {
+            P[i][jmax+1] = bufRecv[i];
+        }
+    }
+
 }
 
 void uv_comm(double **U,

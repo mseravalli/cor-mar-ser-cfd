@@ -78,6 +78,7 @@ int main(int argn, char** args){
     int n;
     int it;
     double res;
+    char nextSORiter;
     
     int iproc;
     int jproc;
@@ -232,19 +233,12 @@ int main(int argn, char** args){
                  F,
                  G,
                  RS);
-
-        {
-            char txt[1024];
-            sprintf(txt, " %f ", U[imax+1][jmax+1]);
-            Program_Message(txt); 
-        }
-
-        break;
                  
         it = 0;
         res = eps + 1;
-        
-        while (it < itermax && res > eps)
+        nextSORiter = 1;
+
+        while (nextSORiter)
         {
              sor(
                  omg,
@@ -252,12 +246,29 @@ int main(int argn, char** args){
                  dy,
                  imax,
                  jmax,
+                 rank_l,
+                 rank_r,
+                 rank_b,
+                 rank_t,
+                 it,
+                 bufSend,
+                 bufRecv,
                  P,
                  RS,
                  &res);
+
+            /*master decides if another iteration in required*/
+            if(myrank == 0){
+              nextSORiter = ((it < itermax && res > eps)? 1 : 0);
+            }
+            
+            /*it broadcasts the decision to all other processes*/
+            MPI_Bcast(&nextSORiter, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
                  
             it++;
         }
+
+        break;
         
         calculate_uv(dt,
                  dx,
