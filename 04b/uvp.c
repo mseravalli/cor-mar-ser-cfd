@@ -215,6 +215,10 @@ void calculate_uv(
   double dy,
   int imax,
   int jmax,
+  int rank_l,
+  int rank_r,
+  int rank_b,
+  int rank_t,
   double **U,
   double **V,
   double **F,
@@ -223,6 +227,8 @@ void calculate_uv(
 )
 {
     int i, j;
+    int istart, iend;
+    int jstart, jend;
     double dtodx, dtody;  
     
     /******** Calculate dt/dx and dt/dy (it is the same for each element) ********/
@@ -230,20 +236,26 @@ void calculate_uv(
     dtody = dt/dy;
     
     /******** Calculate u in step next step ********/
-    for(i = 1; i < imax; i++)
+    istart = (rank_l == MPI_PROC_NULL? 2 : 1 );
+    iend = (rank_r == MPI_PROC_NULL ? imax : imax + 1);
+
+    for(i = istart; i <= iend; i++)
     {
-        for(j = 1; j < jmax+1; j++)
+        for(j = 1; j <= jmax; j++)
         {
-            U[i][j] = F[i][j] - dtodx*(P[i+1][j] - P[i][j]);
+            U[i][j] = F[i][j] - dtodx*(P[i][j] - P[i-1][j]);
         }
     }
 
     /******** Calculate v in step next step ********/
-    for(i = 1; i < imax + 1; i++)
+    jstart = (rank_b == MPI_PROC_NULL ? 2 : 1 );
+    jend = (rank_t == MPI_PROC_NULL ? jmax : jmax + 1);
+
+    for(i = 1; i <= imax; i++)
     {
-        for(j = 1; j < jmax; j++)
+        for(j = jstart; j <= jend; j++)
         {
-            V[i][j] = G[i][j] - dtody*(P[i][j+1] - P[i][j]);
+            V[i][j] = G[i][j] - dtody*(P[i][j] - P[i][j-1]);
         }
     }
 }

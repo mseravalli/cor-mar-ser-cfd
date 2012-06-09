@@ -268,18 +268,22 @@ int main(int argn, char** args){
             it++;
         }
 
-        break;
-        
         calculate_uv(dt,
                  dx,
                  dy,
                  imax,
                  jmax,
+                 rank_l, 
+                 rank_r, 
+                 rank_b,
+                 rank_t,
                  U,
                  V,
                  F,
                  G,
                  P);
+
+        break;
 
             write_vtkFile("files/file",
 		                  n,
