@@ -202,10 +202,10 @@ void calculate_dt(
     
     /* determines globan umax and vmax and places it in master thread */
     MPI_Reduce(&umax, &globUmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&vmax, &globVmax, 1, MPI_DOUBLE, MPI_MAX, 1, MPI_COMM_WORLD);
+    MPI_Reduce(&vmax, &globVmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
     /* broadcasts umax nad vmax */
-    MPI_Bcast(&globUmax, 1, MPI_DOUBLE, 2, MPI_COMM_WORLD);
-    MPI_Bcast(&globVmax, 1, MPI_DOUBLE, 3, MPI_COMM_WORLD);
+    MPI_Bcast(&globUmax, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&globVmax, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     
     
     /******** Calculate conditions ********/
