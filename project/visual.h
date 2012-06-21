@@ -35,6 +35,14 @@ void write_vtkFile(const char *szProblem,
                    double **P,
                    double ***C); 
 
+void write_vtkConcentrations(const char *szProblem,
+                             int    timeStepNumber,
+                             int    imax,
+                             int    jmax,
+                             int    kmax,
+		                     double dx,
+		                     double dy,
+                             double ***C);
 /**
  * Method for writing header information in vtk format. 
  * 

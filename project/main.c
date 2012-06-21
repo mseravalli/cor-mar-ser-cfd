@@ -296,7 +296,7 @@ int main(int argn, char** args){
 
         if( ((int)t) % ((int)dt_value) == 0 
             && t > n*dt_value){
-            write_vtkFile("files/file",
+            write_vtkFile("vtk/cavity",
 		                  n,
 		                  xlength,
                           ylength,
@@ -309,13 +309,21 @@ int main(int argn, char** args){
                           V,
                           P,
                           C);
+            write_vtkConcentrations("vtk/concentration",
+                                    n,
+                                    imax,
+                                    jmax,
+                                    kmax,
+		                            dx,
+		                            dy,
+                                    C);
             n++;
         }
 
         t += dt;
     }
 
-    write_vtkFile("files/file",
+    write_vtkFile("vtk/cavity",
 		          n,
 		          xlength,
                   ylength,
@@ -328,6 +336,14 @@ int main(int argn, char** args){
                   V,
                   P,
                   C);
+    write_vtkConcentrations("vtk/concentration",
+                            n,
+                            imax,
+                            jmax,
+                            kmax,
+                            dx,
+                            dy,
+                            C);
 
 
     free_matrix(U,  0, imax + 1, 0, jmax + 1);

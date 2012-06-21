@@ -17,7 +17,7 @@ void write_vtkFile(const char *szProblem,
                    double **P,
                    double ***C) {
   
-  int i,j, k;
+  int i,j;
   char szFileName[80];
   FILE *fp=NULL;
   sprintf( szFileName, "%s.%i.vtk", szProblem, timeStepNumber );
@@ -53,7 +53,7 @@ void write_vtkFile(const char *szProblem,
     }
   }
 
-
+/*
   for (k = 0; k < kmax; k++ ) {
     fprintf(fp, "\n");
     fprintf(fp,"CELL_DATA %i \n", ((imax)*(jmax)) );
@@ -65,7 +65,7 @@ void write_vtkFile(const char *szProblem,
       }
     }
   }
-
+*/
 
   if( fclose(fp) )
   {
@@ -75,6 +75,54 @@ void write_vtkFile(const char *szProblem,
   }
 }
 
+void write_vtkConcentrations(const char *szProblem,
+                             int    timeStepNumber,
+                             int    imax,
+                             int    jmax,
+                             int    kmax,
+		                     double dx,
+		                     double dy,
+                             double ***C) {
+
+    int k;
+    for (k = 0; k < kmax; k++ ) {
+  
+        int i,j;
+        char szFileName[80];
+        FILE *fp=NULL;
+        sprintf( szFileName, "%s%i.%i.vtk", szProblem, k, timeStepNumber );
+        fp = fopen( szFileName, "w");
+        if( fp == NULL )		       
+        {
+          char szBuff[80];
+          sprintf( szBuff, "Failed to open %s", szFileName );
+          ERROR( szBuff );
+          return;
+        }
+      
+        write_vtkHeader( fp, imax, jmax, dx, dy);
+        write_vtkPointCoordinates(fp, imax, jmax, dx, dy);
+      
+        fprintf(fp,"\n");
+        fprintf(fp,"CELL_DATA %i \n", ((imax)*(jmax)) );
+        fprintf(fp, "SCALARS pressure float 1 \n"); 
+        fprintf(fp, "LOOKUP_TABLE default \n");
+        for(j = 1; j < jmax+1; j++) {
+          for(i = 1; i < imax+1; i++) {
+            fprintf(fp, "%f\n", C[k][i][j] );
+          }
+        }
+      
+      
+        if( fclose(fp) )
+        {
+          char szBuff[80];
+          sprintf( szBuff, "Failed to close %s", szFileName );
+          ERROR( szBuff );
+        }
+
+    }
+}
 
 void write_vtkHeader( FILE *fp, int imax, int jmax, 
                       double dx, double dy) {
