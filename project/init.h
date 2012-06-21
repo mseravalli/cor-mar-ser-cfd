@@ -44,6 +44,10 @@ int read_parameters(
   double *UI,
   double *VI,
   double *PI,
+  double* S_AI,
+  double* S_BI,
+  double* S_CI,
+  double* S_DI,
   double *GX,
   double *GY,
   double *t_end,
@@ -70,11 +74,19 @@ void init_uvp(
   double UI,
   double VI,
   double PI,
+  double S_AI,
+  double S_BI,
+  double S_CI,
+  double S_DI,
   int imax,
   int jmax,
-  double **U,
-  double **V,
-  double **P
+  double** U,
+  double** V,
+  double** P,
+  double** S_A,
+  double** S_B,
+  double** S_C,
+  double** S_D
 );
 
 #endif

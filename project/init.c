@@ -2,18 +2,22 @@
 #include "init.h"
 
 int read_parameters( const char *szFileName,       /* name of the file */
-                    double *Re,                /* reynolds number   */
-                    double *UI,                /* velocity x-direction */
-                    double *VI,                /* velocity y-direction */
-                    double *PI,                /* pressure */
-                    double *GX,                /* gravitation x-direction */
-                    double *GY,                /* gravitation y-direction */
-                    double *t_end,             /* end time */
-                    double *xlength,           /* length of the domain x-dir.*/
-                    double *ylength,           /* length of the domain y-dir.*/
-                    double *dt,                /* time step */
-                    double *dx,                /* length of a cell x-dir. */
-                    double *dy,                /* length of a cell y-dir. */
+                    double* Re,                /* reynolds number   */
+                    double* UI,                /* velocity x-direction */
+                    double* VI,                /* velocity y-direction */
+                    double* PI,                /* pressure */
+                    double* S_AI,                /* substance amount */
+                    double* S_BI,                /* substance amount */
+                    double* S_CI,                /* substance amount */
+                    double* S_DI,                /* substance amount */
+                    double* GX,                /* gravitation x-direction */
+                    double* GY,                /* gravitation y-direction */
+                    double* t_end,             /* end time */
+                    double* xlength,           /* length of the domain x-dir.*/
+                    double* ylength,           /* length of the domain y-dir.*/
+                    double* dt,                /* time step */
+                    double* dx,                /* length of a cell x-dir. */
+                    double* dy,                /* length of a cell y-dir. */
                     int  *imax,                /* number of cells x-direction*/
                     int  *jmax,                /* number of cells y-direction*/
                     double *alpha,             /* uppwind differencing factor*/
@@ -47,6 +51,10 @@ int read_parameters( const char *szFileName,       /* name of the file */
    READ_DOUBLE( szFileName, *GX );
    READ_DOUBLE( szFileName, *GY );
    READ_DOUBLE( szFileName, *PI );
+   READ_DOUBLE( szFileName, *S_AI );
+   READ_DOUBLE( szFileName, *S_BI );
+   READ_DOUBLE( szFileName, *S_CI );
+   READ_DOUBLE( szFileName, *S_DI );
 
    *dx = *xlength / (double)(*imax);
    *dy = *ylength / (double)(*jmax);
@@ -60,14 +68,22 @@ int read_parameters( const char *szFileName,       /* name of the file */
  * The arrays U,V and P are initialized to the constant values UI, VI and PI on
  * the whole domain.
  */
-void init_uvp(  double UI,
-                double VI,
-                double PI,
-                int imax,
-                int jmax,
-                double **U,
-                double **V,
-                double **P)
+void init_uvp(double UI,
+              double VI,
+              double PI,
+              double S_AI,
+              double S_BI,
+              double S_CI,
+              double S_DI,
+              int imax,
+              int jmax,
+              double **U,
+              double **V,
+              double **P,
+              double** S_A,
+              double** S_B,
+              double** S_C,
+              double** S_D)
 {
 
     /* initialize the matrices */

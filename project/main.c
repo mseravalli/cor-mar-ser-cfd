@@ -47,6 +47,10 @@ int main(int argn, char** args){
     double  UI;                /* velocity x-direction */
     double  VI;                /* velocity y-direction */
     double  PI;                /* pressure */
+    double  S_AI;              /* initial values for substance concentration */
+    double  S_BI;
+    double  S_CI;
+    double  S_DI;
     double  GX;                /* gravitation x-direction */
     double  GY;                /* gravitation y-direction */
     double  t_end;             /* end time */
@@ -65,12 +69,16 @@ int main(int argn, char** args){
     double  eps;               /* accuracy bound for pressure*/
     double  dt_value;           /* time for output */              
 
-    double **U = NULL;
-    double **V = NULL;
-    double **P = NULL;
-    double **F = NULL;
-    double **G = NULL;
-    double **RS = NULL;
+    double** U = NULL;
+    double** V = NULL;
+    double** P = NULL;
+    double** S_A =NULL;
+    double** S_B =NULL;
+    double** S_C =NULL;
+    double** S_D =NULL;
+    double** F = NULL;
+    double** G = NULL;
+    double** RS = NULL;
     
     double t; 
     int n;
@@ -95,6 +103,10 @@ int main(int argn, char** args){
                     &UI,     
                     &VI,     
                     &PI,     
+                    &S_AI,
+                    &S_BI,
+                    &S_CI,
+                    &S_DI,
                     &GX,     
                     &GY,     
                     &t_end,  
@@ -115,14 +127,32 @@ int main(int argn, char** args){
     t = 0;
     n = 0;
 
-    U = matrix(0, imax + 1, 0, jmax + 1); 
-    V = matrix(0, imax + 1, 0, jmax + 1); 
-    /*P = matrix(1, imax, 1, jmax);*/
-    P = matrix(0, imax + 1, 0, jmax + 1);
-    F = matrix(0, imax + 1, 0, jmax + 1);
-    G = matrix(0, imax + 1, 0, jmax + 1);
-    RS = matrix(0, imax + 1, 0, jmax + 1); 
-    init_uvp(UI, VI, PI, imax, jmax, U, V, P);
+    U   = matrix(0, imax + 1, 0, jmax + 1); 
+    V   = matrix(0, imax + 1, 0, jmax + 1); 
+    P   = matrix(0, imax + 1, 0, jmax + 1);
+    S_A = matrix(0, imax + 1, 0, jmax + 1);
+    S_B = matrix(0, imax + 1, 0, jmax + 1);
+    S_C = matrix(0, imax + 1, 0, jmax + 1);
+    S_D = matrix(0, imax + 1, 0, jmax + 1);
+    F   = matrix(0, imax + 1, 0, jmax + 1);
+    G   = matrix(0, imax + 1, 0, jmax + 1);
+    RS  = matrix(0, imax + 1, 0, jmax + 1); 
+    init_uvp(UI, 
+             VI, 
+             PI, 
+             S_AI,
+             S_BI,
+             S_CI,
+             S_DI,
+             imax, 
+             jmax, 
+             U, 
+             V, 
+             P, 
+             S_A, 
+             S_B, 
+             S_C, 
+             S_D);
 
     /*t_end = 1;*/
 
@@ -239,12 +269,16 @@ int main(int argn, char** args){
 
 
 
-    free_matrix(U, 0, imax + 1, 0, jmax + 1);
-    free_matrix(V, 0, imax + 1, 0, jmax + 1);
-    free_matrix(P, 0, imax + 1, 0, jmax + 1);
-    free_matrix(F, 0, imax + 1, 0, jmax + 1);
-    free_matrix(G, 0, imax + 1, 0, jmax + 1);
-    free_matrix(RS, 0, imax + 1, 0, jmax + 1);
+    free_matrix(U,   0, imax + 1, 0, jmax + 1);
+    free_matrix(V,   0, imax + 1, 0, jmax + 1);
+    free_matrix(P,   0, imax + 1, 0, jmax + 1);
+    free_matrix(S_A, 0, imax + 1, 0, jmax + 1);
+    free_matrix(S_B, 0, imax + 1, 0, jmax + 1);
+    free_matrix(S_C, 0, imax + 1, 0, jmax + 1);
+    free_matrix(S_D, 0, imax + 1, 0, jmax + 1);
+    free_matrix(F,   0, imax + 1, 0, jmax + 1);
+    free_matrix(G,   0, imax + 1, 0, jmax + 1);
+    free_matrix(RS,  0, imax + 1, 0, jmax + 1);
 
     return 1;
 }
