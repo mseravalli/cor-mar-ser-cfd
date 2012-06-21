@@ -300,11 +300,13 @@ int main(int argn, char** args){
                           ylength,
                           imax,
                           jmax,
+                          kmax,
                 		  dx,
 		                  dy,
                           U,
                           V,
-                          P);
+                          P,
+                          C);
             n++;
         }
 
@@ -317,11 +319,13 @@ int main(int argn, char** args){
                   ylength,
                   imax,
                   jmax,
+                  kmax,
                   dx,
 		          dy,
                   U,
                   V,
-                  P);
+                  P,
+                  C);
 
 
     free_matrix(U,  0, imax + 1, 0, jmax + 1);

@@ -4,18 +4,20 @@
 
 
 void write_vtkFile(const char *szProblem,
-		 int    timeStepNumber,
-		 double xlength,
-                 double ylength,
-                 int    imax,
-                 int    jmax,
-		 double dx,
-		 double dy,
-                 double **U,
-                 double **V,
-                 double **P) {
+                   int    timeStepNumber,
+                   double xlength,
+                   double ylength,
+                   int    imax,
+                   int    jmax,
+                   int    kmax,
+		           double dx,
+		           double dy,
+                   double **U,
+                   double **V,
+                   double **P,
+                   double ***C) {
   
-  int i,j;
+  int i,j, k;
   char szFileName[80];
   FILE *fp=NULL;
   sprintf( szFileName, "%s.%i.vtk", szProblem, timeStepNumber );
@@ -50,6 +52,20 @@ void write_vtkFile(const char *szProblem,
       fprintf(fp, "%f\n", P[i][j] );
     }
   }
+
+
+  for (k = 0; k < kmax; k++ ) {
+    fprintf(fp, "\n");
+    fprintf(fp,"CELL_DATA %i \n", ((imax)*(jmax)) );
+    fprintf(fp, "SCALARS concentration%d float 1 \n", k); 
+    fprintf(fp, "LOOKUP_TABLE default \n");
+    for(j = 1; j < jmax+1; j++) {
+      for(i = 1; i < imax+1; i++) {
+        fprintf(fp, "%f\n", C[k][i][j] );
+      }
+    }
+  }
+
 
   if( fclose(fp) )
   {
