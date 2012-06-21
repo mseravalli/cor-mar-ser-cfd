@@ -287,9 +287,11 @@ void calculate_c(
   double D,
   int imax,
   int jmax,
+  int kmax,
   double **U,
   double **V,
   double **Q,
+  double ***C,
   int **Flag
 )
 {
@@ -302,42 +304,45 @@ void calculate_c(
 
     int i;
     int j;
+    int k;
 
     /****** Calculate C start ******/
 
+    for (k = 0; k < kmax; k++){
     for (i = 1; i <= imax; i++) {
         for (j = 1; j <= jmax; j++) {
 
-            if (Flag[][] >= C_F) {
+            if (Flag[i][j] >= C_F) {
 
                 /*** ducdx ***/
 
-                firstOperand = (1/dx)*(U[i][j]*(C[i][j]+C[i+1][j])/2 - U[i-1][j]*(C[i-1][j]+C[i][j])/2);
-                secondOperand = (alpha/dx)*(abs(U[i][j])*(C[i][j]+C[i+1][j])/2 - abs(U[i-1][j])*(C[i-1][j]+C[i][j])/2);
+                firstOperand = (1/dx)*(U[i][j]*(C[k][i][j]+C[k][i+1][j])/2 - U[i-1][j]*(C[k][i-1][j]+C[k][i][j])/2);
+                secondOperand = (alpha/dx)*(abs(U[i][j])*(C[k][i][j]+C[k][i+1][j])/2 - abs(U[i-1][j])*(C[k][i-1][j]+C[k][i][j])/2);
 
                 ducdx = firstOperand + secondOperand;
 
                 /*** dvcdy ***/
 
-                firstOperand = (1/dy)*(V[i][j]*(C[i][j]+C[i][j+1])/2 - V[i][j-1]*(C[i][j-1]+C[i][j])/2);
-                secondOperand = (alpha/dy)*(abs(V[i][j])*(C[i][j]+C[i][j+1])/2 - abs(V[i][j-1])*(C[i][j-1]+C[i][j])/2);
+                firstOperand = (1/dy)*(V[i][j]*(C[k][i][j]+C[k][i][j+1])/2 - V[i][j-1]*(C[k][i][j-1]+C[k][i][j])/2);
+                secondOperand = (alpha/dy)*(abs(V[i][j])*(C[k][i][j]+C[k][i][j+1])/2 - abs(V[i][j-1])*(C[k][i][j-1]+C[k][i][j])/2);
 
                 dvcdy = firstOperand + secondOperand;
 
                 /*** d2cdx2 ***/
 
-                d2cdx2 = (C[i+1][j]-2*C[i][j]+C[i-1][j])/(dx*dx);
+                d2cdx2 = (C[k][i+1][j]-2*C[k][i][j]+C[k][i-1][j])/(dx*dx);
 
                 /*** d2cdy2 ***/
 
-                d2cdy2 = (C[i][j+1]-2*C[i][j]+C[i][j-1])/(dy*dy);
+                d2cdy2 = (C[k][i][j+1]-2*C[k][i][j]+C[k][i][j-1])/(dy*dy);
 
                 /*** C(t+dt) ***/
 
-                C[i][j] =  C[i][j] + dt*(D*(d2cdx2+d2cdy2) - ducdx - dvcdy + Q[i][j]);
+                C[k][i][j] =  C[k][i][j] + dt*(D*(d2cdx2+d2cdy2) - ducdx - dvcdy + Q[i][j]);
             
             }
 
         }
     }
+}
 }

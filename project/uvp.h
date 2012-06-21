@@ -121,11 +121,13 @@ void calculate_c(
   double dy,
   double alpha,
   double D,
-  double imax,
-  double jmax,
+  int imax,
+  int jmax,
+  int kmax,
   double **U,
   double **V,
   double **Q,
+  double ***C,
   int **Flag
 );
 

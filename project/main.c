@@ -95,6 +95,7 @@ int main(int argn, char** args){
     int n;
     int it;
     double res;
+    double D = 5.3;
 
     if(argn <= 1)
     {
@@ -203,7 +204,8 @@ int main(int argn, char** args){
                  jmax,
                  U,
                  V,
-                 Flag);
+                 Flag,
+                 D);
                  
         boundaryvalues(imax,
                        jmax,
