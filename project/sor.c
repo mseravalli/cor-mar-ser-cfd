@@ -1,6 +1,7 @@
 #include "sor.h"
 #include "constants.h"
 #include <math.h>
+#include "string.h"
 
 void sor(
   double   omg,

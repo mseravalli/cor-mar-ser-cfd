@@ -47,10 +47,10 @@ int main(int argn, char** args){
     double  UI;                /* velocity x-direction */
     double  VI;                /* velocity y-direction */
     double  PI;                /* pressure */
-    double  S_AI;              /* initial values for substance concentration */
-    double  S_BI;
-    double  S_CI;
-    double  S_DI;
+    double  C0;              /* initial values for substance concentration */
+    double  C1;
+    double  C2;
+    double  C3;
     double  GX;                /* gravitation x-direction */
     double  GY;                /* gravitation y-direction */
     double  t_end;             /* end time */
@@ -61,6 +61,7 @@ int main(int argn, char** args){
     double  dy;                /* length of a cell y-dir. */
     int     imax;                /* number of cells x-direction*/
     int     jmax;                /* number of cells y-direction*/
+    int     kmax = 4;
     double  alpha;             /* uppwind differencing factor*/
     double  omg;               /* relaxation factor */
     double  tau;               /* safety factor for time step*/
@@ -79,16 +80,13 @@ int main(int argn, char** args){
     char imageName[64];
     char cavityFile[64];
 
-    double** U = NULL;
-    double** V = NULL;
-    double** P = NULL;
-    double** S_A =NULL;
-    double** S_B =NULL;
-    double** S_C =NULL;
-    double** S_D =NULL;
-    double** F = NULL;
-    double** G = NULL;
-    double** RS = NULL;
+    double**  U = NULL;
+    double**  V = NULL;
+    double**  P = NULL;
+    double*** C = NULL;
+    double**  F = NULL;
+    double**  G = NULL;
+    double**  RS = NULL;
     char problem[64];
     int **Problem = NULL;
     int **Flag = NULL;
@@ -97,9 +95,6 @@ int main(int argn, char** args){
     int n;
     int it;
     double res;
-
-    int i;
-    int j;
 
     if(argn <= 1)
     {
@@ -124,10 +119,10 @@ int main(int argn, char** args){
                     &UI,     
                     &VI,     
                     &PI,     
-                    &S_AI,
-                    &S_BI,
-                    &S_CI,
-                    &S_DI,
+                    &C0,
+                    &C1,
+                    &C2,
+                    &C3,
                     &GX,     
                     &GY,     
                     &t_end,  
@@ -178,31 +173,25 @@ int main(int argn, char** args){
     U   = matrix(0, imax + 1, 0, jmax + 1); 
     V   = matrix(0, imax + 1, 0, jmax + 1); 
     P   = matrix(0, imax + 1, 0, jmax + 1);
-    S_A = matrix(0, imax + 1, 0, jmax + 1);
-    S_B = matrix(0, imax + 1, 0, jmax + 1);
-    S_C = matrix(0, imax + 1, 0, jmax + 1);
-    S_D = matrix(0, imax + 1, 0, jmax + 1);
     F   = matrix(0, imax + 1, 0, jmax + 1);
     G   = matrix(0, imax + 1, 0, jmax + 1);
     RS  = matrix(0, imax + 1, 0, jmax + 1);
+    C   = matrix3(0, imax + 1, 0, jmax + 1, kmax);
     init_uvp(UI, 
              VI, 
              PI, 
-             S_AI,
-             S_BI,
-             S_CI,
-             S_DI,
+             C0,
+             C1,
+             C2,
+             C3,
              imax, 
              jmax, 
              problem,
              U, 
              V, 
              P, 
-             S_A, 
-             S_B, 
-             S_C, 
-             S_D);
-    
+             C);
+
     while (t < t_end)
     {
         calculate_dt(Re,
@@ -335,18 +324,15 @@ int main(int argn, char** args){
                   P);
 
 
-    free_matrix(U,   0, imax + 1, 0, jmax + 1);
-    free_matrix(V,   0, imax + 1, 0, jmax + 1);
-    free_matrix(P,   0, imax + 1, 0, jmax + 1);
-    free_matrix(S_A, 0, imax + 1, 0, jmax + 1);
-    free_matrix(S_B, 0, imax + 1, 0, jmax + 1);
-    free_matrix(S_C, 0, imax + 1, 0, jmax + 1);
-    free_matrix(S_D, 0, imax + 1, 0, jmax + 1);
-    free_matrix(F,   0, imax + 1, 0, jmax + 1);
-    free_matrix(G,   0, imax + 1, 0, jmax + 1);
-    free_matrix(RS,  0, imax + 1, 0, jmax + 1);
+    free_matrix(U,  0, imax + 1, 0, jmax + 1);
+    free_matrix(V,  0, imax + 1, 0, jmax + 1);
+    free_matrix(P,  0, imax + 1, 0, jmax + 1);
+    free_matrix(F,  0, imax + 1, 0, jmax + 1);
+    free_matrix(G,  0, imax + 1, 0, jmax + 1);
+    free_matrix(RS, 0, imax + 1, 0, jmax + 1);
     free_imatrix(Flag, 0, imax + 1, 0, jmax + 1);
     free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
+    free_matrix3(C , 0, imax + 1, 0, jmax + 1, kmax);
 
     return 0;
 }
