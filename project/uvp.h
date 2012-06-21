@@ -36,7 +36,12 @@ void calculate_fg(
   double **U,
   double **V,
   double **F,
-  double **G
+  double **G,
+  int **Flag,
+  int wl,
+  int wr,
+  int wt,
+  int wb
 );
 
 
@@ -55,7 +60,8 @@ void calculate_rs(
   int jmax,
   double **F,
   double **G,
-  double **RS
+  double **RS,
+  int **Flag
 );
 
 
@@ -76,7 +82,8 @@ void calculate_dt(
   int imax,
   int jmax,
   double **U,
-  double **V
+  double **V,
+  int **Flag
 );
 
 
@@ -103,7 +110,8 @@ void calculate_uv(
   double **V,
   double **F,
   double **G,
-  double **P
+  double **P,
+  int **Flag
 );
 
 #endif

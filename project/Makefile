@@ -1,13 +1,15 @@
 IDIR =./
 CC=gcc
-CFLAGS = -Wall -pedantic -Werror -g
+#CFLAGS = -Wall -pedantic -Werror -g
+CFLAGS = -funroll-loops -O3
 
 ODIR=obj
 LDIR =../lib
 
 LIBS=-lm
 
-_DEPS = helper.h\
+_DEPS = constants.h\
+        helper.h\
 		init.h\
 		boundary_val.h\
 		uvp.h\

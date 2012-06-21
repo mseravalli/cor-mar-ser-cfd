@@ -40,30 +40,35 @@
  */
 int read_parameters( 
   const char *szFileName,
-  double *Re,
-  double *UI,
-  double *VI,
-  double *PI,
+  double* Re,
+  double* UI,
+  double* VI,
+  double* PI,
   double* S_AI,
   double* S_BI,
   double* S_CI,
   double* S_DI,
-  double *GX,
-  double *GY,
-  double *t_end,
-  double *xlength,
-  double *ylength,
-  double *dt,
-  double *dx,
-  double *dy,
-  int  *imax,
-  int  *jmax,
-  double *alpha,
-  double *omg,
-  double *tau,
-  int  *itermax,
-  double *eps,
-  double *dt_value
+  double* GX,
+  double* GY,
+  double* t_end,
+  double* xlength,
+  double* ylength,
+  double* dt,
+  double* dx,
+  double* dy,
+  int*    imax,
+  int*    jmax,
+  double* alpha,
+  double* omg,
+  double* tau,
+  int*    itermax,
+  double* eps,
+  int*    wl,
+  int*    wr,
+  int*    wt,
+  int*    wb,
+  double* dt_value,
+  double* deltaP
 );
 
 /**
@@ -80,6 +85,7 @@ void init_uvp(
   double S_DI,
   int imax,
   int jmax,
+  char* problem,
   double** U,
   double** V,
   double** P,
@@ -89,5 +95,14 @@ void init_uvp(
   double** S_D
 );
 
+/**
+ * Initializes flag matrix
+**/
+int init_flag(
+    int **Problem,
+    int imax,
+    int jmax,
+    int **Flag
+);
 #endif
 

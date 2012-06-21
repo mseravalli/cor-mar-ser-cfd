@@ -8,8 +8,31 @@
 void boundaryvalues(
   int imax,
   int jmax,
+  int wl,
+  int wr,
+  int wt,
+  int wb,
   double **U,
-  double **V
+  double **V,
+  double **F,
+  double **G,
+  double **P,
+  int **Flag
+);
+
+/*Set special boundary*/
+
+void spec_boundary_val(
+    char *problem,
+    int imax,
+    int jmax,
+    double dx,
+    double dy,
+    double Re,
+    double deltaP,
+    double **U,
+    double **V,
+    double **P
 );
 
 #endif

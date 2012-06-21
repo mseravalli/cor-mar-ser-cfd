@@ -5,6 +5,7 @@
 #include "boundary_val.h"
 #include "sor.h"
 #include <stdio.h>
+#include <string.h>
 
 
 /**
@@ -42,7 +43,6 @@
  */
 int main(int argn, char** args){
 
-    const char *szFileName = "cavity100.dat";       /* name of the file */
     double  Re;                /* reynolds number   */          
     double  UI;                /* velocity x-direction */
     double  VI;                /* velocity y-direction */
@@ -69,6 +69,16 @@ int main(int argn, char** args){
     double  eps;               /* accuracy bound for pressure*/
     double  dt_value;           /* time for output */              
 
+    int wl;
+    int wr;
+    int wt;
+    int wb;
+
+    double deltaP;
+
+    char imageName[64];
+    char cavityFile[64];
+
     double** U = NULL;
     double** V = NULL;
     double** P = NULL;
@@ -79,26 +89,37 @@ int main(int argn, char** args){
     double** F = NULL;
     double** G = NULL;
     double** RS = NULL;
+    char problem[64];
+    int **Problem = NULL;
+    int **Flag = NULL;
     
     double t; 
     int n;
     int it;
     double res;
-    
+
     int i;
     int j;
 
-    char write = 1;
-
-    if(argn > 1)
+    if(argn <= 1)
     {
-        if(args[1][0] == 0x30)
-            write = 0;
-        else
-            write = 1;
+        printf("ERROR: you need to specify a problem (karman, plane, step)\n");
+        return 1;
+    } else {
+        if( !(   strcmp(args[1], "karman") == 0 
+              || strcmp(args[1], "plane")  == 0
+              || strcmp(args[1], "step")   == 0)){
+            printf("ERROR: the passed argument was different from karman, plane or step\n");
+            return 1;
+        }
     }
 
-    read_parameters(szFileName,
+    strcpy(problem, args[1]);
+
+    strcpy(cavityFile, problem);
+    strcat(cavityFile, "_cavity.dat");
+
+    read_parameters(cavityFile,
                     &Re,     
                     &UI,     
                     &VI,     
@@ -122,10 +143,37 @@ int main(int argn, char** args){
                     &tau,    
                     &itermax,
                     &eps,    
-                    &dt_value);
+                    &wl,
+                    &wr,
+                    &wt,
+                    &wb,
+                    &dt_value,
+                    &deltaP);
                     
     t = 0;
     n = 0;
+
+    strcpy(imageName, problem);
+    strcat(imageName, ".pgm");
+    Problem = read_pgm(imageName, &imax, &jmax);
+    dx = xlength / (double)(imax);
+    dy = ylength / (double)(jmax);
+    
+    Flag = imatrix(0, imax + 1, 0, jmax + 1);
+
+    if(init_flag(Problem, imax, jmax, Flag) == 1)
+    {
+        /* 
+         * if there was a forbidden obstacle it returns an error, 
+         * frees everything and finishes the program
+         */
+        printf("ERROR: Invalid obstacle in .pgm file\n");
+
+        free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
+        free_imatrix(Flag, 0, imax + 1, 0, jmax + 1);
+
+        return 1;
+    }
 
     U   = matrix(0, imax + 1, 0, jmax + 1); 
     V   = matrix(0, imax + 1, 0, jmax + 1); 
@@ -136,7 +184,7 @@ int main(int argn, char** args){
     S_D = matrix(0, imax + 1, 0, jmax + 1);
     F   = matrix(0, imax + 1, 0, jmax + 1);
     G   = matrix(0, imax + 1, 0, jmax + 1);
-    RS  = matrix(0, imax + 1, 0, jmax + 1); 
+    RS  = matrix(0, imax + 1, 0, jmax + 1);
     init_uvp(UI, 
              VI, 
              PI, 
@@ -146,6 +194,7 @@ int main(int argn, char** args){
              S_DI,
              imax, 
              jmax, 
+             problem,
              U, 
              V, 
              P, 
@@ -153,9 +202,7 @@ int main(int argn, char** args){
              S_B, 
              S_C, 
              S_D);
-
-    /*t_end = 1;*/
-
+    
     while (t < t_end)
     {
         calculate_dt(Re,
@@ -166,13 +213,33 @@ int main(int argn, char** args){
                  imax,
                  jmax,
                  U,
-                 V);
+                 V,
+                 Flag);
                  
         boundaryvalues(imax,
                        jmax,
+                       wl,
+                       wr,
+                       wt,
+                       wb,
                        U,
-                       V);
-    
+                       V,
+                       F,
+                       G,
+                       P,
+                       Flag);
+
+        spec_boundary_val(problem,
+                          imax,
+                          jmax,
+                          dx,
+                          dy,
+                          Re,
+                          deltaP,
+                          U,
+                          V,
+                          P);
+
         calculate_fg(Re,
                  GX,
                  GY,
@@ -185,7 +252,12 @@ int main(int argn, char** args){
                  U,
                  V,
                  F,
-                 G);
+                 G,
+                 Flag,
+                 wl,
+                 wr,
+                 wt,
+                 wb);
         
         calculate_rs(dt,
                  dx,
@@ -194,24 +266,14 @@ int main(int argn, char** args){
                  jmax,
                  F,
                  G,
-                 RS);
+                 RS,
+                 Flag);
                  
         it = 0;
         res = eps + 1;
         
         while (it < itermax && res > eps)
         {
-            for (i = 1; i<=imax;i++)
-            {
-                P[i][0]= P[i][1];
-                P[i][jmax+1]= P[i][jmax];
-            }
-            
-            for (j = 1; j<=jmax;j++)
-            {
-                P[0][j]= P[1][j];
-                P[imax+1][j]= P[imax][j];
-            }
 
              sor(
                  omg,
@@ -219,9 +281,12 @@ int main(int argn, char** args){
                  dy,
                  imax,
                  jmax,
+                 deltaP,
                  P,
                  RS,
-                 &res);
+                 Flag,
+                 &res,
+                 problem);
                  
             it++;
         }
@@ -235,9 +300,11 @@ int main(int argn, char** args){
                  V,
                  F,
                  G,
-                 P);
+                 P,
+                 Flag);
 
-        if(write)
+        if( ((int)t) % ((int)dt_value) == 0 
+            && t > n*dt_value){
             write_vtkFile("files/file",
 		                  n,
 		                  xlength,
@@ -249,24 +316,23 @@ int main(int argn, char** args){
                           U,
                           V,
                           P);
+            n++;
+        }
 
         t += dt;
-        n++;
     }
 
-    if(write)
-        write_vtkFile("files/file",
-		                  n,
-		                  xlength,
-                          ylength,
-                          imax,
-                          jmax,
-                		  dx,
-		                  dy,
-                          U,
-                          V,
-                          P);
-
+    write_vtkFile("files/file",
+		          n,
+		          xlength,
+                  ylength,
+                  imax,
+                  jmax,
+                  dx,
+		          dy,
+                  U,
+                  V,
+                  P);
 
 
     free_matrix(U,   0, imax + 1, 0, jmax + 1);
@@ -279,8 +345,10 @@ int main(int argn, char** args){
     free_matrix(F,   0, imax + 1, 0, jmax + 1);
     free_matrix(G,   0, imax + 1, 0, jmax + 1);
     free_matrix(RS,  0, imax + 1, 0, jmax + 1);
+    free_imatrix(Flag, 0, imax + 1, 0, jmax + 1);
+    free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
 
-    return 1;
+    return 0;
 }
 
 

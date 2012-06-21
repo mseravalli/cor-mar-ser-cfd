@@ -2,7 +2,7 @@
 #include "helper.h"
 #include "uvp.h"
 #include <math.h>
-
+#include "constants.h"
 
 void calculate_fg(
   double Re,
@@ -17,8 +17,13 @@ void calculate_fg(
   double **U,
   double **V,
   double **F,
-  double **G
-)
+  double **G,
+  int **Flag,
+  int wl,
+  int wr,
+  int wt,
+  int wb
+) 
 {
     
     /******** VARIABLE DECLARATION START ********/
@@ -44,10 +49,6 @@ void calculate_fg(
 
     /******** CALCULATE F START ********/
     
-    boundaryvalues(imax, jmax, U, V);
-
-    /******** Calculate the single derivatives ********/
-
     /******** Calculate F ********/
     
     for(i = 1; i <= imax-1; i++)
@@ -55,42 +56,45 @@ void calculate_fg(
         for(j = 1; j <= jmax; j++)
         {
 
-            /* du2dx */
-            firstOperand = ( 1 / dx) *
-                ( pow((U[i][j] + U[i+1][j])/2, 2) -  pow((U[i-1][j] + U[i][j])/2, 2));
+            /* Fluid */
+            if (Flag[i][j]>= C_F && Flag[i+1][j]>= C_F)
+            {
+                /* du2dx */
+                firstOperand = ( 1 / dx) *
+                    ( pow((U[i][j] + U[i+1][j])/2, 2) -  pow((U[i-1][j] + U[i][j])/2, 2));
 
-            secondOperand = ( alpha / dx ) *
-                ( ( (abs(U[i][j] + U[i+1][j])/2) * ((U[i][j] - U[i+1][j])/2) )  
-                - ( (abs(U[i-1][j] + U[i][j])/2) * ((U[i-1][j] - U[i][j])/2) ) );
+                secondOperand = ( alpha / dx ) *
+                    ( ( (abs(U[i][j] + U[i+1][j])/2) * ((U[i][j] - U[i+1][j])/2) )  
+                    - ( (abs(U[i-1][j] + U[i][j])/2) * ((U[i-1][j] - U[i][j])/2) ) );
 
-            du2dx = firstOperand + secondOperand;
+                du2dx = firstOperand + secondOperand;
+                
+                /* duvdy */
+                firstOperand = ( 1 / dy )*
+                ( ( (V[i][j] + V[i+1][j]) / 2 ) * ( (U[i][j] + U[i][j+1]) / 2 )
+                - ( (V[i][j-1] + V[i+1][j-1]) / 2 ) * ( (U[i][j-1] + U[i][j]) / 2 ) );
+
+                secondOperand = ( alpha / dy )*
+                ( ( (abs(V[i][j] + V[i+1][j])/2) * ((U[i][j] - U[i][j+1])/2) )
+                - ( (abs(V[i][j-1] + V[i+1][j-1])/2) * ((U[i][j-1] - U[i][j])/2) ));
+                duvdy = firstOperand + secondOperand;
+
+                /* d2udx2 */
+                d2udx2 = (U[i+1][j] - 2*U[i][j] + U[i-1][j]) / pow(dx,2);
+
+                /* d2udy2 */
+                d2udy2 = (U[i][j+1] - 2*U[i][j] + U[i][j-1]) / pow(dy,2);
+
+                F[i][j] = U[i][j] + dt * ( (1/Re) * (d2udx2 + d2udy2 ) - du2dx - duvdy + GX );
+            }
             
-            /* duvdy */
-            firstOperand = ( 1 / dy )*
-            ( ( (V[i][j] + V[i+1][j]) / 2 ) * ( (U[i][j] + U[i][j+1]) / 2 )
-            - ( (V[i][j-1] + V[i+1][j-1]) / 2 ) * ( (U[i][j-1] + U[i][j]) / 2 ) );
-
-            secondOperand = ( alpha / dy )*
-            ( ( (abs(V[i][j] + V[i+1][j])/2) * ((U[i][j] - U[i][j+1])/2) )
-            - ( (abs(V[i][j-1] + V[i+1][j-1])/2) * ((U[i][j-1] - U[i][j])/2) ));
-            duvdy = firstOperand + secondOperand;
-
-            /* d2udx2 */
-            d2udx2 = (U[i+1][j] - 2*U[i][j] + U[i-1][j]) / pow(dx,2);
-
-            /* d2udy2 */
-            d2udy2 = (U[i][j+1] - 2*U[i][j] + U[i][j-1]) / pow(dy,2);
-
-            F[i][j] = U[i][j] + dt * ( (1/Re) * (d2udx2 + d2udy2 ) - du2dx - duvdy + GX );
         }
     }
-
+    
     /******** CALCULATE F END ********/
     
 
     /******** CALCULATE G START ********/
-
-    boundaryvalues(imax, jmax, U, V);
 
     /******** Calculate G ********/
 
@@ -98,35 +102,38 @@ void calculate_fg(
     {
         for(j = 1; j <= jmax-1; j++)
         {
+            /* Fluid */
+            if (Flag[i][j]>=C_F && Flag[i][j+1]>=C_F)
+            {
+               /* dv2dy */ 
+                firstOperand = ( 1 / dy) *
+                    ( pow((V[i][j] + V[i][j+1])/2, 2) -  pow((V[i][j-1] + V[i][j])/2, 2));
 
-           /* dv2dy */ 
-            firstOperand = ( 1 / dy) *
-                ( pow((V[i][j] + V[i][j+1])/2, 2) -  pow((V[i][j-1] + V[i][j])/2, 2));
+                secondOperand = ( alpha / dy ) *
+                    ( ( (abs(V[i][j] + V[i][j+1])/2) * ((V[i][j] - V[i][j+1])/2) )  
+                    - ( (abs(V[i][j-1] + V[i][j])/2) * ((V[i][j-1] - V[i][j])/2) ) );
 
-            secondOperand = ( alpha / dy ) *
-                ( ( (abs(V[i][j] + V[i][j+1])/2) * ((V[i][j] - V[i][j+1])/2) )  
-                - ( (abs(V[i][j-1] + V[i][j])/2) * ((V[i][j-1] - V[i][j])/2) ) );
+                dv2dy = firstOperand + secondOperand;
 
-            dv2dy = firstOperand + secondOperand;
+                /* duvdx */
+                firstOperand = ( 1 / dx )*
+                ( ( (U[i][j] + U[i][j+1]) / 2 ) * ( (V[i][j] + V[i+1][j]) / 2 )
+                - ( (U[i-1][j] + U[i-1][j+1]) / 2 ) * ( (V[i-1][j] + V[i][j]) / 2 ) );
 
-            /* duvdx */
-            firstOperand = ( 1 / dx )*
-            ( ( (U[i][j] + U[i][j+1]) / 2 ) * ( (V[i][j] + V[i+1][j]) / 2 )
-            - ( (U[i-1][j] + U[i-1][j+1]) / 2 ) * ( (V[i-1][j] + V[i][j]) / 2 ) );
+                secondOperand = ( alpha / dx )*
+                ( ( (abs(U[i][j] + U[i][j+1])/2) * ((V[i][j] - V[i+1][j])/2) )
+                - ( (abs(U[i-1][j] + U[i-1][j+1])/2) * ((V[i-1][j] - V[i][j])/2) ));
 
-            secondOperand = ( alpha / dx )*
-            ( ( (abs(U[i][j] + U[i][j+1])/2) * ((V[i][j] - V[i+1][j])/2) )
-            - ( (abs(U[i-1][j] + U[i-1][j+1])/2) * ((V[i-1][j] - V[i][j])/2) ));
+                duvdx = firstOperand + secondOperand;
 
-            duvdx = firstOperand + secondOperand;
+                /* d2vdx2 */
+                d2vdx2 = (V[i+1][j] - 2*V[i][j] + V[i-1][j]) / pow(dx,2);
+              
+                /* d2vdy2*/
+                d2vdy2 = (V[i][j+1] - 2*V[i][j] + V[i][j-1]) / pow(dy,2);
 
-            /* d2vdx2 */
-            d2vdx2 = (V[i+1][j] - 2*V[i][j] + V[i-1][j]) / pow(dx,2);
-          
-            /* d2vdy2*/
-            d2vdy2 = (V[i][j+1] - 2*V[i][j] + V[i][j-1]) / pow(dy,2);
-
-            G[i][j] = V[i][j] + dt * ( (1/Re) * ( d2vdx2 + d2vdy2 ) - duvdx - dv2dy + GY);
+                G[i][j] = V[i][j] + dt * ( (1/Re) * ( d2vdx2 + d2vdy2 ) - duvdx - dv2dy + GY);
+            }
         }
     }
 
@@ -156,7 +163,8 @@ void calculate_dt(
   int imax,
   int jmax,
   double **U,
-  double **V
+  double **V,
+  int **Flag
 )
 {
     double umax = 0;
@@ -171,10 +179,12 @@ void calculate_dt(
     {
         for(j = 0; j < jmax; j++)
         {
-            if(umax < U[i][j])
-                umax = U[i][j];
-            if(vmax < V[i][j])
-                vmax = V[i][j];
+            if(Flag[i][j] >= C_F){
+                if(umax < U[i][j])
+                    umax = U[i][j];
+                if(vmax < V[i][j])
+                    vmax = V[i][j];
+            }
         }
     }
 
@@ -204,7 +214,8 @@ void calculate_uv(
   double **V,
   double **F,
   double **G,
-  double **P
+  double **P,
+  int **Flag
 )
 {
     int i, j;
@@ -219,7 +230,9 @@ void calculate_uv(
     {
         for(j = 1; j < jmax+1; j++)
         {
-            U[i][j] = F[i][j] - dtodx*(P[i+1][j] - P[i][j]);
+            if (Flag[i][j] >= C_F && Flag[i+1][j] >= C_F){
+                 U[i][j] = F[i][j] - dtodx*(P[i+1][j] - P[i][j]);
+            }
         }
     }
 
@@ -228,7 +241,9 @@ void calculate_uv(
     {
         for(j = 1; j < jmax; j++)
         {
-            V[i][j] = G[i][j] - dtody*(P[i][j+1] - P[i][j]);
+            if (Flag[i][j] >= C_F && Flag[i][j+1] >= C_F){
+                V[i][j] = G[i][j] - dtody*(P[i][j+1] - P[i][j]);
+            }
         }
     }
 }
@@ -241,7 +256,8 @@ void calculate_rs(
   int jmax,
   double **F,
   double **G,
-  double **RS
+  double **RS,
+  int **Flag
 )
 {
     int i, j;
@@ -252,7 +268,9 @@ void calculate_rs(
     {
         for(j = 1; j <= jmax; j++)
         {
-            RS[i][j]= 1/dt*((F[i][j]-F[i-1][j])/dx+(G[i][j]-G[i][j-1])/dy);
+            if (Flag[i][j] >= C_F){
+                RS[i][j]= 1/dt*((F[i][j]-F[i-1][j])/dx+(G[i][j]-G[i][j-1])/dy);
             }
         }
+     }
 }

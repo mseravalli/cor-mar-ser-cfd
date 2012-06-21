@@ -9,14 +9,17 @@
  * An \omega = 1 GS - implementation is given within sor.c.
  */
 void sor(
-  double omg,
-  double dx,
-  double dy,
-  int    imax,
-  int    jmax,
-  double **P,
-  double **RS,
-  double *res
+  double   omg,
+  double   dx,
+  double   dy,
+  int      imax,
+  int      jmax,
+  double deltaP,
+  double** P,
+  double** RS,
+  int**    FLAG,
+  double*  res,
+  char* problem
 );
 
 
