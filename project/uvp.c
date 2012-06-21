@@ -164,14 +164,15 @@ void calculate_dt(
   int jmax,
   double **U,
   double **V,
-  int **Flag
+  int **Flag,
+  double D
 )
 {
     double umax = 0;
     double vmax = 0;
     int i, j;
 
-    double dtcond, dxcond, dycond;
+    double dtdcond, dtcond, dxcond, dycond;
     double minval;
 
     /******** Determine umax and vmax *********/
@@ -189,12 +190,15 @@ void calculate_dt(
     }
 
     /******** Calculate conditions ********/
+    dtdcond = D/(2*(1/(dx*dx) + 1/(dy*dy)));
     dtcond = Re/(2*(1/(dx*dx) + 1/(dy*dy)));
     dxcond = dx/fabs(umax);
     dycond = dy/fabs(vmax);
 
     /******** Determine smalles condition ********/
-    minval = dtcond;
+    minval = dtdcond;
+    if(minval > dtcond)
+        minval = dtcond;
     if(minval > dxcond)
         minval = dxcond;
     if(minval > dycond)
@@ -273,4 +277,67 @@ void calculate_rs(
             }
         }
      }
+}
+
+void calculate_c(
+  double dt,
+  double dx,
+  double dy,
+  double alpha,
+  double D,
+  int imax,
+  int jmax,
+  double **U,
+  double **V,
+  double **Q,
+  int **Flag
+)
+{
+    double ducdx;
+    double d2cdx2;
+    double dvcdy;
+    double d2cdy2;
+    double firstOperand;
+    double secondOperand;
+
+    int i;
+    int j;
+
+    /****** Calculate C start ******/
+
+    for (i = 1; i <= imax; i++) {
+        for (j = 1; j <= jmax; j++) {
+
+            if (Flag[][] >= C_F) {
+
+                /*** ducdx ***/
+
+                firstOperand = (1/dx)*(U[i][j]*(C[i][j]+C[i+1][j])/2 - U[i-1][j]*(C[i-1][j]+C[i][j])/2);
+                secondOperand = (alpha/dx)*(abs(U[i][j])*(C[i][j]+C[i+1][j])/2 - abs(U[i-1][j])*(C[i-1][j]+C[i][j])/2);
+
+                ducdx = firstOperand + secondOperand;
+
+                /*** dvcdy ***/
+
+                firstOperand = (1/dy)*(V[i][j]*(C[i][j]+C[i][j+1])/2 - V[i][j-1]*(C[i][j-1]+C[i][j])/2);
+                secondOperand = (alpha/dy)*(abs(V[i][j])*(C[i][j]+C[i][j+1])/2 - abs(V[i][j-1])*(C[i][j-1]+C[i][j])/2);
+
+                dvcdy = firstOperand + secondOperand;
+
+                /*** d2cdx2 ***/
+
+                d2cdx2 = (C[i+1][j]-2*C[i][j]+C[i-1][j])/(dx*dx);
+
+                /*** d2cdy2 ***/
+
+                d2cdy2 = (C[i][j+1]-2*C[i][j]+C[i][j-1])/(dy*dy);
+
+                /*** C(t+dt) ***/
+
+                C[i][j] =  C[i][j] + dt*(D*(d2cdx2+d2cdy2) - ducdx - dvcdy + Q[i][j]);
+            
+            }
+
+        }
+    }
 }

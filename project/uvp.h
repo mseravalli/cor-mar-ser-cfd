@@ -83,7 +83,8 @@ void calculate_dt(
   int jmax,
   double **U,
   double **V,
-  int **Flag
+  int **Flag,
+  double D
 );
 
 
@@ -111,6 +112,20 @@ void calculate_uv(
   double **F,
   double **G,
   double **P,
+  int **Flag
+);
+
+void calculate_c(
+  double dt,
+  double dx,
+  double dy,
+  double alpha,
+  double D,
+  double imax,
+  double jmax,
+  double **U,
+  double **V,
+  double **Q,
   int **Flag
 );
 
