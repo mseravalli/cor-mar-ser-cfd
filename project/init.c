@@ -7,10 +7,10 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     double *UI,                /* velocity x-direction */
                     double *VI,                /* velocity y-direction */
                     double *PI,                /* pressure */
-                    double* S_AI,                /* substance amount */
-                    double* S_BI,                /* substance amount */
-                    double* S_CI,                /* substance amount */
-                    double* S_DI,                /* substance amount */
+                    double* C0,                /* substance amount */
+                    double* C1,                /* substance amount */
+                    double* C2,                /* substance amount */
+                    double* C3,                /* substance amount */
                     double *GX,                /* gravitation x-direction */
                     double *GY,                /* gravitation y-direction */
                     double *t_end,             /* end time */
@@ -65,10 +65,10 @@ int read_parameters( const char *szFileName,       /* name of the file */
    READ_DOUBLE( szFileName, *GX );
    READ_DOUBLE( szFileName, *GY );
    READ_DOUBLE( szFileName, *PI );
-   READ_DOUBLE( szFileName, *S_AI );
-   READ_DOUBLE( szFileName, *S_BI );
-   READ_DOUBLE( szFileName, *S_CI );
-   READ_DOUBLE( szFileName, *S_DI );
+   READ_DOUBLE( szFileName, *C0 );
+   READ_DOUBLE( szFileName, *C1 );
+   READ_DOUBLE( szFileName, *C2 );
+   READ_DOUBLE( szFileName, *C3 );
 
    READ_DOUBLE( szFileName, *deltaP );
 
@@ -88,20 +88,17 @@ int read_parameters( const char *szFileName,       /* name of the file */
 void init_uvp(double UI,
               double VI,
               double PI,
-              double S_AI,
-              double S_BI,
-              double S_CI,
-              double S_DI,
+              double C0,
+              double C1,
+              double C2,
+              double C3,
               int imax,
               int jmax,
               char* problem,
               double **U,
               double **V,
               double **P,
-              double** S_A,
-              double** S_B,
-              double** S_C,
-              double** S_D)
+              double*** C )
 {
     
     int i ,j;
@@ -119,6 +116,11 @@ void init_uvp(double UI,
     init_matrix(V, 0, imax + 1, 0, jmax + 1, VI);
     
     init_matrix(P, 1, imax, 1, jmax, PI);
+
+    init_matrix(C[0], 1, imax, 1, jmax, C0);
+    init_matrix(C[1], 1, imax, 1, jmax, C1);
+    init_matrix(C[2], 1, imax, 1, jmax, C2);
+    init_matrix(C[3], 1, imax, 1, jmax, C3);
 
 }
 

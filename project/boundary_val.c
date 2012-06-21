@@ -224,7 +224,7 @@ void spec_boundary_val(
     )
 {
     int j = 0;
-    double dpdx;
+    /*double dpdx;*/
 
     if (strcmp(problem, "karman") == 0) {
         for(j = 1; j <= jmax; ++j)
