@@ -1,0 +1,13 @@
+Worksheet 4 - Cordero, Maric, Seravalli
+
+The program solves the given problem in parallel, with the parameters specified in the cavity file.
+
+The objects will be created in the obj folder and the output will be saved in the directory files.
+
+To compile the file simply
+
+$ make
+
+to run the file either use the standard mpirun or a small script that deletes the old output and run the program on a specific number of processes (6 by default).
+
+$ sh run.sh

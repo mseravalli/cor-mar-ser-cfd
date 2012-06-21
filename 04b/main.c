@@ -4,9 +4,9 @@
 #include "uvp.h"
 #include "boundary_val.h"
 #include "sor.h"
-#include "parallel.h"
 #include <stdio.h>
 #include "mpi.h"
+#include "parallel.h"
 
 
 /**
@@ -57,15 +57,15 @@ int main(int argn, char** args){
     double  dt;                /* time step */
     double  dx;                /* length of a cell x-dir. */
     double  dy;                /* length of a cell y-dir. */
-    int     imax;              /* number of cells x-direction*/
-    int     jmax;              /* number of cells y-direction*/
+    int     imax;                /* number of cells x-direction*/
+    int     jmax;                /* number of cells y-direction*/
     double  alpha;             /* uppwind differencing factor*/
     double  omg;               /* relaxation factor */
     double  tau;               /* safety factor for time step*/
-    int     itermax;           /* max. number of iterations  */
-                               /* for pressure per time step */
+    int     itermax;             /* max. number of iterations  */
+                                /* for pressure per time step */
     double  eps;               /* accuracy bound for pressure*/
-    double  dt_value;          /* time for output */              
+    double  dt_value;           /* time for output */              
 
     double **U = NULL;
     double **V = NULL;
@@ -73,6 +73,12 @@ int main(int argn, char** args){
     double **F = NULL;
     double **G = NULL;
     double **RS = NULL;
+    
+    double t; 
+    int n;
+    int it;
+    double res;
+    char nextSORiter;
     
     int iproc;
     int jproc;
@@ -92,20 +98,11 @@ int main(int argn, char** args){
     
     int num_proc;
     int myrank;
-    MPI_Status status;
-    
-    double t; 
-    int n;
-    int it;
-    double res;
-        
-    int nextSORiter;
-    
+
     double *bufSend;
     double *bufRecv;
 
-    char txt[256];
-
+    /**** initialise all the variables ****/
     MPI_Init(&argn, &args);
 
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
@@ -134,10 +131,11 @@ int main(int argn, char** args){
                     &dt_value,
                     &iproc,
                     &jproc);
-
+                    
+    /* if the number of processes is not coherent with the subdomains, exit */
     if (num_proc % (iproc*jproc) != 0) {
         if (myrank == 0) {
-            printf("cannot execute the program: number of processes and subdomains should be coherent\n");
+            printf("cannot execute : number of processes and subdomains should be coherent\n");
         }
         MPI_Finalize();
         return 1;
@@ -159,27 +157,35 @@ int main(int argn, char** args){
                   &omg_i,
                   &omg_j,
                   num_proc);
-                    
+
+    imax = ir - il + 1;
+    jmax = jt - jb + 1;
+
     t = 0;
     n = 0;
 
-    U = matrix(0, ir - il + 3, 0, jt - jb + 2); 
-    V = matrix(0, ir - il + 2, 0, jt - jb + 3); 
-    P = matrix(0, ir - il + 2, 0, jt - jb + 2);
-    F = matrix(0, ir - il + 3, 0, jt - jb + 2); 
-    G = matrix(0, ir - il + 2, 0, jt - jb + 3); 
-    RS = matrix(0, ir - il + 2, 0, jt - jb + 2); 
-    init_uvp(UI, VI, PI, ir - il + 1, jt - jb + 1, U, V, P);
-    
-    max_length = ir-il+3;
-    if(max_length < jt-jb+3)
+    /**** allocate all the matrices and the vectores ****/
+    U = matrix(0, imax + 2, 0, jmax + 1); 
+    F = matrix(0, imax + 2, 0, jmax + 1);
+    V = matrix(0, imax + 1, 0, jmax + 2); 
+    G = matrix(0, imax + 1, 0, jmax + 2);
+    P = matrix(0, imax + 1, 0, jmax + 1);
+    RS = matrix(0, imax + 1, 0, jmax + 1); 
+
+    max_length = imax+3;
+    if(max_length < jmax+3)
     {
-      max_length = jt-jb+3;    
+      max_length = jmax+3;    
     }
     
     bufSend = (double *) malloc((size_t)(max_length * sizeof(double)));
     bufRecv = (double *) malloc((size_t)(max_length * sizeof(double)));
-    
+
+    /**** initialise the matrices ****/
+    init_matrix(U, 0, imax + 2, 0, jmax + 1, UI); 
+    init_matrix(V, 0, imax + 1, 0, jmax + 2, VI); 
+    init_matrix(P, 0, imax + 1, 0, jmax + 1, PI);
+
     while (t < t_end)
     {
         calculate_dt(Re,
@@ -187,24 +193,20 @@ int main(int argn, char** args){
                  &dt,
                  dx,
                  dy,
-                 il,
-                 ir,
-                 jt,
-                 jb,
+                 imax,
+                 jmax,
                  U,
                  V);
-                 
-        boundaryvalues(il,
-                       ir,
-                       jt,
-                       jb,
-                       omg_i,
-                       omg_j,
-                       iproc,
-                       jproc,
+
+        boundaryvalues(imax,
+                       jmax,
+                       rank_l,
+                       rank_r,
+                       rank_b,
+                       rank_t,
                        U,
                        V);
-    
+
         calculate_fg(Re,
                  GX,
                  GY,
@@ -212,10 +214,8 @@ int main(int argn, char** args){
                  dt,
                  dx,
                  dy,
-                 il,
-                 ir,
-                 jt,
-                 jb,
+                 imax,
+                 jmax,
                  rank_l,
                  rank_r,
                  rank_b,
@@ -228,66 +228,53 @@ int main(int argn, char** args){
         calculate_rs(dt,
                  dx,
                  dy,
-                 il,
-		 ir,
-                 jt,
-                 jb,
-  		 rank_l,
-  		 rank_r,
-  		 rank_b,
-  		 rank_t,
+                 imax,
+                 jmax,
                  F,
                  G,
                  RS);
                  
         it = 0;
         res = eps + 1;
-        
-        nextSORiter = 0;
-        while (nextSORiter == 0)
+        nextSORiter = 1;
+
+        while (nextSORiter)
         {
              sor(
                  omg,
                  dx,
                  dy,
-                 P,
-                 RS,
-                 &res,
-                 il,
-                 ir,
-                 jb,
-                 jt,
-                 myrank,
-                 num_proc,
+                 imax,
+                 jmax,
                  rank_l,
                  rank_r,
                  rank_b,
                  rank_t,
+                 it,
                  bufSend,
                  bufRecv,
-                 &status,
-                 it);
-            
+                 P,
+                 RS,
+                 &res);
+
             /*master decides if another iteration in required*/
             if(myrank == 0){
-              nextSORiter = ((it < itermax && res > eps)? 0 : 1);
+              nextSORiter = ((it < itermax && res > eps)? 1 : 0);
             }
             
             /*it broadcasts the decision to all other processes*/
             MPI_Bcast(&nextSORiter, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-            
+                 
             it++;
         }
-        
+
         calculate_uv(dt,
                  dx,
                  dy,
-                 il,
-                 ir,
-                 jt,
-                 jb,
-                 rank_l,
-                 rank_r,
+                 imax,
+                 jmax,
+                 rank_l, 
+                 rank_r, 
                  rank_b,
                  rank_t,
                  U,
@@ -295,74 +282,55 @@ int main(int argn, char** args){
                  F,
                  G,
                  P);
-                 
-        uv_comm(U,
-                    V,
-                    il,
-                    ir,
-                    jb,
-                    jt,
-                    rank_l,
-                    rank_r,
-                    rank_b,
-                    rank_t,
-                    bufSend,
-                    bufRecv,
-                    &status,
-                    n);
 
-        if( n % (int)dt_value == 0 ){
-            output_vtk(U, 
-                       V, 
-                       P, 
-                       il, 
-                       ir, 
-                       jb, 
-                       jt, 
-                       imax, 
-                       jmax, 
-                       omg_i, 
-                       omg_j, 
-                       dx, 
-                       dy, 
-                       n, 
-                       "cavity");
-        }
+        break;
 
-        ++n;
+            write_vtkFile("files/file",
+		                  n,
+		                  xlength,
+                          ylength,
+                          imax,
+                          jmax,
+                		  dx,
+		                  dy,
+                          U,
+                          V,
+                          P);
 
         t += dt;
+        n++;
     }
 
-    output_vtk(U, 
-               V, 
-               P, 
-               il, 
-               ir, 
-               jb, 
-               jt, 
-               imax, 
-               jmax, 
-               omg_i, 
-               omg_j, 
-               dx, 
-               dy, 
-               n, 
-               "cavity");
+    write_vtkFile("files/file",
+		                  n,
+		                  xlength,
+                          ylength,
+                          imax,
+                          jmax,
+                		  dx,
+		                  dy,
+                          U,
+                          V,
+                          P);
 
-    free_matrix(U, 0, ir - il + 3, 0, jt - jb + 2); 
-    free_matrix(V, 0, ir - il + 2, 0, jt - jb + 3); 
-    free_matrix(P, 0, ir - il + 2, 0, jt - jb + 2);
-    free_matrix(F, 0, ir - il + 3, 0, jt - jb + 2); 
-    free_matrix(G, 0, ir - il + 2, 0, jt - jb + 3); 
-    free_matrix(RS, 0, ir - il + 2, 0, jt - jb + 2);
-    
+
     free(bufSend);
     free(bufRecv);
 
-    Programm_Stop(txt);
+    free_matrix(U, 0, imax + 2, 0, jmax + 1);
+    free_matrix(F, 0, imax + 2, 0, jmax + 1);
+    free_matrix(V, 0, imax + 1, 0, jmax + 2);
+    free_matrix(G, 0, imax + 1, 0, jmax + 2);
+    free_matrix(P, 0, imax + 1, 0, jmax + 1);
+    free_matrix(RS, 0, imax + 1, 0, jmax + 1);
+
+    Programm_Stop("end correctly reached");
 
     MPI_Finalize();
 
     return 0;
 }
+
+
+
+

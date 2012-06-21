@@ -28,8 +28,8 @@ void write_vtkFile(const char *szProblem,
     return;
   }
 
-  write_vtkHeader( fp, imax, jmax, dx, dy);
-  write_vtkPointCoordinates(fp, imax, jmax, dx, dy);
+  write_vtkHeader( fp, imax, jmax, dx, dy); 
+/*  write_vtkPointCoordinates(fp, imax, jmax, dx, dy); */
 
   fprintf(fp,"POINT_DATA %i \n", (imax+1)*(jmax+1) );
 	
@@ -81,10 +81,15 @@ void write_vtkHeader( FILE *fp, int imax, int jmax,
 }
 
 
-void write_vtkPointCoordinates( FILE *fp, int imax, int jmax, 
-                      double dx, double dy) {
-  double originX = 0.0;  
-  double originY = 0.0;
+void write_vtkPointCoordinates( FILE *fp, 
+                                int imax, 
+                                int jmax, 
+                                int omg_i,
+                                int omg_j,
+                                double dx, 
+                                double dy) {
+  double originX = (omg_i*imax)*dx;  
+  double originY = (omg_j*jmax)*dy;
 
   int i = 0;
   int j = 0;
@@ -110,6 +115,7 @@ void parallelContainer(double** U,
 {
 
     char pieceExtend[256];
+    char parallelCont[256];
     int i;
     int j;
 
@@ -118,27 +124,27 @@ void parallelContainer(double** U,
     int jt;
     int jb;
     
-    FILE* parallelContainer = NULL;
-    sprintf(outputFile, "files/P%s.%i.vtk", outputFile, nTS);
-    parallelContainer = fopen(outputFile, "w");
+    FILE* parallelContFile = NULL;
+    sprintf(parallelCont, "files/P%s.%i.vtk", outputFile, nTS);
+    parallelContFile = fopen(parallelCont, "w");
 
     /* write header */
-    fprintf(parallelContainer, "<VTKFile type=\"PStructuredGrid\"");
-    fprintf(parallelContainer, 
+    fprintf(parallelContFile, "<VTKFile type=\"PStructuredGrid\"");
+    fprintf(parallelContFile, 
             "<PStructuredGrid WholeExtent=\"1 imax 1 jmax 0 0\" GhostLevel=\"0\">");
 
-    fprintf(parallelContainer, "<PPointData>");
-    fprintf(parallelContainer, "</PPointData>");
+    fprintf(parallelContFile, "<PPointData>");
+    fprintf(parallelContFile, "</PPointData>");
 
-    fprintf(parallelContainer, "<PCellData>");
-    fprintf(parallelContainer, "</PCellData>");
+    fprintf(parallelContFile, "<PCellData>");
+    fprintf(parallelContFile, "</PCellData>");
 
-    fprintf(parallelContainer, "<PPoints>");
-    fprintf(parallelContainer, "</PPoints>");
+    fprintf(parallelContFile, "<PPoints>");
+    fprintf(parallelContFile, "</PPoints>");
     
     for (i = 0; i < iproc; ++i) {
         for (j = 0; j < jproc; ++j) {
-            sprintf(pieceExtend, "%s_%i%i.%i", outputFile, omg_i, omg_j, nTS);
+            sprintf(pieceExtend, "%s_%i%i.%i", outputFile, i, j, nTS);
 
             il = (imax / iproc) * i + 1;
             jb = (jmax / jproc) * j + 1;
@@ -155,7 +161,7 @@ void parallelContainer(double** U,
                 jt = (j + 1) * (jmax / jproc); 
             }
 
-            fprintf(parallelContainer, 
+            fprintf(parallelContFile, 
                     "<Piece Extent=\"%i %i %i %i 0 0\" Source=\"%s.vts\"/>", 
                     il,
                     ir,
@@ -166,8 +172,8 @@ void parallelContainer(double** U,
         }
     }
 
-    fprintf(parallelContainer, "</PStructuredGrid>");
-    fprintf(parallelContainer, "</VTKFile>");
+    fprintf(parallelContFile, "</PStructuredGrid>");
+    fprintf(parallelContFile, "</VTKFile>");
 
 }
 
@@ -176,6 +182,8 @@ void parallelHeader(FILE *fp,
                     int ir, 
                     int jb,
                     int jt,
+                    int imax,
+                    int jmax,
                     double dx, 
                     double dy)
 {
@@ -192,8 +200,8 @@ void parallelHeader(FILE *fp,
     fprintf(fp,"ASCII\n");
     fprintf(fp,"\n");	
     fprintf(fp,"DATASET STRUCTURED_GRID\n");
-    fprintf(fp,"DIMENSIONS  %i %i 1 \n", imax+1, jmax+1);
-    fprintf(fp,"POINTS %i float\n", (imax+1)*(jmax+1) );
+    fprintf(fp,"DIMENSIONS  %i %i 1 \n", ir+1, jt+1);
+    fprintf(fp,"POINTS %i float\n", (ir+1)*(jt+1) );
     fprintf(fp,"\n");
 
 }
@@ -227,39 +235,69 @@ void output_vtk(double** U,
                 int ir,
                 int jb,
                 int jt,
+                int imax, 
+                int jmax,
                 int omg_i,
                 int omg_j,
+                double dx,
+                double dy,
+                int timeStepNumber,
                 char* outputFile
                 )
 {
+    
+  int i,j;
+  char szFileName[80];
+  FILE *fp=NULL;
+  sprintf( szFileName, "files/%s_%i%i.%i.vtk", outputFile, omg_i, omg_j, timeStepNumber );
+  fp = fopen( szFileName, "w");
+  if( fp == NULL )		       
+  {
+    char szBuff[80];
+    sprintf( szBuff, "Failed to open %s", szFileName );
+    ERROR( szBuff );
+    return;
+  }
 
-    int i,j;
-    char szFileName[80];
-    FILE *fp=NULL;
-    sprintf( szFileName, "%s.%i.vtk", szProblem, timeStepNumber );
-    fp = fopen( szFileName, "w");
-    if( fp == NULL )		       
-    {
-      char szBuff[80];
-      sprintf( szBuff, "Failed to open %s", szFileName );
-      ERROR( szBuff );
-      return;
+  write_vtkHeader( fp, 
+                   ir - il + 1, 
+                   jt - jb + 1, 
+                   dx, 
+                   dy);
+  write_vtkPointCoordinates( fp, 
+                             ir - il + 1, 
+                             jt - jb + 1, 
+                             omg_i,
+                             omg_j,
+                             dx, 
+                             dy);
+
+  fprintf(fp,"POINT_DATA %i \n", (ir - il + 2)*(jt - jb + 2) );
+	
+  fprintf(fp,"\n");
+  fprintf(fp, "VECTORS velocity float\n");
+  for(j = 0; j < (jt - jb + 2); j++) {
+    for(i = 0; i < (ir - il + 2); i++) {
+      fprintf(fp, "%f %f 0\n", (U[i][j] + U[i][j+1]) * 0.5, (V[i][j] + V[i+1][j]) * 0.5 );
     }
+  }
 
-    parallelHeader(fp,  
-                   il, 
-                   ir, 
-                   jb,
-                   jt,
-                   dx, 
-                   dy);
+  fprintf(fp,"\n");
+  fprintf(fp,"CELL_DATA %i \n", ((ir - il + 1)*(jt - jb + 1)) );
+  fprintf(fp, "SCALARS pressure float 1 \n"); 
+  fprintf(fp, "LOOKUP_TABLE default \n");
+  for(j = 1; j < (jt - jb + 2); j++) {
+    for(i = 1; i < (ir - il + 2); i++) {
+      fprintf(fp, "%f\n", P[i][j] );
+    }
+  }
 
-    parallelCoords(fp,
-                   il, 
-                   ir, 
-                   jb,
-                   jt,
-                   dx, 
-                   dy);
+  if( fclose(fp) )
+  {
+    char szBuff[80];
+    sprintf( szBuff, "Failed to close %s", szFileName );
+    ERROR( szBuff );
+  }
+
 }
 

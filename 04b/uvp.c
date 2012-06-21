@@ -2,7 +2,6 @@
 #include "helper.h"
 #include "uvp.h"
 #include <math.h>
-#include "mpi.h"
 #include "parallel.h"
 
 void calculate_fg(
@@ -13,10 +12,8 @@ void calculate_fg(
   double dt,
   double dx,
   double dy,
-  int il,
-  int ir,
-  int jt,
-  int jb,
+  int imax,
+  int jmax,
   int rank_l,
   int rank_r,
   int rank_b,
@@ -46,20 +43,16 @@ void calculate_fg(
     int i;
     int j;
 
-    int istart, iend;
-    int jstart, jend;
-    
-    int imax, jmax;
-    imax = ir-il+1;
-    jmax = jt-jb+1;
-    
+    int istart;
+    int jstart;
+    int iend;
+    int jend;
+
     /******** VARIABLE DECLARATION END ********/
 
 
     /******** CALCULATE F START ********/
     
-    /******** Calculate F ********/
-
     istart = (rank_l == MPI_PROC_NULL? 2 : 1 );
     iend = (rank_r == MPI_PROC_NULL ? imax : imax + 1);
 
@@ -99,10 +92,9 @@ void calculate_fg(
     }
 
     /******** CALCULATE F END ********/
+    
 
     /******** CALCULATE G START ********/
-
-    /******** Calculate G ********/
 
     jstart = (rank_b == MPI_PROC_NULL ? 2 : 1 );
     jend = (rank_t == MPI_PROC_NULL ? jmax : jmax + 1);
@@ -166,32 +158,25 @@ void calculate_dt(
   double *dt,
   double dx,
   double dy,
-  int il,
-  int ir,
-  int jt,
-  int jb,
+  int imax,
+  int jmax,
   double **U,
   double **V
 )
 {
     double umax = 0;
     double vmax = 0;
-    double globUmax;
-    double globVmax;
+    double globUmax = 0;
+    double globVmax = 0;
     int i, j;
 
     double dtcond, dxcond, dycond;
     double minval;
 
-    int imax, jmax;
-
-    imax = ir-il+1;
-    jmax = jt-jb+1;
-
     /******** Determine umax and vmax *********/
-    for(i = 1; i <= imax+1; i++)
+    for(i = 0; i <= imax+1; i++)
     {
-        for(j = 1; j <= jmax+1; j++)
+        for(j = 0; j <= jmax+1; j++)
         {
             if(umax < fabs(U[i][j]))
                 umax = fabs(U[i][j]);
@@ -199,19 +184,19 @@ void calculate_dt(
                 vmax = fabs(V[i][j]);
         }
     }
-    
-    /* determines globan umax and vmax and places it in master thread */
+
+    /* determines global umax and vmax and places it in master thread */
     MPI_Reduce(&umax, &globUmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
     MPI_Reduce(&vmax, &globVmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
     /* broadcasts umax nad vmax */
     MPI_Bcast(&globUmax, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&globVmax, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    
-    
+
     /******** Calculate conditions ********/
     dtcond = Re/(2*(1/(dx*dx) + 1/(dy*dy)));
-    dxcond = dx/fabs(globUmax);
-    dycond = dy/fabs(globVmax);
+    dxcond = dx/fabs(umax);
+    dycond = dy/fabs(vmax);
 
     /******** Determine smalles condition ********/
     minval = dtcond;
@@ -228,10 +213,8 @@ void calculate_uv(
   double dt,
   double dx,
   double dy,
-  int il,
-  int ir,
-  int jt, 
-  int jb,
+  int imax,
+  int jmax,
   int rank_l,
   int rank_r,
   int rank_b,
@@ -247,11 +230,6 @@ void calculate_uv(
     int istart, iend;
     int jstart, jend;
     double dtodx, dtody;  
-
-    int imax, jmax;
-
-    imax = ir-il+1;
-    jmax = jt-jb+1;
     
     /******** Calculate dt/dx and dt/dy (it is the same for each element) ********/
     dtodx = dt/dx;
@@ -286,27 +264,17 @@ void calculate_rs(
   double dt,
   double dx,
   double dy,
-  int il,
-  int ir,
-  int jt,
-  int jb,
-  int rank_l,
-  int rank_r,
-  int rank_b,
-  int rank_t,
+  int imax,
+  int jmax,
   double **F,
   double **G,
   double **RS
 )
 {
     int i, j;
-
-    int imax, jmax;
-
-    imax = ir-il+1;
-    jmax = jt-jb+1;
    
     /******** Calculate RS ********/
+
     for(i = 2; i <= imax+1; i++)
     {
         for(j = 2; j <= jmax+1; j++)
