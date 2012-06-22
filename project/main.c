@@ -83,13 +83,14 @@ int main(int argn, char** args){
     double**  U = NULL;
     double**  V = NULL;
     double**  P = NULL;
-    double*** C = NULL;
     double**  F = NULL;
     double**  G = NULL;
     double**  RS = NULL;
     char problem[64];
     int **Problem = NULL;
     int **Flag = NULL;
+    double*** C = NULL;
+    double**  Q = NULL;
     
     double t; 
     int n;
@@ -178,6 +179,7 @@ int main(int argn, char** args){
     G   = matrix(0, imax + 1, 0, jmax + 1);
     RS  = matrix(0, imax + 1, 0, jmax + 1);
     C   = matrix3(0, imax + 1, 0, jmax + 1, kmax);
+    Q   = matrix(0, imax + 1, 0, jmax + 1);
     init_uvp(UI, 
              VI, 
              PI, 
@@ -209,6 +211,9 @@ int main(int argn, char** args){
                  
         boundaryvalues(imax,
                        jmax,
+                       kmax,
+                       dx,
+                       dy,
                        wl,
                        wr,
                        wt,
@@ -218,6 +223,7 @@ int main(int argn, char** args){
                        F,
                        G,
                        P,
+                       C,
                        Flag);
 
         spec_boundary_val(problem,
@@ -230,6 +236,20 @@ int main(int argn, char** args){
                           U,
                           V,
                           P);
+
+        calculate_c(dt,
+                    dx,
+                    dy,
+                    alpha,
+                    D,
+                    imax,
+                    jmax,
+                    kmax,
+                    U,
+                    V,
+                    Q,
+                    C,
+                    Flag);
 
         calculate_fg(Re,
                  GX,
@@ -355,6 +375,7 @@ int main(int argn, char** args){
     free_imatrix(Flag, 0, imax + 1, 0, jmax + 1);
     free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
     free_matrix3(C , 0, imax + 1, 0, jmax + 1, kmax);
+    free_matrix(Q,  0, imax + 1, 0, jmax + 1);
 
     return 0;
 }

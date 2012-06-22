@@ -8,15 +8,19 @@
 void boundaryvalues(
   int imax,
   int jmax,
+  int kmax,
+  double dx,
+  double dy,
   int wl,
   int wr,
   int wt,
   int wb,
-  double **U,
-  double **V,
-  double **F,
-  double **G,
-  double **P,
+  double** U,
+  double** V,
+  double** F,
+  double** G,
+  double** P,
+  double***C,
   int **Flag
 );
 
