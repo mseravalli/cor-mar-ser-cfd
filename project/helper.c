@@ -380,7 +380,7 @@ double*** matrix3( int nrl, int nrh, int ncl, int nch, int kmax )
 
    pTop[0] = pArray;
    for (i = 1; i < kmax; ++i) {
-       pTop[i] = pTop[i-1] + kmax;
+       pTop[i] = pTop[i-1] + nrow;
    }
 
    return pTop;
