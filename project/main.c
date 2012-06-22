@@ -96,7 +96,7 @@ int main(int argn, char** args){
     int n;
     int it;
     double res;
-    double D = 5.3;
+    double D = 0.6;
 
     if(argn <= 1)
     {
