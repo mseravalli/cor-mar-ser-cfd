@@ -33,8 +33,8 @@ void boundaryvalues(
     /* stored as left, right, bottom, top */
     double C_bound[4][4] = {{0.0, 0.0, 0.0, 1.0},
                             {0.0, 0.0, 1.0, 0.0},
-                            {0.0, 1.0, 0.0, 0.0},
-                            {1.0, 0.0, 0.0, 0.0}};
+                            {0.0, 0.0, 0.0, 1.0},
+                            {0.0, 0.0, 1.0, 0.0}};
 
     /******** EXTERNAL WALLS START ********/
 
@@ -67,6 +67,9 @@ void boundaryvalues(
          {
              U[0][j] = U[1][j];
              V[0][j] = V[1][j];
+             for (k = 0; k < kmax; ++k) {
+                 C[k][0][j]= C[k][1][j];
+             }
          }
     }
 
@@ -99,6 +102,9 @@ void boundaryvalues(
          {
              U[imax][j] = U[imax-1][j];
              V[imax+1][j] = V[imax][j];
+             for (k = 0; k < kmax; ++k) {
+                 C[k][imax+1][j]= C[k][imax][j];
+             }
          }
     }
 
@@ -131,6 +137,9 @@ void boundaryvalues(
          {
              U[i][0] = U[i][1];
              V[i][0] = V[i][1];
+             for (k = 0; k < kmax; ++k) {
+                 C[k][i][0] = C[k][i][1];
+             }
          }
     }
 
@@ -163,6 +172,9 @@ void boundaryvalues(
          {
              U[i][jmax+1] = U[i][jmax];
              V[i][jmax] = V[i][jmax-1];
+             for (k = 0; k < kmax; ++k) {
+                 C[k][i][jmax+1] = C[k][i][jmax];
+             }
          }
     }
     
