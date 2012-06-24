@@ -136,31 +136,44 @@ int init_flag(
     int i, j;
 
     /* 
-     * normalize the values of the matrix, this could be deleted if we are sure
-     * that the given matrix contains only 0 or 1
+     * 255 -> 1 - fluid
+     * 0 -> 0 - obstacle
+     * 127 -> 2 - obstacle with source
      */
-    for (i = 1; i < imax+1; i++) {
+    /*for (i = 1; i < imax+1; i++) {
         for (j = 1; j < jmax+1; j++) {
-            Problem[i][j] /= (Problem[i][j] != 0 ? Problem[i][j] : 1);
+            if(Problem[i][j] == 255)
+            {
+                Problem[i][j] = 1;
+            }
+            else if (Problem[i][j] == 127)
+            {
+                Problem[i][j] = 2;
+            }
         }
-    }
+    }*/
     
     for(i = 1; i < imax+1; i++)
     {
         for(j = 1; j < jmax+1; j++)
         {
             /*if it is a fluid cell it is being set to C_F, regardles of its neighbours*/
-            if(Problem[i][j] > 0)
+            if(Problem[i][j] == 0)
             {
                 Flag[i][j] = C_F;
             }
             /*otherwise, its flag is calculated as 8*eastern + 4*western + 2*southern + 1*northern cell*/
             else
             {
-                Flag[i][j] = 8 * Problem[i][j-1] + 4 * Problem[i][j+1] + 2 * Problem[i+1][j] + 1 * Problem[i-1][j];
+                Flag[i][j] = 8 * (Problem[i][j-1]>0) + 4 * (Problem[i][j+1]>0) + 2 * (Problem[i+1][j]>0) + 1 * (Problem[i-1][j]>0);
                 /*if falg is not valid it returns a wrong result*/
                 if(Flag[i][j] == 3 || Flag[i][j] == 7 || Flag[i][j] == 11 || Flag[i][j] == 12 || Flag[i][j] == 13 || Flag[i][j] == 14 || Flag[i][j] == 15){
+                    printf("%d %d %d\n", i, j, Flag[i][j]);
                     return 1;
+                }
+                if (Problem[i][j] == 127)
+                {
+                    Flag[i][j] *= 2;
                 }
             }
         }
