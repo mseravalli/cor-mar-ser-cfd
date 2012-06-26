@@ -89,6 +89,7 @@ int main(int argn, char** args){
     char problem[64];
     int **Problem = NULL;
     int **Flag = NULL;
+    int **Sources = NULL;
     double*** C = NULL;
     double**  Q = NULL;
     
@@ -157,8 +158,9 @@ int main(int argn, char** args){
     dy = ylength / (double)(jmax);
     
     Flag = imatrix(0, imax + 1, 0, jmax + 1);
+    Sources = imatrix(0, imax + 1, 0, jmax+1);
 
-    if(init_flag(Problem, imax, jmax, Flag) == 1)
+    if(init_flag(Problem, imax, jmax, Flag, Sources) == 1)
     {
         /* 
          * if there was a forbidden obstacle it returns an error, 
@@ -373,6 +375,7 @@ int main(int argn, char** args){
     free_matrix(G,  0, imax + 1, 0, jmax + 1);
     free_matrix(RS, 0, imax + 1, 0, jmax + 1);
     free_imatrix(Flag, 0, imax + 1, 0, jmax + 1);
+    free_imatrix(Sources, 0, imax+1, 0, jmax+1);
     free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
     free_matrix3(C , 0, imax + 1, 0, jmax + 1, kmax);
     free_matrix(Q,  0, imax + 1, 0, jmax + 1);
