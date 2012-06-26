@@ -158,7 +158,15 @@ int init_flag(
 
     for (i = 1; i < imax+1; i++) {
         for (j = 1; j < jmax+1; j++) {
-            Problem[i][j] /= (Problem[i][j] != 0 ? Problem[i][j] : 1);
+	    /*if fluid problem is 1*/
+            if(Problem[i][j] == 255)
+	    {
+	        Problem[i][j] = 1;
+	    }
+	    else
+	    {
+	    	Problem[i][j] = 0;
+	    }
         }
     }
     
