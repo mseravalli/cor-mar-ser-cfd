@@ -28,15 +28,9 @@ void boundaryvalues(
     int j = 0;
     int k = 0;
 
-    /* probably those values should be passed as parameters */
-    /* MUST be Dynamic */
-    /* stored as left, right, bottom, top */
-    double C_bound[4][4] = {{0.0, 0.0, 0.0, 1.0},
-                            {0.0, 0.0, 1.0, 0.0},
-                            {0.0, 0.0, 0.0, 1.0},
-                            {0.0, 0.0, 1.0, 0.0}};
-
     /******** EXTERNAL WALLS START ********/
+
+    /**** VELOCITIES START ****/
 
     /** left wall **/
     if(wl==1) /** no slip **/
@@ -45,9 +39,6 @@ void boundaryvalues(
          {
              U[0][j] = 0;
              V[0][j] = -1.0*V[1][j];
-             for (k = 0; k < kmax; k++) {
-                 C[k][0][j] = 2*C_bound[k][0]*((j-0.5)*dy) - C[k][1][j];
-             }
          }
     }
     else if (wl==2) /** free slip **/
@@ -56,9 +47,6 @@ void boundaryvalues(
          {
              U[0][j] = 0;
              V[0][j] = V[1][j];
-             for (k = 0; k < kmax; ++k) {
-                 C[k][0][j] = C[k][1][j] + dx*C_bound[k][0]*((j-0.5)*dy);
-             }
          }
     }
     else if (wl==3) /** Outflow **/
@@ -67,9 +55,6 @@ void boundaryvalues(
          {
              U[0][j] = U[1][j];
              V[0][j] = V[1][j];
-             for (k = 0; k < kmax; ++k) {
-                 C[k][0][j]= C[k][1][j];
-             }
          }
     }
 
@@ -80,9 +65,6 @@ void boundaryvalues(
          {
              U[imax][j] = 0;
              V[imax+1][j] = -1.0*V[imax][j];
-             for (k = 0; k < kmax; k++) {
-                 C[k][imax+1][j] = 2*C_bound[k][1]*((j-0.5)*dy) - C[k][imax][j];
-             }
          }
     }
     else if (wr==2) /** free slip **/
@@ -91,9 +73,6 @@ void boundaryvalues(
          {
              U[imax][j] = 0;
              V[imax+1][j] = V[imax][j];
-             for (k = 0; k < kmax; ++k) {
-                 C[k][imax+1][j] = C[k][imax][j] + dx*C_bound[k][1]*((j-0.5)*dy);
-             }
          }
     }
     else if (wr==3) /** Outflow **/
@@ -102,9 +81,6 @@ void boundaryvalues(
          {
              U[imax][j] = U[imax-1][j];
              V[imax+1][j] = V[imax][j];
-             for (k = 0; k < kmax; ++k) {
-                 C[k][imax+1][j]= C[k][imax][j];
-             }
          }
     }
 
@@ -115,9 +91,6 @@ void boundaryvalues(
          {
              V[i][0] = 0;
              U[i][0] = -1.0*U[i][1];
-             for (k = 0; k < kmax; k++) {
-                 C[k][i][0] = 2*C_bound[k][2]*((i-0.5)*dx) - C[k][i][1];
-             }
          }
     }
     else if (wb==2) /** free slip **/
@@ -126,9 +99,6 @@ void boundaryvalues(
          {
              V[i][0] = 0;
              U[i][0] = U[i][1];
-             for (k = 0; k < kmax; ++k) {
-                 C[k][i][0] = C[k][i][1] + dy*C_bound[k][2]*((i-0.5)*dx);
-             }
          }
     }
     else if (wb==3) /** Outflow **/
@@ -137,9 +107,6 @@ void boundaryvalues(
          {
              U[i][0] = U[i][1];
              V[i][0] = V[i][1];
-             for (k = 0; k < kmax; ++k) {
-                 C[k][i][0] = C[k][i][1];
-             }
          }
     }
 
@@ -150,9 +117,6 @@ void boundaryvalues(
          {
              V[i][jmax] = 0;
              U[i][jmax+1] = -1.0*U[i][jmax];
-             for (k = 0; k < kmax; k++) {
-                 C[k][i][jmax+1] = 2*C_bound[k][3]*((i-0.5)*dx) - C[k][i][jmax];
-             }
          }
     }
     else if (wt==2) /** free slip **/
@@ -161,9 +125,6 @@ void boundaryvalues(
          {
              V[i][jmax] = 0;
              U[i][jmax+1] = U[i][jmax];
-             for (k = 0; k < kmax; ++k) {
-                 C[k][i][jmax+1] = C[k][i][jmax] + dy*C_bound[k][3]*((i-0.5)*dx);
-             }
          }
     }
     else if (wt==3) /** Outflow **/
@@ -172,11 +133,29 @@ void boundaryvalues(
          {
              U[i][jmax+1] = U[i][jmax];
              V[i][jmax] = V[i][jmax-1];
-             for (k = 0; k < kmax; ++k) {
-                 C[k][i][jmax+1] = C[k][i][jmax];
-             }
          }
     }
+
+    /**** VELOCITIES END ****/
+
+    /**** CONCENTRATION START ****/
+
+    for (k = 0; k < kmax; ++k) {
+
+        /** left and right wall **/
+        for (j = 0; j < jmax; ++j) {
+            C[k][0][j] = -C[k][1][j];
+            C[k][imax+1][j] = C[k][imax][j];
+        }
+
+        /** lower and upper wall **/
+         for(i = 1; i <= imax; ++i) {
+             C[k][i][0] = -C[k][i][1];
+             C[k][i][jmax+1] = -C[k][i][jmax];
+         }
+    }
+
+    /**** CONCENTREATION END ****/
     
     /******** EXTERNAL WALLS END ********/
 
@@ -275,10 +254,13 @@ void spec_boundary_val(
     double deltaP,
     double **U,
     double **V,
-    double **P
+    double **P,
+    double*** C
     )
 {
-    int j = 0;
+    int i, j = 0;
+    double C0 = 1;
+    double C1 = 1;
     /*double dpdx;*/
 
     if (strcmp(problem, "karman") == 0) {
@@ -287,6 +269,14 @@ void spec_boundary_val(
             U[0][j] = 1.0;
             V[0][j] = -V[1][j];
         }
+    }
+
+    for (i = 1; i <= imax; ++i) {
+        C[0][i][0] = 2*C0-C[0][i][1];
+    }
+
+    for (j = 1; j <= jmax; ++j) {
+        C[1][0][j] = 2*C1-C[1][1][j];
     }
 
 }

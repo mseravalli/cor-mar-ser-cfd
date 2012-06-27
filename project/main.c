@@ -237,7 +237,8 @@ int main(int argn, char** args){
                           deltaP,
                           U,
                           V,
-                          P);
+                          P,
+                          C);
 
         calculate_c(dt,
                     dx,

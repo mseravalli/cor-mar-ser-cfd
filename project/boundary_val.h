@@ -36,7 +36,9 @@ void spec_boundary_val(
     double deltaP,
     double **U,
     double **V,
-    double **P
+    double **P,
+    double*** C
+
 );
 
 #endif
