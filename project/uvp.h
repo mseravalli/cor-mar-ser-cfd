@@ -126,9 +126,24 @@ void calculate_c(
   int kmax,
   double **U,
   double **V,
-  double **Q,
+  double ***Q,
   double ***C,
   int **Flag
 );
+
+void calculate_q(
+  double K,
+  int imax,
+  int jmax,
+  int kmax,
+  double ***Q,
+  double ***C,
+  int **Flag,
+  double k0,
+  double k1,
+  double k2,
+  double k3
+);
+
 
 #endif

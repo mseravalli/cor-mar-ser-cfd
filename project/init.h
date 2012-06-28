@@ -68,7 +68,10 @@ int read_parameters(
   int*    wt,
   int*    wb,
   double* dt_value,
-  double* deltaP
+  double* deltaP,
+  double* D, 
+  double* K
+
 );
 
 /**

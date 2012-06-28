@@ -32,7 +32,9 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     int    *wt,
                     int    *wb,
         		    double *dt_value,            /* time for output */
-                    double *deltaP
+                    double *deltaP,
+                    double* D,
+                    double* K
 ) 
 {
    READ_DOUBLE( szFileName, *xlength );
@@ -71,6 +73,8 @@ int read_parameters( const char *szFileName,       /* name of the file */
    READ_DOUBLE( szFileName, *C3 );
 
    READ_DOUBLE( szFileName, *deltaP );
+   READ_DOUBLE( szFileName, *D );
+   READ_DOUBLE( szFileName, *K );
 
 /*
    *dx = *xlength / (double)(*imax);

@@ -290,7 +290,7 @@ void calculate_c(
   int kmax,
   double **U,
   double **V,
-  double **Q,
+  double ***Q,
   double ***C,
   int **Flag
 )
@@ -317,14 +317,14 @@ void calculate_c(
                 /*** ducdx ***/
 
                 firstOperand = (1/dx)*(U[i][j]*(C[k][i][j]+C[k][i+1][j])/2 - U[i-1][j]*(C[k][i-1][j]+C[k][i][j])/2);
-                secondOperand = (alpha/dx)*(abs(U[i][j])*(C[k][i][j]+C[k][i+1][j])/2 - abs(U[i-1][j])*(C[k][i-1][j]+C[k][i][j])/2);
+                secondOperand = (alpha/dx)*(abs(U[i][j])*(C[k][i][j]-C[k][i+1][j])/2 - abs(U[i-1][j])*(C[k][i-1][j]-C[k][i][j])/2);
 
                 ducdx = firstOperand + secondOperand;
 
                 /*** dvcdy ***/
 
                 firstOperand = (1/dy)*(V[i][j]*(C[k][i][j]+C[k][i][j+1])/2 - V[i][j-1]*(C[k][i][j-1]+C[k][i][j])/2);
-                secondOperand = (alpha/dy)*(abs(V[i][j])*(C[k][i][j]+C[k][i][j+1])/2 - abs(V[i][j-1])*(C[k][i][j-1]+C[k][i][j])/2);
+                secondOperand = (alpha/dy)*(abs(V[i][j])*(C[k][i][j]-C[k][i][j+1])/2 - abs(V[i][j-1])*(C[k][i][j-1]-C[k][i][j])/2);
 
                 dvcdy = firstOperand + secondOperand;
 
@@ -338,11 +338,48 @@ void calculate_c(
 
                 /*** C(t+dt) ***/
 
-                C[k][i][j] =  C[k][i][j] + dt*(D*(d2cdx2+d2cdy2) - ducdx - dvcdy + Q[i][j]);
+                C[k][i][j] =  C[k][i][j] + dt*(D*(d2cdx2+d2cdy2) - ducdx - dvcdy + Q[k][i][j]);
             
             }
 
         }
     }
 }
+}
+
+void calculate_q(
+  double K,
+  int imax,
+  int jmax,
+  int kmax,
+  double ***Q,
+  double ***C,
+  int **Flag,
+  double k0,
+  double k1,
+  double k2,
+  double k3
+)
+{
+    int i;
+    int j;
+
+
+    /****** Calculate Q start ******/
+
+    for (i = 1; i <= imax; i++) {
+        for (j = 1; j <= jmax; j++) {
+
+            if (Flag[i][j] >= C_F) {
+
+                    Q[0][i][j] = -K*pow(C[0][i][j],k0)*pow(C[1][i][j],k1);
+                    Q[1][i][j] = -(k1/k0)*K*pow(C[0][i][j],k0)*pow(C[1][i][j],k1);
+                    Q[2][i][j] =  (k2/k0)*K*pow(C[0][i][j],k0)*pow(C[1][i][j],k1);
+                    Q[3][i][j] =  (k3/k0)*K*pow(C[0][i][j],k0)*pow(C[1][i][j],k1);
+            
+            }
+
+        }
+    }
+
 }

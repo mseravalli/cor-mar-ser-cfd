@@ -91,14 +91,19 @@ int main(int argn, char** args){
     int **Flag = NULL;
     int **Sources = NULL;
     double*** C = NULL;
-    double**  Q = NULL;
+    double***  Q = NULL;
     
     double t; 
     int n;
     int it;
     double res;
-    double D = 0.6;
-
+    double D;      /*Diffusion Cons.*/
+    double K;      /*Kinetic Cons.*/
+    double k0 = 1;
+    double k1 = 2;
+    double k2 = 1;
+    double k3 = 0;
+    
     if(argn <= 1)
     {
         printf("ERROR: you need to specify a problem (karman, plane, step)\n");
@@ -146,7 +151,10 @@ int main(int argn, char** args){
                     &wt,
                     &wb,
                     &dt_value,
-                    &deltaP);
+                    &deltaP,
+                    &D,
+                    &K
+                    );
                     
     t = 0;
     n = 0;
@@ -181,7 +189,7 @@ int main(int argn, char** args){
     G   = matrix(0, imax + 1, 0, jmax + 1);
     RS  = matrix(0, imax + 1, 0, jmax + 1);
     C   = matrix3(0, imax + 1, 0, jmax + 1, kmax);
-    Q   = matrix(0, imax + 1, 0, jmax + 1);
+    Q   = matrix3(0, imax + 1, 0, jmax + 1, kmax);
     init_uvp(UI, 
              VI, 
              PI, 
@@ -240,7 +248,19 @@ int main(int argn, char** args){
                           P,
                           C);
 
-        calculate_c(dt,
+         calculate_q(K,
+                    imax,
+                    jmax,
+                    kmax,
+                    Q,
+                    C,
+                    Flag,
+                    k0,
+                    k1,
+                    k2,
+                    k3);
+
+          calculate_c(dt,
                     dx,
                     dy,
                     alpha,
@@ -253,6 +273,7 @@ int main(int argn, char** args){
                     Q,
                     C,
                     Flag);
+
 
         calculate_fg(Re,
                  GX,
@@ -379,7 +400,7 @@ int main(int argn, char** args){
     free_imatrix(Sources, 0, imax+1, 0, jmax+1);
     free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
     free_matrix3(C , 0, imax + 1, 0, jmax + 1, kmax);
-    free_matrix(Q,  0, imax + 1, 0, jmax + 1);
+    free_matrix3(Q,  0, imax + 1, 0, jmax + 1, kmax);
 
     return 0;
 }
