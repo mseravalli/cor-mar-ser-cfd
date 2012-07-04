@@ -143,15 +143,15 @@ void boundaryvalues(
     for (k = 0; k < kmax; ++k) {
 
         /** left and right wall **/
-        for (j = 0; j < jmax; ++j) {
+        for (j = 0; j <= jmax; ++j) {
             C[k][0][j] = -C[k][1][j];
             C[k][imax+1][j] = C[k][imax][j];
         }
 
         /** lower and upper wall **/
          for(i = 1; i <= imax; ++i) {
-             C[k][i][0] = -C[k][i][1];
-             C[k][i][jmax+1] = -C[k][i][jmax];
+             C[k][i][0] = C[k][i][1];
+             C[k][i][jmax+1] = C[k][i][jmax];
          }
     }
 
@@ -160,7 +160,9 @@ void boundaryvalues(
     /******** EXTERNAL WALLS END ********/
 
 
-    /******** INSTERNAL OBJECTS START ********/
+    /******** INTERNAL OBJECTS START ********/
+
+    /**** VELOCITIES START ****/
 
     for (i = 1; i <= imax; ++i) { 
         for (j = 1; j <= jmax; ++j) {
@@ -239,7 +241,62 @@ void boundaryvalues(
         }
     }
 
-    /******** INSTERNAL OBJECTS END ********/
+    /**** VELOCITIES END ****/
+
+    /**** CONCENTRATIONS START ****/
+
+    for (k = 0; k < kmax; ++k) {
+        for (i = 1; i <= imax; ++i) { 
+            for (j = 1; j <= jmax; ++j) {
+
+                
+
+                if (Flag[i][j] == B_N)
+                {
+                    C[k][i][j]=C[k][i][j+1];
+                }
+                
+                else if (Flag[i][j] == B_W)
+                {
+                    C[k][i][j]=C[k][i-1][j];
+                }
+
+                else if (Flag[i][j] == B_S)
+                {
+                    C[k][i][j]=C[k][i][j-1];
+                }
+
+                else if (Flag[i][j] == B_O)
+                {
+                    C[k][i][j]=C[k][i+1][j];
+                }
+
+                else if (Flag[i][j] == B_NO) 
+                {
+                    C[k][i][j]=(C[k][i+1][j]+C[k][i][j+1])/2;
+                }
+
+                else if (Flag[i][j] == B_NW) 
+                {
+                    C[k][i][j]=(C[k][i-1][j]+C[k][i][j+1])/2;
+                }
+
+                else if (Flag[i][j] == B_SO) 
+                {
+                    C[k][i][j]=(C[k][i+1][j]+C[k][i][j-1])/2;
+                }
+
+                else if (Flag[i][j] == B_SW) 
+                {
+                    C[k][i][j]=(C[k][i-1][j]+C[k][i][j-1])/2;
+                }
+            }
+        }
+    }
+
+    /**** CONCENTRATIONS END ****/
+
+    /******** INTERNAL OBJECTS END ********/
 
  
 }

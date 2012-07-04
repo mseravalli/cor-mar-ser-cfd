@@ -149,28 +149,28 @@ int init_flag(
 
     for (i = 1; i < imax+1; i++) {
         for (j = 1; j < jmax+1; j++) {
-	    if(Problem[i][j] != 0 && Problem[i][j] != 255)
-	    {
-	    	Sources[i][j] = Problem[i][j];
+            if(Problem[i][j] != 0 && Problem[i][j] != 255)
+            {
+                Sources[i][j] = Problem[i][j];
+            }
+            else
+            {
+                Sources[i][j] = 0;
+            }
 	    }
-	    else
-	    {
-	    	Sources[i][j] = 0;
-	    }
-	}
     }
 
     for (i = 1; i < imax+1; i++) {
         for (j = 1; j < jmax+1; j++) {
-	    /*if fluid problem is 1*/
+            /*if fluid problem is 1*/
             if(Problem[i][j] == 255)
-	    {
-	        Problem[i][j] = 1;
-	    }
-	    else
-	    {
-	    	Problem[i][j] = 0;
-	    }
+            {
+                Problem[i][j] = 1;
+            }
+            else
+            {
+                Problem[i][j] = 0;
+            }
         }
     }
     
@@ -186,7 +186,7 @@ int init_flag(
             /*otherwise, its flag is calculated as 8*eastern + 4*western + 2*southern + 1*northern cell*/
             else
             {
-                Flag[i][j] = 8 * Problem[i][j-1] + 4 * Problem[i][j+1] + 2 * Problem[i+1][j] + 1 * Problem[i-1][j];
+                Flag[i][j] = 8 * Problem[i+1][j] + 4 * Problem[i-1][j] + 2 * Problem[i][j-1] + 1 * Problem[i][j+1];
                 /*if falg is not valid it returns a wrong result*/
                 if(Flag[i][j] == 3 || Flag[i][j] == 7 || Flag[i][j] == 11 || Flag[i][j] == 12 || Flag[i][j] == 13 || Flag[i][j] == 14 || Flag[i][j] == 15){
                     return 1;
