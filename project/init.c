@@ -7,10 +7,6 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     double *UI,                /* velocity x-direction */
                     double *VI,                /* velocity y-direction */
                     double *PI,                /* pressure */
-                    double* C0,                /* substance amount */
-                    double* C1,                /* substance amount */
-                    double* C2,                /* substance amount */
-                    double* C3,                /* substance amount */
                     double *GX,                /* gravitation x-direction */
                     double *GY,                /* gravitation y-direction */
                     double *t_end,             /* end time */
@@ -32,7 +28,8 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     int    *wt,
                     int    *wb,
         		    double *dt_value,            /* time for output */
-                    double *deltaP
+                    double *deltaP,
+                    int    *kmax
 ) 
 {
    READ_DOUBLE( szFileName, *xlength );
@@ -65,12 +62,10 @@ int read_parameters( const char *szFileName,       /* name of the file */
    READ_DOUBLE( szFileName, *GX );
    READ_DOUBLE( szFileName, *GY );
    READ_DOUBLE( szFileName, *PI );
-   READ_DOUBLE( szFileName, *C0 );
-   READ_DOUBLE( szFileName, *C1 );
-   READ_DOUBLE( szFileName, *C2 );
-   READ_DOUBLE( szFileName, *C3 );
 
    READ_DOUBLE( szFileName, *deltaP );
+   
+   READ_INT( szFileName, *kmax );
 
 /*
    *dx = *xlength / (double)(*imax);
@@ -79,7 +74,20 @@ int read_parameters( const char *szFileName,       /* name of the file */
    return 1;
 }
 
+void init_K(const char *szFileName, int kmax, double* K) {
+    
+    int k;
+    char* baseName = "C";
+    char varName[64];
+    double var;
 
+    for (k = 0; k < kmax; ++k){
+        sprintf(varName, "%s%d", baseName, k);
+        read_double(szFileName, varName, &var);
+        K[k] = var; 
+    }
+
+}
 
 /**
  * The arrays U,V and P are initialized to the constant values UI, VI and PI on
@@ -88,10 +96,6 @@ int read_parameters( const char *szFileName,       /* name of the file */
 void init_uvp(double UI,
               double VI,
               double PI,
-              double C0,
-              double C1,
-              double C2,
-              double C3,
               int imax,
               int jmax,
               char* problem,
@@ -117,10 +121,10 @@ void init_uvp(double UI,
     
     init_matrix(P, 1, imax, 1, jmax, PI);
 
-    init_matrix(C[0], 1, imax, 1, jmax, C0);
-    init_matrix(C[1], 1, imax, 1, jmax, C1);
-    init_matrix(C[2], 1, imax, 1, jmax, C2);
-    init_matrix(C[3], 1, imax, 1, jmax, C3);
+    init_matrix(C[0], 1, imax, 1, jmax, 0);
+    init_matrix(C[1], 1, imax, 1, jmax, 0);
+    init_matrix(C[2], 1, imax, 1, jmax, 0);
+    init_matrix(C[3], 1, imax, 1, jmax, 0);
 
 }
 

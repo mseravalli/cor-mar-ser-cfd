@@ -47,10 +47,6 @@ int main(int argn, char** args){
     double  UI;                /* velocity x-direction */
     double  VI;                /* velocity y-direction */
     double  PI;                /* pressure */
-    double  C0;              /* initial values for substance concentration */
-    double  C1;
-    double  C2;
-    double  C3;
     double  GX;                /* gravitation x-direction */
     double  GY;                /* gravitation y-direction */
     double  t_end;             /* end time */
@@ -92,6 +88,7 @@ int main(int argn, char** args){
     int **Sources = NULL;
     double*** C = NULL;
     double**  Q = NULL;
+    double*   K = NULL;
     
     double t; 
     int n;
@@ -122,10 +119,6 @@ int main(int argn, char** args){
                     &UI,     
                     &VI,     
                     &PI,     
-                    &C0,
-                    &C1,
-                    &C2,
-                    &C3,
                     &GX,     
                     &GY,     
                     &t_end,  
@@ -146,7 +139,8 @@ int main(int argn, char** args){
                     &wt,
                     &wb,
                     &dt_value,
-                    &deltaP);
+                    &deltaP,
+                    &kmax);
                     
     t = 0;
     n = 0;
@@ -182,13 +176,10 @@ int main(int argn, char** args){
     RS  = matrix(0, imax + 1, 0, jmax + 1);
     C   = matrix3(0, imax + 1, 0, jmax + 1, kmax);
     Q   = matrix(0, imax + 1, 0, jmax + 1);
+    K   = (double*) malloc((size_t) (kmax * sizeof(double)));
     init_uvp(UI, 
              VI, 
              PI, 
-             C0,
-             C1,
-             C2,
-             C3,
              imax, 
              jmax, 
              problem,
@@ -196,6 +187,8 @@ int main(int argn, char** args){
              V, 
              P, 
              C);
+    
+    init_K(cavityFile, kmax, K);
 
     while (t < t_end)
     {
@@ -226,7 +219,9 @@ int main(int argn, char** args){
                        G,
                        P,
                        C,
-                       Flag);
+                       Flag,
+                       Sources,
+                       K);
 
         spec_boundary_val(problem,
                           imax,
@@ -380,6 +375,7 @@ int main(int argn, char** args){
     free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
     free_matrix3(C , 0, imax + 1, 0, jmax + 1, kmax);
     free_matrix(Q,  0, imax + 1, 0, jmax + 1);
+    free(K);
 
     return 0;
 }

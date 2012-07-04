@@ -21,7 +21,9 @@ void boundaryvalues(
   double** G,
   double** P,
   double*** C,
-  int** Flag
+  int** Flag,
+  int** Sources,
+  double* K
 )
 {
     int i = 0;
@@ -248,47 +250,93 @@ void boundaryvalues(
     for (k = 0; k < kmax; ++k) {
         for (i = 1; i <= imax; ++i) { 
             for (j = 1; j <= jmax; ++j) {
-
                 
+                /** if source then dirichlet boundary conditions **/
+                /* shift 1 k times to see if the obstacle is source for
+                 * that concentration
+                 */
+                if( Sources[i][j] & (1 << k)) {
+                    if (Flag[i][j] == B_N)
+                    {
+                        C[k][i][j] = 2*K[k]-C[k][i][j+1];
+                    }
+                    
+                    else if (Flag[i][j] == B_W)
+                    {
+                        C[k][i][j] = 2*K[k]-C[k][i-1][j];
+                    }
 
-                if (Flag[i][j] == B_N)
-                {
-                    C[k][i][j]=C[k][i][j+1];
-                }
-                
-                else if (Flag[i][j] == B_W)
-                {
-                    C[k][i][j]=C[k][i-1][j];
-                }
+                    else if (Flag[i][j] == B_S)
+                    {
+                        C[k][i][j] = 2*K[k]-C[k][i][j-1];
+                    }
 
-                else if (Flag[i][j] == B_S)
-                {
-                    C[k][i][j]=C[k][i][j-1];
-                }
+                    else if (Flag[i][j] == B_O)
+                    {
+                        C[k][i][j] = 2*K[k]-C[k][i+1][j];
+                    }
 
-                else if (Flag[i][j] == B_O)
-                {
-                    C[k][i][j]=C[k][i+1][j];
-                }
+                    else if (Flag[i][j] == B_NO) 
+                    {
+                        C[k][i][j] = 2*K[k]-(C[k][i+1][j]+C[k][i][j+1])/2;
+                    }
 
-                else if (Flag[i][j] == B_NO) 
-                {
-                    C[k][i][j]=(C[k][i+1][j]+C[k][i][j+1])/2;
-                }
+                    else if (Flag[i][j] == B_NW) 
+                    {
+                        C[k][i][j] = 2*K[k]-(C[k][i-1][j]+C[k][i][j+1])/2;
+                    }
 
-                else if (Flag[i][j] == B_NW) 
-                {
-                    C[k][i][j]=(C[k][i-1][j]+C[k][i][j+1])/2;
-                }
+                    else if (Flag[i][j] == B_SO) 
+                    {
+                        C[k][i][j] = 2*K[k]-(C[k][i+1][j]+C[k][i][j-1])/2;
+                    }
 
-                else if (Flag[i][j] == B_SO) 
-                {
-                    C[k][i][j]=(C[k][i+1][j]+C[k][i][j-1])/2;
+                    else if (Flag[i][j] == B_SW) 
+                    {
+                        C[k][i][j] = 2*K[k]-(C[k][i-1][j]+C[k][i][j-1])/2;
+                    }
                 }
+                /** if not source then neumann boundary conditions **/
+                else {
+                    if (Flag[i][j] == B_N)
+                    {
+                        C[k][i][j]=C[k][i][j+1];
+                    }
+                    
+                    else if (Flag[i][j] == B_W)
+                    {
+                        C[k][i][j]=C[k][i-1][j];
+                    }
 
-                else if (Flag[i][j] == B_SW) 
-                {
-                    C[k][i][j]=(C[k][i-1][j]+C[k][i][j-1])/2;
+                    else if (Flag[i][j] == B_S)
+                    {
+                        C[k][i][j]=C[k][i][j-1];
+                    }
+
+                    else if (Flag[i][j] == B_O)
+                    {
+                        C[k][i][j]=C[k][i+1][j];
+                    }
+
+                    else if (Flag[i][j] == B_NO) 
+                    {
+                        C[k][i][j]=(C[k][i+1][j]+C[k][i][j+1])/2;
+                    }
+
+                    else if (Flag[i][j] == B_NW) 
+                    {
+                        C[k][i][j]=(C[k][i-1][j]+C[k][i][j+1])/2;
+                    }
+
+                    else if (Flag[i][j] == B_SO) 
+                    {
+                        C[k][i][j]=(C[k][i+1][j]+C[k][i][j-1])/2;
+                    }
+
+                    else if (Flag[i][j] == B_SW) 
+                    {
+                        C[k][i][j]=(C[k][i-1][j]+C[k][i][j-1])/2;
+                    }
                 }
             }
         }
@@ -315,19 +363,22 @@ void spec_boundary_val(
     double*** C
     )
 {
-    int i, j = 0;
-    double C0 = 1;
-    double C1 = 1;
+    /*int i;*/
+    int j;
+    /*
+    double C0 = 0;
+    double C1 = 0;
+    */
     /*double dpdx;*/
 
     if (strcmp(problem, "karman") == 0) {
         for(j = 1; j <= jmax; ++j)
         {
-            U[0][j] = 1.0;
+            U[0][j] = 10.0;
             V[0][j] = -V[1][j];
         }
     }
-
+/*
     for (i = 1; i <= imax; ++i) {
         C[0][i][0] = 2*C0-C[0][i][1];
     }
@@ -335,6 +386,7 @@ void spec_boundary_val(
     for (j = 1; j <= jmax; ++j) {
         C[1][0][j] = 2*C1-C[1][1][j];
     }
+    */
 
 }
 
