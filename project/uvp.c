@@ -346,7 +346,7 @@ void calculate_c(
 }
 
 void calculate_q(
-  double K,
+  double *K,
   int imax,
   int jmax,
   int kmax,
@@ -370,13 +370,13 @@ void calculate_q(
 
             if (Flag[i][j] >= C_F) {
 
-                    Q[0][i][j] = -K*pow(C[0][i][j],k0)*pow(C[1][i][j],k1);
-                    Q[1][i][j] = -(k1/k0)*K*pow(C[0][i][j],k0)*pow(C[1][i][j],k1);
-                    Q[2][i][j] =  (k2/k0)*K*pow(C[0][i][j],k0)*pow(C[1][i][j],k1);
-                    Q[3][i][j] =  (k3/k0)*K*pow(C[0][i][j],k0)*pow(C[1][i][j],k1);
+                    Q[0][i][j] = -K[0]*pow(C[0][i][j],k0)*pow(C[1][i][j],k1);
+                    Q[1][i][j] = -K[1]*pow(C[0][i][j],k0)*pow(C[1][i][j],k1);
+                    Q[2][i][j] =  K[2]*pow(C[0][i][j],k0)*pow(C[1][i][j],k1);
+                    Q[3][i][j] =  K[3]*pow(C[0][i][j],k0)*pow(C[1][i][j],k1);
             
-            }
 
+            }
         }
     }
 

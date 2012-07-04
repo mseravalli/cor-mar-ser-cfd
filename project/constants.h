@@ -1,5 +1,5 @@
 #define C_F 16
-/*#define C_B 0*/
+#define C_C 17 /*catalyst*/
 
 #define B_N  1  /*0b00001*/
 #define B_NO 9  /*0b01001*/

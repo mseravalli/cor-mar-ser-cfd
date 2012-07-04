@@ -7,10 +7,6 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     double *UI,                /* velocity x-direction */
                     double *VI,                /* velocity y-direction */
                     double *PI,                /* pressure */
-                    double* C0,                /* substance amount */
-                    double* C1,                /* substance amount */
-                    double* C2,                /* substance amount */
-                    double* C3,                /* substance amount */
                     double *GX,                /* gravitation x-direction */
                     double *GY,                /* gravitation y-direction */
                     double *t_end,             /* end time */
@@ -34,7 +30,7 @@ int read_parameters( const char *szFileName,       /* name of the file */
         		    double *dt_value,            /* time for output */
                     double *deltaP,
                     double* D,
-                    double* K
+                    int    *kmax
 ) 
 {
    READ_DOUBLE( szFileName, *xlength );
@@ -67,14 +63,10 @@ int read_parameters( const char *szFileName,       /* name of the file */
    READ_DOUBLE( szFileName, *GX );
    READ_DOUBLE( szFileName, *GY );
    READ_DOUBLE( szFileName, *PI );
-   READ_DOUBLE( szFileName, *C0 );
-   READ_DOUBLE( szFileName, *C1 );
-   READ_DOUBLE( szFileName, *C2 );
-   READ_DOUBLE( szFileName, *C3 );
 
    READ_DOUBLE( szFileName, *deltaP );
    READ_DOUBLE( szFileName, *D );
-   READ_DOUBLE( szFileName, *K );
+   READ_INT( szFileName, *kmax );
 
 /*
    *dx = *xlength / (double)(*imax);
@@ -83,7 +75,20 @@ int read_parameters( const char *szFileName,       /* name of the file */
    return 1;
 }
 
+void init_K(const char *szFileName, int kmax, double* K) {
+    
+    int k;
+    char* baseName = "C";
+    char varName[64];
+    double var;
 
+    for (k = 0; k < kmax; ++k){
+        sprintf(varName, "%s%d", baseName, k);
+        read_double(szFileName, varName, &var);
+        K[k] = var; 
+    }
+
+}
 
 /**
  * The arrays U,V and P are initialized to the constant values UI, VI and PI on
@@ -92,10 +97,6 @@ int read_parameters( const char *szFileName,       /* name of the file */
 void init_uvp(double UI,
               double VI,
               double PI,
-              double C0,
-              double C1,
-              double C2,
-              double C3,
               int imax,
               int jmax,
               char* problem,
@@ -121,10 +122,10 @@ void init_uvp(double UI,
     
     init_matrix(P, 1, imax, 1, jmax, PI);
 
-    init_matrix(C[0], 1, imax, 1, jmax, C0);
-    init_matrix(C[1], 1, imax, 1, jmax, C1);
-    init_matrix(C[2], 1, imax, 1, jmax, C2);
-    init_matrix(C[3], 1, imax, 1, jmax, C3);
+    init_matrix(C[0], 1, imax, 1, jmax, 0);
+    init_matrix(C[1], 1, imax, 1, jmax, 0);
+    init_matrix(C[2], 1, imax, 1, jmax, 0);
+    init_matrix(C[3], 1, imax, 1, jmax, 0);
 
 }
 
@@ -142,6 +143,7 @@ int init_flag(
 
     /* 
      * 255 - fluid
+     * 128 - catalyst
      * 0 - obstacle
      * 1=(01)b - source of the first substance, 2=(10)b - source of the secont substance, 3=(11)b - source of both substances
      */
@@ -149,7 +151,7 @@ int init_flag(
 
     for (i = 1; i < imax+1; i++) {
         for (j = 1; j < jmax+1; j++) {
-            if(Problem[i][j] != 0 && Problem[i][j] != 255)
+            if(Problem[i][j] != 0 && Problem[i][j] != 255 && Problem[i][j] != 128)
             {
                 Sources[i][j] = Problem[i][j];
             }
@@ -162,11 +164,19 @@ int init_flag(
 
     for (i = 1; i < imax+1; i++) {
         for (j = 1; j < jmax+1; j++) {
-            /*if fluid problem is 1*/
+            /*if fluid Problem is 1, Flag set*/
             if(Problem[i][j] == 255)
             {
                 Problem[i][j] = 1;
+		Flag[i][j] = C_F;
             }
+	    /*if catalyst Problem is also 1, Flag set*/
+	    else if(Problem[i][j] == 128)
+	    {
+	    	Problem[i][j] = 1;
+		Flag[i][j] = C_C;
+	    }
+	    /*if obstacle Problem is 0*/
             else
             {
                 Problem[i][j] = 0;
@@ -178,13 +188,8 @@ int init_flag(
     {
         for(j = 1; j < jmax+1; j++)
         {
-            /*if it is a fluid cell it is being set to C_F, regardles of its neighbours*/
-            if(Problem[i][j] > 0)
-            {
-                Flag[i][j] = C_F;
-            }
-            /*otherwise, its flag is calculated as 8*eastern + 4*western + 2*southern + 1*northern cell*/
-            else
+	    /*Flag for fluid and catalyst is set in the previous loop, so here we are dealing only with obstacles*/
+	    if(Problem[i][j] == 0)
             {
                 Flag[i][j] = 8 * Problem[i+1][j] + 4 * Problem[i-1][j] + 2 * Problem[i][j-1] + 1 * Problem[i][j+1];
                 /*if falg is not valid it returns a wrong result*/

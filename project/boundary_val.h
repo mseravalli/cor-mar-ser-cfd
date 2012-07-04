@@ -21,7 +21,9 @@ void boundaryvalues(
   double** G,
   double** P,
   double***C,
-  int **Flag
+  int **Flag,
+  int **Sources,
+  double* K
 );
 
 /*Set special boundary*/

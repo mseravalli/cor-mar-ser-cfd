@@ -44,10 +44,6 @@ int read_parameters(
   double* UI,
   double* VI,
   double* PI,
-  double* C0,
-  double* C1,
-  double* C2,
-  double* C3,
   double* GX,
   double* GY,
   double* t_end,
@@ -70,8 +66,7 @@ int read_parameters(
   double* dt_value,
   double* deltaP,
   double* D, 
-  double* K
-
+  int*    kmax
 );
 
 /**
@@ -82,10 +77,6 @@ void init_uvp(
   double UI,
   double VI,
   double PI,
-  double S_AI,
-  double S_BI,
-  double S_CI,
-  double S_DI,
   int imax,
   int jmax,
   char* problem,
@@ -105,5 +96,12 @@ int init_flag(
     int **Flag,
     int **Sources
 );
+
+void init_K(
+    const char* szFileName,
+    int kmax,
+    double* k
+);
+
 #endif
 

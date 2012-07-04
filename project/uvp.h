@@ -132,7 +132,7 @@ void calculate_c(
 );
 
 void calculate_q(
-  double K,
+  double *K,
   int imax,
   int jmax,
   int kmax,
