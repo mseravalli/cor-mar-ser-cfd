@@ -138,6 +138,7 @@ int init_flag(
 
     /* 
      * 255 - fluid
+     * 128 - catalyst
      * 0 - obstacle
      * 1=(01)b - source of the first substance, 2=(10)b - source of the secont substance, 3=(11)b - source of both substances
      */
@@ -145,7 +146,7 @@ int init_flag(
 
     for (i = 1; i < imax+1; i++) {
         for (j = 1; j < jmax+1; j++) {
-            if(Problem[i][j] != 0 && Problem[i][j] != 255)
+            if(Problem[i][j] != 0 && Problem[i][j] != 255 && Problem[i][j] != 128)
             {
                 Sources[i][j] = Problem[i][j];
             }
@@ -158,11 +159,19 @@ int init_flag(
 
     for (i = 1; i < imax+1; i++) {
         for (j = 1; j < jmax+1; j++) {
-            /*if fluid problem is 1*/
+            /*if fluid Problem is 1, Flag set*/
             if(Problem[i][j] == 255)
             {
                 Problem[i][j] = 1;
+		Flag[i][j] = C_F;
             }
+	    /*if catalyst Problem is also 1, Flag set*/
+	    else if(Problem[i][j] == 128)
+	    {
+	    	Problem[i][j] = 1;
+		Flag[i][j] = C_C;
+	    }
+	    /*if obstacle Problem is 0*/
             else
             {
                 Problem[i][j] = 0;
@@ -174,13 +183,8 @@ int init_flag(
     {
         for(j = 1; j < jmax+1; j++)
         {
-            /*if it is a fluid cell it is being set to C_F, regardles of its neighbours*/
-            if(Problem[i][j] > 0)
-            {
-                Flag[i][j] = C_F;
-            }
-            /*otherwise, its flag is calculated as 8*eastern + 4*western + 2*southern + 1*northern cell*/
-            else
+	    /*Flag for fluid and catalyst is set in the previous loop, so here we are dealing only with obstacles*/
+	    if(Problem[i][j] == 0)
             {
                 Flag[i][j] = 8 * Problem[i+1][j] + 4 * Problem[i-1][j] + 2 * Problem[i][j-1] + 1 * Problem[i][j+1];
                 /*if falg is not valid it returns a wrong result*/
