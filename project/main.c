@@ -86,19 +86,16 @@ int main(int argn, char** args){
     int **Problem = NULL;
     int **Flag = NULL;
     int **Sources = NULL;
-    double*** C = NULL;
-    double***  Q = NULL;
-    double*   K = NULL;
+    double*** C  = NULL;
+    double*   C0 = NULL;
+    double*** Q  = NULL;
+    double*   K  = NULL;
     
     double t; 
     int n;
     int it;
     double res;
     double D;      /*Diffusion Cons.*/
-    double k0 = 1;
-    double k1 = 2;
-    double k2 = 1;
-    double k3 = 0;
     
     if(argn <= 1)
     {
@@ -180,6 +177,7 @@ int main(int argn, char** args){
     G   = matrix(0, imax + 1, 0, jmax + 1);
     RS  = matrix(0, imax + 1, 0, jmax + 1);
     C   = matrix3(0, imax + 1, 0, jmax + 1, kmax);
+    C0  = (double*) malloc((size_t) (kmax * sizeof(double)));
     Q   = matrix3(0, imax + 1, 0, jmax + 1, kmax);
     K   = (double*) malloc((size_t) (kmax * sizeof(double)));
     init_uvp(UI, 
@@ -193,7 +191,7 @@ int main(int argn, char** args){
              P, 
              C);
     
-    init_K(cavityFile, kmax, K);
+    init_C0K(cavityFile, kmax, C0, K);
 
     while (t < t_end)
     {
@@ -226,7 +224,7 @@ int main(int argn, char** args){
                        C,
                        Flag,
                        Sources,
-                       K);
+                       C0);
 
         spec_boundary_val(problem,
                           imax,
@@ -246,11 +244,7 @@ int main(int argn, char** args){
                     kmax,
                     Q,
                     C,
-                    Flag,
-                    k0,
-                    k1,
-                    k2,
-                    k3);
+                    Flag);
 
           calculate_c(dt,
                     dx,
@@ -350,10 +344,10 @@ int main(int argn, char** args){
                                     imax,
                                     jmax,
                                     kmax,
-		                            dx,
-		                            dy,
+		                                dx,
+		                                dy,
                                     C);
-            n++;
+                                    n++;
         }
 
         t += dt;
@@ -392,6 +386,7 @@ int main(int argn, char** args){
     free_imatrix(Sources, 0, imax+1, 0, jmax+1);
     free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);
     free_matrix3(C , 0, imax + 1, 0, jmax + 1, kmax);
+    free(C0);
     free_matrix3(Q,  0, imax + 1, 0, jmax + 1, kmax);
     free(K);
 

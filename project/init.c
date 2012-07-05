@@ -75,16 +75,21 @@ int read_parameters( const char *szFileName,       /* name of the file */
    return 1;
 }
 
-void init_K(const char *szFileName, int kmax, double* K) {
+void init_C0K(const char *szFileName, int kmax, double* C0, double* K) {
     
     int k;
-    char* baseName = "C";
-    char varName[64];
+    char* baseNameC0 = "C";
+    char* baseNameK = "K";
+    char varNameC0[64];
+    char varNameK[64];
     double var;
 
     for (k = 0; k < kmax; ++k){
-        sprintf(varName, "%s%d", baseName, k);
-        read_double(szFileName, varName, &var);
+        sprintf(varNameC0, "%s%d", baseNameC0, k);
+        sprintf(varNameK, "%s%d", baseNameK, k);
+        read_double(szFileName, varNameC0, &var);
+        C0[k] = var; 
+        read_double(szFileName, varNameK, &var);
         K[k] = var; 
     }
 

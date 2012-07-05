@@ -138,11 +138,7 @@ void calculate_q(
   int kmax,
   double ***Q,
   double ***C,
-  int **Flag,
-  double k0,
-  double k1,
-  double k2,
-  double k3
+  int **Flag
 );
 
 

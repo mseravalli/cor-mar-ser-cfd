@@ -23,7 +23,7 @@ void boundaryvalues(
   double***C,
   int **Flag,
   int **Sources,
-  double* K
+  double* C0
 );
 
 /*Set special boundary*/

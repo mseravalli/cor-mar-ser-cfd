@@ -97,10 +97,11 @@ int init_flag(
     int **Sources
 );
 
-void init_K(
+void init_C0K(
     const char* szFileName,
     int kmax,
-    double* k
+    double* C0,
+    double* K
 );
 
 #endif

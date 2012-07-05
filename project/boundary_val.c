@@ -23,7 +23,7 @@ void boundaryvalues(
   double*** C,
   int** Flag,
   int** Sources,
-  double* K
+  double* C0
 )
 {
     int i = 0;
@@ -258,42 +258,42 @@ void boundaryvalues(
                 if( Sources[i][j] & (1 << k)) {
                     if (Flag[i][j] == B_N)
                     {
-                        C[k][i][j] = 2*K[k]-C[k][i][j+1];
+                        C[k][i][j] = 2*C0[k]-C[k][i][j+1];
                     }
                     
                     else if (Flag[i][j] == B_W)
                     {
-                        C[k][i][j] = 2*K[k]-C[k][i-1][j];
+                        C[k][i][j] = 2*C0[k]-C[k][i-1][j];
                     }
 
                     else if (Flag[i][j] == B_S)
                     {
-                        C[k][i][j] = 2*K[k]-C[k][i][j-1];
+                        C[k][i][j] = 2*C0[k]-C[k][i][j-1];
                     }
 
                     else if (Flag[i][j] == B_O)
                     {
-                        C[k][i][j] = 2*K[k]-C[k][i+1][j];
+                        C[k][i][j] = 2*C0[k]-C[k][i+1][j];
                     }
 
                     else if (Flag[i][j] == B_NO) 
                     {
-                        C[k][i][j] = 2*K[k]-(C[k][i+1][j]+C[k][i][j+1])/2;
+                        C[k][i][j] = 2*C0[k]-(C[k][i+1][j]+C[k][i][j+1])/2;
                     }
 
                     else if (Flag[i][j] == B_NW) 
                     {
-                        C[k][i][j] = 2*K[k]-(C[k][i-1][j]+C[k][i][j+1])/2;
+                        C[k][i][j] = 2*C0[k]-(C[k][i-1][j]+C[k][i][j+1])/2;
                     }
 
                     else if (Flag[i][j] == B_SO) 
                     {
-                        C[k][i][j] = 2*K[k]-(C[k][i+1][j]+C[k][i][j-1])/2;
+                        C[k][i][j] = 2*C0[k]-(C[k][i+1][j]+C[k][i][j-1])/2;
                     }
 
                     else if (Flag[i][j] == B_SW) 
                     {
-                        C[k][i][j] = 2*K[k]-(C[k][i-1][j]+C[k][i][j-1])/2;
+                        C[k][i][j] = 2*C0[k]-(C[k][i-1][j]+C[k][i][j-1])/2;
                     }
                 }
                 /** if not source then neumann boundary conditions **/
