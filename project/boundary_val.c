@@ -30,322 +30,341 @@ void boundaryvalues(
     int j = 0;
     int k = 0;
 
-    /******** EXTERNAL WALLS START ********/
-
-    /**** VELOCITIES START ****/
-
-    /** left wall **/
-    if(wl==1) /** no slip **/
+    #pragma omp parallel private(i, j, k)
     {
-         for(j = 1; j <= jmax; ++j)
-         {
-             U[0][j] = 0;
-             V[0][j] = -1.0*V[1][j];
-         }
-    }
-    else if (wl==2) /** free slip **/
-    {
-         for(j = 1; j <= jmax; ++j)
-         {
-             U[0][j] = 0;
-             V[0][j] = V[1][j];
-         }
-    }
-    else if (wl==3) /** Outflow **/
-    {
-         for(j = 1; j <= jmax; ++j)
-         {
-             U[0][j] = U[1][j];
-             V[0][j] = V[1][j];
-         }
-    }
+        /******** EXTERNAL WALLS START ********/
 
-    /** right wall **/
-    if(wr==1) /** no slip **/
-    {
-         for(j = 1; j <= jmax; ++j)
-         {
-             U[imax][j] = 0;
-             V[imax+1][j] = -1.0*V[imax][j];
-         }
-    }
-    else if (wr==2) /** free slip **/
-    {
-         for(j = 1; j <= jmax; ++j)
-         {
-             U[imax][j] = 0;
-             V[imax+1][j] = V[imax][j];
-         }
-    }
-    else if (wr==3) /** Outflow **/
-    {
-         for(j = 1; j <= jmax; ++j)
-         {
-             U[imax][j] = U[imax-1][j];
-             V[imax+1][j] = V[imax][j];
-         }
-    }
-
-    /** lower wall **/
-    if(wb==1) /** no slip **/
-    {
-         for(i = 1; i <= imax; ++i)
-         {
-             V[i][0] = 0;
-             U[i][0] = -1.0*U[i][1];
-         }
-    }
-    else if (wb==2) /** free slip **/
-    {
-         for(i = 1; i <= imax; ++i)
-         {
-             V[i][0] = 0;
-             U[i][0] = U[i][1];
-         }
-    }
-    else if (wb==3) /** Outflow **/
-    {
-         for(i = 1; i <= imax; ++i)
-         {
-             U[i][0] = U[i][1];
-             V[i][0] = V[i][1];
-         }
-    }
-
-    /** upper wall **/
-    if(wt==1) /** no slip **/
-    {
-         for(i = 1; i <= imax; ++i)
-         {
-             V[i][jmax] = 0;
-             U[i][jmax+1] = -1.0*U[i][jmax];
-         }
-    }
-    else if (wt==2) /** free slip **/
-    {
-         for(i = 1; i <= imax; ++i)
-         {
-             V[i][jmax] = 0;
-             U[i][jmax+1] = U[i][jmax];
-         }
-    }
-    else if (wt==3) /** Outflow **/
-    {
-         for(i = 1; i <= imax; ++i)
-         {
-             U[i][jmax+1] = U[i][jmax];
-             V[i][jmax] = V[i][jmax-1];
-         }
-    }
-
-    /**** VELOCITIES END ****/
-
-    /**** CONCENTRATION START ****/
-
-    for (k = 0; k < kmax; ++k) {
-
-        /** left and right wall **/
-        for (j = 0; j <= jmax; ++j) {
-            C[k][0][j] = -C[k][1][j];
-            C[k][imax+1][j] = C[k][imax][j];
-        }
-
-        /** lower and upper wall **/
-         for(i = 1; i <= imax; ++i) {
-             C[k][i][0] = C[k][i][1];
-             C[k][i][jmax+1] = C[k][i][jmax];
-         }
-    }
-
-    /**** CONCENTREATION END ****/
-    
-    /******** EXTERNAL WALLS END ********/
-
-
-    /******** INTERNAL OBJECTS START ********/
-
-    /**** VELOCITIES START ****/
-
-    for (i = 1; i <= imax; ++i) { 
-        for (j = 1; j <= jmax; ++j) {
-
-            if (Flag[i][j] == B_N)
+        /**** VELOCITIES START ****/
+        #pragma omp sections
+        {
+            /** left wall **/
+            #pragma omp section
             {
-                V[i][j]=0;
-                U[i-1][j]=-1.0*U[i-1][j+1];
-                U[i][j]=-1.0*U[i][j+1];
-                G[i][j]=V[i][j];
-            }
-            
-            else if (Flag[i][j] == B_W)
-            {
-                U[i-1][j]=0;
-                V[i][j]=-1.0*V[i-1][j];
-                V[i][j-1]=-1.0*V[i-1][j-1];
-                F[i-1][j]=U[i-1][j];
+                if(wl==1) /** no slip **/
+                {
+                     for(j = 1; j <= jmax; ++j)
+                     {
+                         U[0][j] = 0;
+                         V[0][j] = -1.0*V[1][j];
+                     }
+                }
+                else if (wl==2) /** free slip **/
+                {
+                     for(j = 1; j <= jmax; ++j)
+                     {
+                         U[0][j] = 0;
+                         V[0][j] = V[1][j];
+                     }
+                }
+                else if (wl==3) /** Outflow **/
+                {
+                     for(j = 1; j <= jmax; ++j)
+                     {
+                         U[0][j] = U[1][j];
+                         V[0][j] = V[1][j];
+                     }
+                }
             }
 
-            else if (Flag[i][j] == B_S)
+            /** right wall **/
+            #pragma omp section
             {
-                V[i][j-1]=0;
-                U[i-1][j]=-1.0*U[i-1][j-1];
-                U[i][j]=-1.0*U[i][j-1];
-                G[i][j-1]=V[i][j-1];
+                if(wr==1) /** no slip **/
+                {
+                     for(j = 1; j <= jmax; ++j)
+                     {
+                         U[imax][j] = 0;
+                         V[imax+1][j] = -1.0*V[imax][j];
+                     }
+                }
+                else if (wr==2) /** free slip **/
+                {
+                     for(j = 1; j <= jmax; ++j)
+                     {
+                         U[imax][j] = 0;
+                         V[imax+1][j] = V[imax][j];
+                     }
+                }
+                else if (wr==3) /** Outflow **/
+                {
+                     for(j = 1; j <= jmax; ++j)
+                     {
+                         U[imax][j] = U[imax-1][j];
+                         V[imax+1][j] = V[imax][j];
+                     }
+                }
             }
 
-            else if (Flag[i][j] == B_O)
+            /** lower wall **/
+            #pragma omp section
             {
-                U[i][j]=0;
-                V[i][j]=-1.0*V[i+1][j];
-                V[i][j-1]=-1.0*V[i+1][j-1];
-                F[i][j]=U[i][j];
+                if(wb==1) /** no slip **/
+                {
+                     for(i = 1; i <= imax; ++i)
+                     {
+                         V[i][0] = 0;
+                         U[i][0] = -1.0*U[i][1];
+                     }
+                }
+                else if (wb==2) /** free slip **/
+                {
+                     for(i = 1; i <= imax; ++i)
+                     {
+                         V[i][0] = 0;
+                         U[i][0] = U[i][1];
+                     }
+                }
+                else if (wb==3) /** Outflow **/
+                {
+                     for(i = 1; i <= imax; ++i)
+                     {
+                         U[i][0] = U[i][1];
+                         V[i][0] = V[i][1];
+                     }
+                }
             }
 
-            else if (Flag[i][j] == B_NO) 
+            /** upper wall **/
+            #pragma omp section
             {
-                U[i][j]=0;
-                V[i][j]=0;
-                U[i-1][j]=-1.0*U[i-1][j+1];
-                V[i][j-1]=-1.0*V[i+1][j-1];
-                F[i][j]=U[i][j];
-                G[i][j]=V[i][j];
-            }
-
-            else if (Flag[i][j] == B_NW) 
-            {
-                U[i-1][j]=0;
-                V[i][j]=0;
-                U[i][j]=-1.0*U[i][j+1];
-                V[i][j-1]=-1.0*V[i-1][j-1];
-                F[i-1][j]=U[i-1][j];
-                G[i][j]=V[i][j];
-            }
-
-            else if (Flag[i][j] == B_SO) 
-            {
-                U[i][j]=0;
-                V[i][j-1]=0;
-                U[i-1][j]=-1.0*U[i-1][j-1];
-                V[i][j]=-1.0*V[i+1][j];
-                F[i][j]=U[i][j];
-                G[i][j-1]=V[i][j-1];
-            }
-
-            else if (Flag[i][j] == B_SW) 
-            {
-                U[i-1][j]=0;
-                V[i][j-1]=0;
-                U[i][j]=-1.0*U[i][j-1];
-                V[i][j]=-1.0*V[i-1][j];
-                F[i-1][j]=U[i-1][j];
-                G[i][j-1]=V[i][j-1];
+                if(wt==1) /** no slip **/
+                {
+                     for(i = 1; i <= imax; ++i)
+                     {
+                         V[i][jmax] = 0;
+                         U[i][jmax+1] = -1.0*U[i][jmax];
+                     }
+                }
+                else if (wt==2) /** free slip **/
+                {
+                     for(i = 1; i <= imax; ++i)
+                     {
+                         V[i][jmax] = 0;
+                         U[i][jmax+1] = U[i][jmax];
+                     }
+                }
+                else if (wt==3) /** Outflow **/
+                {
+                     for(i = 1; i <= imax; ++i)
+                     {
+                         U[i][jmax+1] = U[i][jmax];
+                         V[i][jmax] = V[i][jmax-1];
+                     }
+                }
             }
         }
-    }
+        /**** VELOCITIES END ****/
 
-    /**** VELOCITIES END ****/
+        /**** CONCENTRATION START ****/
 
-    /**** CONCENTRATIONS START ****/
+        for (k = 0; k < kmax; ++k) {
 
-    for (k = 0; k < kmax; ++k) {
+            /** left and right wall **/
+            #pragma omp for
+            for (j = 0; j <= jmax; ++j) {
+                C[k][0][j] = -C[k][1][j];
+                C[k][imax+1][j] = C[k][imax][j];
+            }
+
+            /** lower and upper wall **/
+            #pragma omp for
+            for(i = 0; i <= imax; ++i) {
+                C[k][i][0] = C[k][i][1];
+                C[k][i][jmax+1] = C[k][i][jmax];
+            }
+        }
+
+        /**** CONCENTREATION END ****/
+        
+        /******** EXTERNAL WALLS END ********/
+
+
+        /******** INTERNAL OBJECTS START ********/
+
+        /**** VELOCITIES START ****/
+
+        #pragma omp for collapse(2)
         for (i = 1; i <= imax; ++i) { 
             for (j = 1; j <= jmax; ++j) {
-                
-                /** if source then dirichlet boundary conditions **/
-                /* shift 1 k times to see if the obstacle is source for
-                 * that concentration
-                 */
-                if( Sources[i][j] & (1 << k)) {
-                    if (Flag[i][j] == B_N)
-                    {
-                        C[k][i][j] = 2*C0[k]-C[k][i][j+1];
-                    }
-                    
-                    else if (Flag[i][j] == B_W)
-                    {
-                        C[k][i][j] = 2*C0[k]-C[k][i-1][j];
-                    }
 
-                    else if (Flag[i][j] == B_S)
-                    {
-                        C[k][i][j] = 2*C0[k]-C[k][i][j-1];
-                    }
-
-                    else if (Flag[i][j] == B_O)
-                    {
-                        C[k][i][j] = 2*C0[k]-C[k][i+1][j];
-                    }
-
-                    else if (Flag[i][j] == B_NO) 
-                    {
-                        C[k][i][j] = 2*C0[k]-(C[k][i+1][j]+C[k][i][j+1])/2;
-                    }
-
-                    else if (Flag[i][j] == B_NW) 
-                    {
-                        C[k][i][j] = 2*C0[k]-(C[k][i-1][j]+C[k][i][j+1])/2;
-                    }
-
-                    else if (Flag[i][j] == B_SO) 
-                    {
-                        C[k][i][j] = 2*C0[k]-(C[k][i+1][j]+C[k][i][j-1])/2;
-                    }
-
-                    else if (Flag[i][j] == B_SW) 
-                    {
-                        C[k][i][j] = 2*C0[k]-(C[k][i-1][j]+C[k][i][j-1])/2;
-                    }
+                if (Flag[i][j] == B_N)
+                {
+                    V[i][j]=0;
+                    U[i-1][j]=-1.0*U[i-1][j+1];
+                    U[i][j]=-1.0*U[i][j+1];
+                    G[i][j]=V[i][j];
                 }
-                /** if not source then neumann boundary conditions **/
-                else {
-                    if (Flag[i][j] == B_N)
-                    {
-                        C[k][i][j]=C[k][i][j+1];
-                    }
+                
+                else if (Flag[i][j] == B_W)
+                {
+                    U[i-1][j]=0;
+                    V[i][j]=-1.0*V[i-1][j];
+                    V[i][j-1]=-1.0*V[i-1][j-1];
+                    F[i-1][j]=U[i-1][j];
+                }
+
+                else if (Flag[i][j] == B_S)
+                {
+                    V[i][j-1]=0;
+                    U[i-1][j]=-1.0*U[i-1][j-1];
+                    U[i][j]=-1.0*U[i][j-1];
+                    G[i][j-1]=V[i][j-1];
+                }
+
+                else if (Flag[i][j] == B_O)
+                {
+                    U[i][j]=0;
+                    V[i][j]=-1.0*V[i+1][j];
+                    V[i][j-1]=-1.0*V[i+1][j-1];
+                    F[i][j]=U[i][j];
+                }
+
+                else if (Flag[i][j] == B_NO) 
+                {
+                    U[i][j]=0;
+                    V[i][j]=0;
+                    U[i-1][j]=-1.0*U[i-1][j+1];
+                    V[i][j-1]=-1.0*V[i+1][j-1];
+                    F[i][j]=U[i][j];
+                    G[i][j]=V[i][j];
+                }
+
+                else if (Flag[i][j] == B_NW) 
+                {
+                    U[i-1][j]=0;
+                    V[i][j]=0;
+                    U[i][j]=-1.0*U[i][j+1];
+                    V[i][j-1]=-1.0*V[i-1][j-1];
+                    F[i-1][j]=U[i-1][j];
+                    G[i][j]=V[i][j];
+                }
+
+                else if (Flag[i][j] == B_SO) 
+                {
+                    U[i][j]=0;
+                    V[i][j-1]=0;
+                    U[i-1][j]=-1.0*U[i-1][j-1];
+                    V[i][j]=-1.0*V[i+1][j];
+                    F[i][j]=U[i][j];
+                    G[i][j-1]=V[i][j-1];
+                }
+
+                else if (Flag[i][j] == B_SW) 
+                {
+                    U[i-1][j]=0;
+                    V[i][j-1]=0;
+                    U[i][j]=-1.0*U[i][j-1];
+                    V[i][j]=-1.0*V[i-1][j];
+                    F[i-1][j]=U[i-1][j];
+                    G[i][j-1]=V[i][j-1];
+                }
+            }
+        }
+
+        /**** VELOCITIES END ****/
+
+        /**** CONCENTRATIONS START ****/
+        
+        #pragma omp for collapse(3)
+        for (k = 0; k < kmax; ++k) {
+            for (i = 1; i <= imax; ++i) { 
+                for (j = 1; j <= jmax; ++j) {
                     
-                    else if (Flag[i][j] == B_W)
-                    {
-                        C[k][i][j]=C[k][i-1][j];
-                    }
+                    /** if source then dirichlet boundary conditions **/
+                    /* shift 1 k times to see if the obstacle is source for
+                     * that concentration
+                     */
+                    if( Sources[i][j] & (1 << k)) {
+                        if (Flag[i][j] == B_N)
+                        {
+                            C[k][i][j] = 2*C0[k]-C[k][i][j+1];
+                        }
+                        
+                        else if (Flag[i][j] == B_W)
+                        {
+                            C[k][i][j] = 2*C0[k]-C[k][i-1][j];
+                        }
 
-                    else if (Flag[i][j] == B_S)
-                    {
-                        C[k][i][j]=C[k][i][j-1];
-                    }
+                        else if (Flag[i][j] == B_S)
+                        {
+                            C[k][i][j] = 2*C0[k]-C[k][i][j-1];
+                        }
 
-                    else if (Flag[i][j] == B_O)
-                    {
-                        C[k][i][j]=C[k][i+1][j];
-                    }
+                        else if (Flag[i][j] == B_O)
+                        {
+                            C[k][i][j] = 2*C0[k]-C[k][i+1][j];
+                        }
 
-                    else if (Flag[i][j] == B_NO) 
-                    {
-                        C[k][i][j]=(C[k][i+1][j]+C[k][i][j+1])/2;
-                    }
+                        else if (Flag[i][j] == B_NO) 
+                        {
+                            C[k][i][j] = 2*C0[k]-(C[k][i+1][j]+C[k][i][j+1])/2;
+                        }
 
-                    else if (Flag[i][j] == B_NW) 
-                    {
-                        C[k][i][j]=(C[k][i-1][j]+C[k][i][j+1])/2;
-                    }
+                        else if (Flag[i][j] == B_NW) 
+                        {
+                            C[k][i][j] = 2*C0[k]-(C[k][i-1][j]+C[k][i][j+1])/2;
+                        }
 
-                    else if (Flag[i][j] == B_SO) 
-                    {
-                        C[k][i][j]=(C[k][i+1][j]+C[k][i][j-1])/2;
-                    }
+                        else if (Flag[i][j] == B_SO) 
+                        {
+                            C[k][i][j] = 2*C0[k]-(C[k][i+1][j]+C[k][i][j-1])/2;
+                        }
 
-                    else if (Flag[i][j] == B_SW) 
-                    {
-                        C[k][i][j]=(C[k][i-1][j]+C[k][i][j-1])/2;
+                        else if (Flag[i][j] == B_SW) 
+                        {
+                            C[k][i][j] = 2*C0[k]-(C[k][i-1][j]+C[k][i][j-1])/2;
+                        }
+                    }
+                    /** if not source then neumann boundary conditions **/
+                    else {
+                        if (Flag[i][j] == B_N)
+                        {
+                            C[k][i][j]=C[k][i][j+1];
+                        }
+                        
+                        else if (Flag[i][j] == B_W)
+                        {
+                            C[k][i][j]=C[k][i-1][j];
+                        }
+
+                        else if (Flag[i][j] == B_S)
+                        {
+                            C[k][i][j]=C[k][i][j-1];
+                        }
+
+                        else if (Flag[i][j] == B_O)
+                        {
+                            C[k][i][j]=C[k][i+1][j];
+                        }
+
+                        else if (Flag[i][j] == B_NO) 
+                        {
+                            C[k][i][j]=(C[k][i+1][j]+C[k][i][j+1])/2;
+                        }
+
+                        else if (Flag[i][j] == B_NW) 
+                        {
+                            C[k][i][j]=(C[k][i-1][j]+C[k][i][j+1])/2;
+                        }
+
+                        else if (Flag[i][j] == B_SO) 
+                        {
+                            C[k][i][j]=(C[k][i+1][j]+C[k][i][j-1])/2;
+                        }
+
+                        else if (Flag[i][j] == B_SW) 
+                        {
+                            C[k][i][j]=(C[k][i-1][j]+C[k][i][j-1])/2;
+                        }
                     }
                 }
             }
         }
+
+        /**** CONCENTRATIONS END ****/
+
+        /******** INTERNAL OBJECTS END ********/
     }
-
-    /**** CONCENTRATIONS END ****/
-
-    /******** INTERNAL OBJECTS END ********/
-
  
 }
 
