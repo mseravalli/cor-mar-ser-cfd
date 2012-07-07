@@ -57,7 +57,7 @@ int main(int argn, char** args){
     double  dy;                /* length of a cell y-dir. */
     int     imax;                /* number of cells x-direction*/
     int     jmax;                /* number of cells y-direction*/
-    int     kmax = 4;
+    int     kmax;
     double  alpha;             /* uppwind differencing factor*/
     double  omg;               /* relaxation factor */
     double  tau;               /* safety factor for time step*/
@@ -96,7 +96,8 @@ int main(int argn, char** args){
     int it;
     double res;
     double D;      /*Diffusion Cons.*/
-    double ki;      /* Kinetic Cons.*/ 
+    double ki;      /* Kinetic Cons.irreversible reaction */ 
+    double kr;      /* Kinetic Cons. reversible reaction */
     
     if(argn <= 1)
     {
@@ -144,7 +145,8 @@ int main(int argn, char** args){
                     &deltaP,
                     &D,
                     &kmax,
-                    &ki);
+                    &ki,
+                    &kr);
                     
     t = 0;
     n = 0;
@@ -181,8 +183,7 @@ int main(int argn, char** args){
     C   = matrix3(0, imax + 1, 0, jmax + 1, kmax);
     C0  = (double*) malloc((size_t) (kmax * sizeof(double)));
     Q   = matrix3(0, imax + 1, 0, jmax + 1, kmax);
-    /*K   = (double*) malloc((size_t) (kmax * sizeof(double)));*/
-    K = matrix(0, kmax, 0, 2);
+    K = matrix(0, 3, 0, kmax);
     init_uvp(UI, 
              VI, 
              PI, 
@@ -195,7 +196,7 @@ int main(int argn, char** args){
              C,
              kmax);
     
-    init_C0K(cavityFile, kmax, C0, K, ki);
+    init_C0K(cavityFile, kmax, C0, K, ki, kr);
 
     while (t < t_end)
     {

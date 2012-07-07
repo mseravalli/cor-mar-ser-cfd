@@ -372,16 +372,12 @@ void calculate_q(
 
     /****** Calculate Q start ******/
 
-    /* TODO: build this function again !!*/
 
     for (i = 1; i <= imax; i++) {
         for (j = 1; j <= jmax; j++) {
             for (k = 0; k < kmax; k++){
                 if (Flag[i][j] >= C_F) {
-                    Q[k][i][j] = K[1][k]*pow(C[0][i][j],-K[0][0])*pow(C[1][i][j],-K[0][1]);
-                   /* Q[1][i][j] = -K[1]*pow(C[0][i][j],K[0])*pow(C[1][i][j],K[1]);
-                    Q[2][i][j] =  K[2]*pow(C[0][i][j],K[0])*pow(C[1][i][j],K[1]);
-                    Q[3][i][j] =  K[3]*pow(C[0][i][j],K[0])*pow(C[1][i][j],K[1]);*/
+                    Q[k][i][j] = (K[1][k]*pow(C[0][i][j],-K[0][0])*pow(C[1][i][j],-K[0][1]))-(K[2][k]*pow(C[2][i][j],K[0][2])*pow(C[3][i][j],K[0][3]));
                 }
             
             }
