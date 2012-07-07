@@ -67,7 +67,8 @@ int read_parameters(
   double* deltaP,
   double* D, 
   int*    kmax,
-  double* ki
+  double* ki,
+  double* kr
 );
 
 /**
@@ -104,7 +105,8 @@ void init_C0K(
     int kmax,
     double* C0,
     double** K,
-    double ki
+    double ki,
+    double kr
 );
 
 #endif
