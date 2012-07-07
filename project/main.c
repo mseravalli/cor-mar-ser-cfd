@@ -89,13 +89,14 @@ int main(int argn, char** args){
     double*** C  = NULL;
     double*   C0 = NULL;
     double*** Q  = NULL;
-    double*   K  = NULL;
+    double**   K  = NULL;
     
     double t; 
     int n;
     int it;
     double res;
     double D;      /*Diffusion Cons.*/
+    double ki;      /* Kinetic Cons.*/ 
     
     if(argn <= 1)
     {
@@ -142,7 +143,8 @@ int main(int argn, char** args){
                     &dt_value,
                     &deltaP,
                     &D,
-                    &kmax);
+                    &kmax,
+                    &ki);
                     
     t = 0;
     n = 0;
@@ -179,7 +181,8 @@ int main(int argn, char** args){
     C   = matrix3(0, imax + 1, 0, jmax + 1, kmax);
     C0  = (double*) malloc((size_t) (kmax * sizeof(double)));
     Q   = matrix3(0, imax + 1, 0, jmax + 1, kmax);
-    K   = (double*) malloc((size_t) (kmax * sizeof(double)));
+    /*K   = (double*) malloc((size_t) (kmax * sizeof(double)));*/
+    K = matrix(0, kmax, 0, 2);
     init_uvp(UI, 
              VI, 
              PI, 
@@ -189,9 +192,10 @@ int main(int argn, char** args){
              U, 
              V, 
              P, 
-             C);
+             C,
+             kmax);
     
-    init_C0K(cavityFile, kmax, C0, K);
+    init_C0K(cavityFile, kmax, C0, K, ki);
 
     while (t < t_end)
     {

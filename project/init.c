@@ -21,16 +21,17 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     double *omg,               /* relaxation factor */
                     double *tau,               /* safety factor for time step*/
                     int  *itermax,             /* max. number of iterations  */
-		                               /* for pressure per time step */
+		                                       /* for pressure per time step */
                     double *eps,               /* accuracy bound for pressure*/
                     int    *wl,
                     int    *wr,
                     int    *wt,
                     int    *wb,
-        		    double *dt_value,            /* time for output */
+        		    double *dt_value,           /* time for output */
                     double *deltaP,
                     double* D,
-                    int    *kmax
+                    int    *kmax,
+                    double *ki                  /* Kinetc of the irreversible reaction */
 ) 
 {
    READ_DOUBLE( szFileName, *xlength );
@@ -67,6 +68,8 @@ int read_parameters( const char *szFileName,       /* name of the file */
    READ_DOUBLE( szFileName, *deltaP );
    READ_DOUBLE( szFileName, *D );
    READ_INT( szFileName, *kmax );
+   READ_DOUBLE( szFileName, *ki );
+
 
 /*
    *dx = *xlength / (double)(*imax);
@@ -75,7 +78,7 @@ int read_parameters( const char *szFileName,       /* name of the file */
    return 1;
 }
 
-void init_C0K(const char *szFileName, int kmax, double* C0, double* K) {
+void init_C0K(const char *szFileName, int kmax, double* C0, double** K, double ki) {
     
     int k;
     char* baseNameC0 = "C";
@@ -90,7 +93,11 @@ void init_C0K(const char *szFileName, int kmax, double* C0, double* K) {
         read_double(szFileName, varNameC0, &var);
         C0[k] = var; 
         read_double(szFileName, varNameK, &var);
-        K[k] = var; 
+        K[0][k] = var; 
+    }
+
+    for (k = 0; k < kmax; k++){
+        K[1][k] = -ki*K[0][k]/K[0][0];
     }
 
 }
@@ -108,10 +115,12 @@ void init_uvp(double UI,
               double **U,
               double **V,
               double **P,
-              double*** C )
+              double*** C,
+              int kmax)
 {
     
     int i ,j;
+    int k;
 
     /* initialize the matrices */
     init_matrix(U, 0, imax + 1, 0, jmax + 1, UI);
@@ -127,10 +136,9 @@ void init_uvp(double UI,
     
     init_matrix(P, 1, imax, 1, jmax, PI);
 
-    init_matrix(C[0], 1, imax, 1, jmax, 0);
-    init_matrix(C[1], 1, imax, 1, jmax, 0);
-    init_matrix(C[2], 1, imax, 1, jmax, 0);
-    init_matrix(C[3], 1, imax, 1, jmax, 0);
+    for (k = 0; k < kmax; k++){
+        init_matrix(C[k], 1, imax, 1, jmax, 0);
+    }
 
 }
 

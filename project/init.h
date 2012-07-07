@@ -66,7 +66,8 @@ int read_parameters(
   double* dt_value,
   double* deltaP,
   double* D, 
-  int*    kmax
+  int*    kmax,
+  double* ki
 );
 
 /**
@@ -83,7 +84,8 @@ void init_uvp(
   double** U,
   double** V,
   double** P,
-  double*** C
+  double*** C,
+  int kmax
 );
 
 /**
@@ -101,7 +103,8 @@ void init_C0K(
     const char* szFileName,
     int kmax,
     double* C0,
-    double* K
+    double** K,
+    double ki
 );
 
 #endif
