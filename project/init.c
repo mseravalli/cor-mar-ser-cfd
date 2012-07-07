@@ -32,7 +32,10 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     double* D,
                     int    *kmax,
                     double *ki,                 /* Kinetic of the irreversible reaction */
-                    double *kr                  /* Kinetic of the reversible reaction */
+                    double *kr,                 /* Kinetic of the reversible reaction */
+                    double *Ei,
+                    double *Er,
+                    double *T
 ) 
 {
    READ_DOUBLE( szFileName, *xlength );
@@ -71,6 +74,10 @@ int read_parameters( const char *szFileName,       /* name of the file */
    READ_INT( szFileName, *kmax );
    READ_DOUBLE( szFileName, *ki );
    READ_DOUBLE( szFileName, *kr );
+   READ_DOUBLE( szFileName, *Ei );
+   READ_DOUBLE( szFileName, *Er );
+   READ_DOUBLE( szFileName, *T );
+
 
 
 /*

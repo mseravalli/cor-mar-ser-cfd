@@ -68,7 +68,10 @@ int read_parameters(
   double* D, 
   int*    kmax,
   double* ki,
-  double* kr
+  double* kr,
+  double* Ei,
+  double* Er,
+  double* T
 );
 
 /**

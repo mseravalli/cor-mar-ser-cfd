@@ -98,6 +98,9 @@ int main(int argn, char** args){
     double D;      /*Diffusion Cons.*/
     double ki;      /* Kinetic Cons.irreversible reaction */ 
     double kr;      /* Kinetic Cons. reversible reaction */
+    double Ei;      /* Reaction Energy irreversible */
+    double Er;      /* Reaction Energy reversible */
+    double T;       /* Temperature */
     
     if(argn <= 1)
     {
@@ -146,7 +149,10 @@ int main(int argn, char** args){
                     &D,
                     &kmax,
                     &ki,
-                    &kr);
+                    &kr,
+                    &Ei,
+                    &Er,
+                    &T);
                     
     t = 0;
     n = 0;
@@ -249,7 +255,10 @@ int main(int argn, char** args){
                     kmax,
                     Q,
                     C,
-                    Flag);
+                    Flag,
+                    Ei,
+                    Er,
+                    T);
 
           calculate_c(dt,
                     dx,

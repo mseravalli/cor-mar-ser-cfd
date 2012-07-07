@@ -352,12 +352,17 @@ void calculate_q(
   int kmax,
   double ***Q,
   double ***C,
-  int **Flag
+  int **Flag,
+  double Ei,
+  double Er,
+  double T
 )
 {
     int i;
     int j;
     int k;
+    double firstOperand;
+    double secondOperand; 
 
 
     /****** Calculate Q start ******/
@@ -367,7 +372,9 @@ void calculate_q(
         for (j = 1; j <= jmax; j++) {
             for (k = 0; k < kmax; k++){
                 if (Flag[i][j] >= C_F) {
-                    Q[k][i][j] = (K[1][k]*pow(C[0][i][j],-K[0][0])*pow(C[1][i][j],-K[0][1]))-(K[2][k]*pow(C[2][i][j],K[0][2])*pow(C[3][i][j],K[0][3]));
+                    firstOperand = (K[1][k]*exp(-Ei/T)*pow(C[0][i][j],-K[0][0])*pow(C[1][i][j],-K[0][1]));
+                    secondOperand = (K[2][k]*exp(-Er/T)*pow(C[2][i][j],K[0][2])*pow(C[3][i][j],K[0][3]));
+                    Q[k][i][j] = firstOperand - secondOperand;
                 }
             
             }
