@@ -13,8 +13,12 @@ void boundaryvalues(
   double dy,
   int wl,
   int wr,
-  int wt,
   int wb,
+  int wt,
+  int cl,
+  int cr,
+  int cb,
+  int ct,
   double** U,
   double** V,
   double** F,
@@ -157,20 +161,46 @@ void boundaryvalues(
 
         /**** CONCENTRATION START ****/
 
+        /* 
+         * if cx specifies a release of a concentration use it 
+         * otherwise use the default behaviour for that boundary i.e
+         * left boundary no entering concentration => dirichlet with 0
+         * right boundary neumann 0
+         * bottom boundary neumann 0
+         * top boundary neumann 0
+         */
         for (k = 0; k < kmax; ++k) {
 
             /** left and right wall **/
             #pragma omp for
             for (j = 0; j <= jmax; ++j) {
-                C[k][0][j] = -C[k][1][j];
-                C[k][imax+1][j] = C[k][imax][j];
+                if (cl & (1 << k)) {
+                    C[k][0][j] = 2*C0[k]-C[k][1][j];
+                } else {
+                    C[k][0][j] = -C[k][1][j];
+                }
+
+                if (cr & (1<<k)) {
+                    C[k][imax+1][j] = 2*C0[k]-C[k][imax][j];
+                } else {
+                    C[k][imax+1][j] = C[k][imax][j];
+                }
             }
 
             /** lower and upper wall **/
-            #pragma omp for
+            #pragma omp for 
             for(i = 0; i <= imax; ++i) {
-                C[k][i][0] = C[k][i][1];
-                C[k][i][jmax+1] = C[k][i][jmax];
+                if (cb & (1<<k)) {
+                    C[k][i][0] = 2*C0[k] - C[k][i][1];
+                } else {
+                    C[k][i][0] = C[k][i][1];
+                }
+
+                if (ct & (1<<k)) {
+                    C[k][i][jmax+1] = 2*C0[k] - C[k][i][jmax];
+                } else {
+                    C[k][i][jmax+1] = C[k][i][jmax];
+                }
             }
         }
 
