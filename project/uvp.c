@@ -3,6 +3,7 @@
 #include "uvp.h"
 #include <math.h>
 #include "constants.h"
+#include <omp.h>
 
 void calculate_fg(
   double Re,
@@ -44,114 +45,122 @@ void calculate_fg(
     int i;
     int j;
 
-    /******** VARIABLE DECLARATION END ********/
-
-
-    /******** CALCULATE F START ********/
-    
-    /******** Calculate F ********/
-    
-    for(i = 1; i <= imax-1; i++)
+    #pragma omp parallel private (i, j, d2udx2, d2udy2, du2dx, duvdy, d2vdx2, d2vdy2, duvdx, dv2dy, firstOperand, secondOperand)
     {
-        for(j = 1; j <= jmax; j++)
+        /******** VARIABLE DECLARATION END ********/
+
+
+        /******** CALCULATE F START ********/
+        
+        /******** Calculate F ********/
+        
+        #pragma omp for collapse(2)
+        for(i = 1; i <= imax-1; i++)
         {
-
-            /* Fluid */
-            if (Flag[i][j]>= C_F && Flag[i+1][j]>= C_F)
+            for(j = 1; j <= jmax; j++)
             {
-                /* du2dx */
-                firstOperand = ( 1 / dx) *
-                    ( ((U[i][j] + U[i+1][j])/2)*((U[i][j] + U[i+1][j])/2) - ((U[i-1][j] + U[i][j])/2)*((U[i-1][j] + U[i][j])/2));
 
-                secondOperand = ( alpha / dx ) *
-                    ( ( (abs(U[i][j] + U[i+1][j])/2) * ((U[i][j] - U[i+1][j])/2) )  
-                    - ( (abs(U[i-1][j] + U[i][j])/2) * ((U[i-1][j] - U[i][j])/2) ) );
+                /* Fluid */
+                if (Flag[i][j]>= C_F && Flag[i+1][j]>= C_F)
+                {
+                    /* du2dx */
+                    firstOperand = ( 1 / dx) *
+                        ( ((U[i][j] + U[i+1][j])/2)*((U[i][j] + U[i+1][j])/2) - ((U[i-1][j] + U[i][j])/2)*((U[i-1][j] + U[i][j])/2));
 
-                du2dx = firstOperand + secondOperand;
+                    secondOperand = ( alpha / dx ) *
+                        ( ( (abs(U[i][j] + U[i+1][j])/2) * ((U[i][j] - U[i+1][j])/2) )  
+                        - ( (abs(U[i-1][j] + U[i][j])/2) * ((U[i-1][j] - U[i][j])/2) ) );
+
+                    du2dx = firstOperand + secondOperand;
+                    
+                    /* duvdy */
+                    firstOperand = ( 1 / dy )*
+                    ( ( (V[i][j] + V[i+1][j]) / 2 ) * ( (U[i][j] + U[i][j+1]) / 2 )
+                    - ( (V[i][j-1] + V[i+1][j-1]) / 2 ) * ( (U[i][j-1] + U[i][j]) / 2 ) );
+
+                    secondOperand = ( alpha / dy )*
+                    ( ( (abs(V[i][j] + V[i+1][j])/2) * ((U[i][j] - U[i][j+1])/2) )
+                    - ( (abs(V[i][j-1] + V[i+1][j-1])/2) * ((U[i][j-1] - U[i][j])/2) ));
+                    duvdy = firstOperand + secondOperand;
+
+                    /* d2udx2 */
+                    d2udx2 = (U[i+1][j] - 2*U[i][j] + U[i-1][j]) / (dx*dx);
+
+                    /* d2udy2 */
+                    d2udy2 = (U[i][j+1] - 2*U[i][j] + U[i][j-1]) / (dy*dy);
+
+                    F[i][j] = U[i][j] + dt * ( (1/Re) * (d2udx2 + d2udy2 ) - du2dx - duvdy + GX );
+                }
                 
-                /* duvdy */
-                firstOperand = ( 1 / dy )*
-                ( ( (V[i][j] + V[i+1][j]) / 2 ) * ( (U[i][j] + U[i][j+1]) / 2 )
-                - ( (V[i][j-1] + V[i+1][j-1]) / 2 ) * ( (U[i][j-1] + U[i][j]) / 2 ) );
-
-                secondOperand = ( alpha / dy )*
-                ( ( (abs(V[i][j] + V[i+1][j])/2) * ((U[i][j] - U[i][j+1])/2) )
-                - ( (abs(V[i][j-1] + V[i+1][j-1])/2) * ((U[i][j-1] - U[i][j])/2) ));
-                duvdy = firstOperand + secondOperand;
-
-                /* d2udx2 */
-                d2udx2 = (U[i+1][j] - 2*U[i][j] + U[i-1][j]) / (dx*dx);
-
-                /* d2udy2 */
-                d2udy2 = (U[i][j+1] - 2*U[i][j] + U[i][j-1]) / (dy*dy);
-
-                F[i][j] = U[i][j] + dt * ( (1/Re) * (d2udx2 + d2udy2 ) - du2dx - duvdy + GX );
             }
-            
         }
-    }
-    
-    /******** CALCULATE F END ********/
-    
+        
+        /******** CALCULATE F END ********/
+        
 
-    /******** CALCULATE G START ********/
+        /******** CALCULATE G START ********/
 
-    /******** Calculate G ********/
+        /******** Calculate G ********/
 
-    for(i = 1; i <= imax; i++)
-    {
-        for(j = 1; j <= jmax-1; j++)
+        #pragma omp for collapse(2)
+        for(i = 1; i <= imax; i++)
         {
-            /* Fluid */
-            if (Flag[i][j]>=C_F && Flag[i][j+1]>=C_F)
+            for(j = 1; j <= jmax-1; j++)
             {
-               /* dv2dy */ 
-                firstOperand = ( 1 / dy) *
-                    ( ((V[i][j] + V[i][j+1])/2)*((V[i][j] + V[i][j+1])/2) - ((V[i][j-1] + V[i][j])/2)*((V[i][j-1] + V[i][j])/2));
+                /* Fluid */
+                if (Flag[i][j]>=C_F && Flag[i][j+1]>=C_F)
+                {
+                   /* dv2dy */ 
+                    firstOperand = ( 1 / dy) *
+                        ( ((V[i][j] + V[i][j+1])/2)*((V[i][j] + V[i][j+1])/2) - ((V[i][j-1] + V[i][j])/2)*((V[i][j-1] + V[i][j])/2));
 
-                secondOperand = ( alpha / dy ) *
-                    ( ( (abs(V[i][j] + V[i][j+1])/2) * ((V[i][j] - V[i][j+1])/2) )  
-                    - ( (abs(V[i][j-1] + V[i][j])/2) * ((V[i][j-1] - V[i][j])/2) ) );
+                    secondOperand = ( alpha / dy ) *
+                        ( ( (abs(V[i][j] + V[i][j+1])/2) * ((V[i][j] - V[i][j+1])/2) )  
+                        - ( (abs(V[i][j-1] + V[i][j])/2) * ((V[i][j-1] - V[i][j])/2) ) );
 
-                dv2dy = firstOperand + secondOperand;
+                    dv2dy = firstOperand + secondOperand;
 
-                /* duvdx */
-                firstOperand = ( 1 / dx )*
-                ( ( (U[i][j] + U[i][j+1]) / 2 ) * ( (V[i][j] + V[i+1][j]) / 2 )
-                - ( (U[i-1][j] + U[i-1][j+1]) / 2 ) * ( (V[i-1][j] + V[i][j]) / 2 ) );
+                    /* duvdx */
+                    firstOperand = ( 1 / dx )*
+                    ( ( (U[i][j] + U[i][j+1]) / 2 ) * ( (V[i][j] + V[i+1][j]) / 2 )
+                    - ( (U[i-1][j] + U[i-1][j+1]) / 2 ) * ( (V[i-1][j] + V[i][j]) / 2 ) );
 
-                secondOperand = ( alpha / dx )*
-                ( ( (abs(U[i][j] + U[i][j+1])/2) * ((V[i][j] - V[i+1][j])/2) )
-                - ( (abs(U[i-1][j] + U[i-1][j+1])/2) * ((V[i-1][j] - V[i][j])/2) ));
+                    secondOperand = ( alpha / dx )*
+                    ( ( (abs(U[i][j] + U[i][j+1])/2) * ((V[i][j] - V[i+1][j])/2) )
+                    - ( (abs(U[i-1][j] + U[i-1][j+1])/2) * ((V[i-1][j] - V[i][j])/2) ));
 
-                duvdx = firstOperand + secondOperand;
+                    duvdx = firstOperand + secondOperand;
 
-                /* d2vdx2 */
-                d2vdx2 = (V[i+1][j] - 2*V[i][j] + V[i-1][j]) / (dx*dx);
-              
-                /* d2vdy2*/
-                d2vdy2 = (V[i][j+1] - 2*V[i][j] + V[i][j-1]) / (dy*dy);
+                    /* d2vdx2 */
+                    d2vdx2 = (V[i+1][j] - 2*V[i][j] + V[i-1][j]) / (dx*dx);
+                  
+                    /* d2vdy2*/
+                    d2vdy2 = (V[i][j+1] - 2*V[i][j] + V[i][j-1]) / (dy*dy);
 
-                G[i][j] = V[i][j] + dt * ( (1/Re) * ( d2vdx2 + d2vdy2 ) - duvdx - dv2dy + GY);
+                    G[i][j] = V[i][j] + dt * ( (1/Re) * ( d2vdx2 + d2vdy2 ) - duvdx - dv2dy + GY);
+                }
             }
         }
-    }
 
-    /******** CALCULATE G END ********/
-    
-    /******** BOUNDARY VALUES START ********/
-    for(j=1; j<=jmax; j++)
-    {
-        F[0][j]=U[0][j];
-        F[imax][j]=U[imax][j];
+        /******** CALCULATE G END ********/
+        
+        /******** BOUNDARY VALUES START ********/
+        #pragma omp for
+        for(j=1; j<=jmax; j++)
+        {
+            F[0][j]=U[0][j];
+            F[imax][j]=U[imax][j];
+        }
+        
+        #pragma omp for
+        for(i=1; i<=imax; i++)
+        {
+            G[i][0]=V[i][0];
+            G[i][jmax]=V[i][jmax];
+        }
+        /******** BOUNDARY VALUES END ********/
+
     }
-    
-    for(i=1; i<=imax; i++)
-    {
-        G[i][0]=V[i][0];
-        G[i][jmax]=V[i][jmax];
-    }
-    /******** BOUNDARY VALUES END ********/
 }
 
 void calculate_dt(
@@ -308,6 +317,7 @@ void calculate_c(
 
     /****** Calculate C start ******/
 
+    #pragma omp parallel for private(i, j, k, ducdx, d2cdx2, dvcdy, d2cdy2, firstOperand, secondOperand) collapse(3)
     for (k = 0; k < kmax; k++){
         for (i = 1; i <= imax; i++) {
             for (j = 1; j <= jmax; j++) {
