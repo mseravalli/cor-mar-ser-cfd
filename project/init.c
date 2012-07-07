@@ -25,8 +25,12 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     double *eps,               /* accuracy bound for pressure*/
                     int    *wl,
                     int    *wr,
-                    int    *wt,
                     int    *wb,
+                    int    *wt,
+                    int    *cl,
+                    int    *cr,
+                    int    *cb,
+                    int    *ct,
         		    double *dt_value,           /* time for output */
                     double *deltaP,
                     double* D,
@@ -59,6 +63,11 @@ int read_parameters( const char *szFileName,       /* name of the file */
    READ_INT( szFileName, *wr );
    READ_INT( szFileName, *wt );
    READ_INT( szFileName, *wb );
+
+   READ_INT( szFileName, *cl );
+   READ_INT( szFileName, *cr );
+   READ_INT( szFileName, *ct );
+   READ_INT( szFileName, *cb );
 
    READ_INT   ( szFileName, *itermax );
    READ_DOUBLE( szFileName, *dt_value );
