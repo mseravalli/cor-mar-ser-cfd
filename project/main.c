@@ -71,6 +71,11 @@ int main(int argn, char** args){
     int wt;
     int wb;
 
+    int cl;
+    int cr;
+    int cb;
+    int ct;
+
     double deltaP;
 
     char imageName[64];
@@ -139,8 +144,12 @@ int main(int argn, char** args){
                     &eps,    
                     &wl,
                     &wr,
-                    &wt,
                     &wb,
+                    &wt,
+                    &cl,
+                    &cr,
+                    &cb,
+                    &ct,
                     &dt_value,
                     &deltaP,
                     &D,
@@ -279,11 +288,7 @@ int main(int argn, char** args){
                  V,
                  F,
                  G,
-                 Flag,
-                 wl,
-                 wr,
-                 wt,
-                 wb);
+                 Flag);
         
         calculate_rs(dt,
                  dx,

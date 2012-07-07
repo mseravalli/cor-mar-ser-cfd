@@ -19,11 +19,7 @@ void calculate_fg(
   double **V,
   double **F,
   double **G,
-  int **Flag,
-  int wl,
-  int wr,
-  int wt,
-  int wb
+  int **Flag
 ) 
 {
     
