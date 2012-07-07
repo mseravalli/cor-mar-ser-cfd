@@ -14,6 +14,8 @@
 #undef PI
 #endif
 
+#define PI_MATH 3.14159265358979323846f 
+
 #define FREE_ARG char*
 
 /**
@@ -32,6 +34,12 @@ int max( int a, int b);
 double fmin( double a, double b);
 double fmax( double a, double b);
 
+void rotate(double* GX, 
+            double* GY, 
+            double t, 
+            double norm, 
+            double period
+);
 
 /**
  * Error handling:

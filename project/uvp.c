@@ -61,7 +61,7 @@ void calculate_fg(
             {
                 /* du2dx */
                 firstOperand = ( 1 / dx) *
-                    ( pow((U[i][j] + U[i+1][j])/2, 2) -  pow((U[i-1][j] + U[i][j])/2, 2));
+                    ( ((U[i][j] + U[i+1][j])/2)*((U[i][j] + U[i+1][j])/2) - ((U[i-1][j] + U[i][j])/2)*((U[i-1][j] + U[i][j])/2));
 
                 secondOperand = ( alpha / dx ) *
                     ( ( (abs(U[i][j] + U[i+1][j])/2) * ((U[i][j] - U[i+1][j])/2) )  
@@ -80,10 +80,10 @@ void calculate_fg(
                 duvdy = firstOperand + secondOperand;
 
                 /* d2udx2 */
-                d2udx2 = (U[i+1][j] - 2*U[i][j] + U[i-1][j]) / pow(dx,2);
+                d2udx2 = (U[i+1][j] - 2*U[i][j] + U[i-1][j]) / (dx*dx);
 
                 /* d2udy2 */
-                d2udy2 = (U[i][j+1] - 2*U[i][j] + U[i][j-1]) / pow(dy,2);
+                d2udy2 = (U[i][j+1] - 2*U[i][j] + U[i][j-1]) / (dy*dy);
 
                 F[i][j] = U[i][j] + dt * ( (1/Re) * (d2udx2 + d2udy2 ) - du2dx - duvdy + GX );
             }
@@ -107,7 +107,7 @@ void calculate_fg(
             {
                /* dv2dy */ 
                 firstOperand = ( 1 / dy) *
-                    ( pow((V[i][j] + V[i][j+1])/2, 2) -  pow((V[i][j-1] + V[i][j])/2, 2));
+                    ( ((V[i][j] + V[i][j+1])/2)*((V[i][j] + V[i][j+1])/2) - ((V[i][j-1] + V[i][j])/2)*((V[i][j-1] + V[i][j])/2));
 
                 secondOperand = ( alpha / dy ) *
                     ( ( (abs(V[i][j] + V[i][j+1])/2) * ((V[i][j] - V[i][j+1])/2) )  
@@ -127,10 +127,10 @@ void calculate_fg(
                 duvdx = firstOperand + secondOperand;
 
                 /* d2vdx2 */
-                d2vdx2 = (V[i+1][j] - 2*V[i][j] + V[i-1][j]) / pow(dx,2);
+                d2vdx2 = (V[i+1][j] - 2*V[i][j] + V[i-1][j]) / (dx*dx);
               
                 /* d2vdy2*/
-                d2vdy2 = (V[i][j+1] - 2*V[i][j] + V[i][j-1]) / pow(dy,2);
+                d2vdy2 = (V[i][j+1] - 2*V[i][j] + V[i][j-1]) / (dy*dy);
 
                 G[i][j] = V[i][j] + dt * ( (1/Re) * ( d2vdx2 + d2vdy2 ) - duvdx - dv2dy + GY);
             }
