@@ -123,8 +123,7 @@ int main(int argn, char** args){
 
     strcpy(problem, args[1]);
 
-    strcpy(cavityFile, problem);
-    strcat(cavityFile, "_cavity.dat");
+    sprintf(cavityFile, "scenarios/%s_parameters.dat", problem);
 
     read_parameters(cavityFile,
                     &Re,     
@@ -167,8 +166,7 @@ int main(int argn, char** args){
     t = 0;
     n = 0;
 
-    strcpy(imageName, problem);
-    strcat(imageName, ".pgm");
+    sprintf(imageName, "scenarios/%s.pgm", problem);
     Problem = read_pgm(imageName, &imax, &jmax);
     dx = xlength / (double)(imax);
     dy = ylength / (double)(jmax);
