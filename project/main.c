@@ -112,7 +112,8 @@ int main(int argn, char** args){
         printf("ERROR: you need to specify a problem (karman, plane, step)\n");
         return 1;
     } else {
-        if( !(   strcmp(args[1], "karman") == 0 
+        if( !(   strcmp(args[1], "karman") == 0
+              || strcmp(args[1], "diffusion") == 0 
               || strcmp(args[1], "plane")  == 0
               || strcmp(args[1], "step")   == 0)){
             printf("ERROR: the passed argument was different from karman, plane or step\n");
@@ -253,6 +254,7 @@ int main(int argn, char** args){
         spec_boundary_val(problem,
                           imax,
                           jmax,
+			  kmax,
                           dx,
                           dy,
                           Re,
