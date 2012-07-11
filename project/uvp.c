@@ -367,6 +367,7 @@ void calculate_q(
     int i;
     int j;
     int k;
+    int cat;
     double firstOperand;
     double secondOperand; 
 
@@ -377,9 +378,17 @@ void calculate_q(
     for (i = 1; i <= imax; i++) {
         for (j = 1; j <= jmax; j++) {
             for (k = 0; k < kmax; k++){
-                if (Flag[i][j] >= C_F) {
-                    firstOperand = (K[1][k]*exp(-Ei/T)*pow(C[0][i][j],-K[0][0])*pow(C[1][i][j],-K[0][1]));
-                    secondOperand = (K[2][k]*exp(-Er/T)*pow(C[2][i][j],K[0][2])*pow(C[3][i][j],K[0][3]));
+                if (Flag[i][j] >= C_F) 
+		{
+		    /*printf("%d ", Flag[i][j]);*/
+		    cat = Flag[i][j] & 0x20;
+		    /*printf("%d ", cat);*/
+		    cat = cat >> 5;
+		    /*printf("%d ", cat);*/
+		    cat = cat*(2-1) + 1;
+		    /*printf("%d\n", cat);*/
+                    firstOperand = (cat*K[1][k]*exp(-Ei/T)*pow(C[0][i][j],-K[0][0])*pow(C[1][i][j],-K[0][1]));
+                    secondOperand = (cat*K[2][k]*exp(-Er/T)*pow(C[2][i][j],K[0][2])*pow(C[3][i][j],K[0][3]));
                     Q[k][i][j] = firstOperand - secondOperand;
                 }
             
