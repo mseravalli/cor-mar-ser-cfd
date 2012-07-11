@@ -402,6 +402,7 @@ void spec_boundary_val(
     char *problem,
     int imax,
     int jmax,
+    int kmax,
     double dx,
     double dy,
     double Re,
@@ -414,6 +415,7 @@ void spec_boundary_val(
 {
     /*int i;*/
     int j;
+    int k;
     /*
     double C0 = 0;
     double C1 = 0;
@@ -423,10 +425,25 @@ void spec_boundary_val(
     if (strcmp(problem, "karman") == 0) {
         for(j = 1; j <= jmax; ++j)
         {
-            U[0][j] = 10.0;
+            U[0][j] = 1.0;
             V[0][j] = -V[1][j];
         }
     }
+
+    if (strcmp(problem, "diffusion") == 0) {
+        for(j = 1; j <= jmax; ++j)
+        {
+            U[0][j] = 0;
+            V[0][j] = 0;
+	    for(k=0; k < kmax; k++)
+	    {
+	        /* neumann on left wall */
+                C[k][0][j] = C[k][1][j];
+	    }
+        }
+    }
+
+
 /*
     for (i = 1; i <= imax; ++i) {
         C[0][i][0] = 2*C0-C[0][i][1];

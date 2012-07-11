@@ -36,6 +36,7 @@ void spec_boundary_val(
     char *problem,
     int imax,
     int jmax,
+    int kmax,
     double dx,
     double dy,
     double Re,

@@ -112,7 +112,8 @@ int main(int argn, char** args){
         printf("ERROR: you need to specify a problem (karman, plane, step)\n");
         return 1;
     } else {
-        if( !(   strcmp(args[1], "karman") == 0 
+        if( !(   strcmp(args[1], "karman") == 0
+              || strcmp(args[1], "diffusion") == 0 
               || strcmp(args[1], "plane")  == 0
               || strcmp(args[1], "step")   == 0)){
             printf("ERROR: the passed argument was different from karman, plane or step\n");
@@ -122,8 +123,7 @@ int main(int argn, char** args){
 
     strcpy(problem, args[1]);
 
-    strcpy(cavityFile, problem);
-    strcat(cavityFile, "_cavity.dat");
+    sprintf(cavityFile, "scenarios/%s_parameters.dat", problem);
 
     read_parameters(cavityFile,
                     &Re,     
@@ -166,8 +166,7 @@ int main(int argn, char** args){
     t = 0;
     n = 0;
 
-    strcpy(imageName, problem);
-    strcat(imageName, ".pgm");
+    sprintf(imageName, "scenarios/%s.pgm", problem);
     Problem = read_pgm(imageName, &imax, &jmax);
     dx = xlength / (double)(imax);
     dy = ylength / (double)(jmax);
@@ -253,6 +252,7 @@ int main(int argn, char** args){
         spec_boundary_val(problem,
                           imax,
                           jmax,
+			  kmax,
                           dx,
                           dy,
                           Re,
