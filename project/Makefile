@@ -1,7 +1,7 @@
 IDIR =./
-CC=gcc
-CFLAGS = -Wall -pedantic -Werror -g -fopenmp
-#CFLAGS = -funroll-loops -O3 -fopenmp
+CC=icc
+#CFLAGS = -Wall -pedantic -Werror -g -openmp
+CFLAGS = -funroll-loops -O3 -openmp
 
 ODIR=obj
 LDIR =../lib
