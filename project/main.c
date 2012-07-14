@@ -44,9 +44,11 @@
 int main(int argn, char** args){
 
     double  Re;                /* reynolds number   */          
+    double  Pr;                /* prandtl number    */
     double  UI;                /* velocity x-direction */
     double  VI;                /* velocity y-direction */
     double  PI;                /* pressure */
+    double  TI;
     double  GX;                /* gravitation x-direction */
     double  GY;                /* gravitation y-direction */
     double  t_end;             /* end time */
@@ -59,6 +61,7 @@ int main(int argn, char** args){
     int     jmax;                /* number of cells y-direction*/
     int     kmax;
     double  alpha;             /* uppwind differencing factor*/
+    double  beta;              /* thermal expansion coefficient */
     double  omg;               /* relaxation factor */
     double  tau;               /* safety factor for time step*/
     int     itermax;             /* max. number of iterations  */
@@ -87,6 +90,7 @@ int main(int argn, char** args){
     double**  F = NULL;
     double**  G = NULL;
     double**  RS = NULL;
+    double**  T = NULL;      /*  Temperature  */
     char problem[64];
     int **Problem = NULL;
     int **Flag = NULL;
@@ -105,7 +109,6 @@ int main(int argn, char** args){
     double kr;      /* Kinetic Cons. reversible reaction */
     double Ei;      /* Reaction Energy irreversible */
     double Er;      /* Reaction Energy reversible */
-    double T;       /* Temperature */
     
     if(argn <= 1)
     {
@@ -126,10 +129,12 @@ int main(int argn, char** args){
     sprintf(cavityFile, "scenarios/%s_parameters.dat", problem);
 
     read_parameters(cavityFile,
-                    &Re,     
+                    &Re,
+                    &Pr,     
                     &UI,     
                     &VI,     
-                    &PI,     
+                    &PI,
+                    &TI,     
                     &GX,     
                     &GY,     
                     &t_end,  
@@ -140,7 +145,8 @@ int main(int argn, char** args){
                     &dy,     
                     &imax,   
                     &jmax,   
-                    &alpha,  
+                    &alpha,
+                    &beta,  
                     &omg,    
                     &tau,    
                     &itermax,
@@ -160,8 +166,7 @@ int main(int argn, char** args){
                     &ki,
                     &kr,
                     &Ei,
-                    &Er,
-                    &T);
+                    &Er);
                     
     t = 0;
     n = 0;
@@ -194,13 +199,15 @@ int main(int argn, char** args){
     F   = matrix(0, imax + 1, 0, jmax + 1);
     G   = matrix(0, imax + 1, 0, jmax + 1);
     RS  = matrix(0, imax + 1, 0, jmax + 1);
+    T   = matrix(0, imax + 1, 0, jmax + 1);
     C   = matrix3(0, imax + 1, 0, jmax + 1, kmax);
     C0  = (double*) malloc((size_t) (kmax * sizeof(double)));
     Q   = matrix3(0, imax + 1, 0, jmax + 1, kmax);
     K = matrix(0, 3, 0, kmax);
     init_uvp(UI, 
              VI, 
-             PI, 
+             PI,
+             TI, 
              imax, 
              jmax, 
              problem,
@@ -208,6 +215,7 @@ int main(int argn, char** args){
              V, 
              P, 
              C,
+             T,
              kmax);
     
     init_C0K(cavityFile, kmax, C0, K, ki, kr);
@@ -215,6 +223,7 @@ int main(int argn, char** args){
     while (t < t_end)
     {
         calculate_dt(Re,
+                 Pr,
                  tau,
                  &dt,
                  dx,
@@ -261,6 +270,20 @@ int main(int argn, char** args){
                           V,
                           P,
                           C);
+          calculate_t(dt,
+                    dx,
+                    dy,
+                    alpha,
+                    imax,
+                    jmax,
+                    Re,
+                    Pr,
+                    U,
+                    V,
+                    T,
+                    Flag);
+
+
 
          calculate_q(K,
                     imax,
@@ -301,7 +324,9 @@ int main(int argn, char** args){
                  V,
                  F,
                  G,
-                 Flag);
+                 Flag,
+                 T,
+                 beta);
         
         calculate_rs(dt,
                  dx,
@@ -405,6 +430,7 @@ int main(int argn, char** args){
     free_matrix(F,  0, imax + 1, 0, jmax + 1);
     free_matrix(G,  0, imax + 1, 0, jmax + 1);
     free_matrix(RS, 0, imax + 1, 0, jmax + 1);
+    free_matrix(T, 0, imax + 1, 0, jmax + 1);
     free_imatrix(Flag, 0, imax + 1, 0, jmax + 1);
     free_imatrix(Sources, 0, imax+1, 0, jmax+1);
     free_imatrix(Problem, 0, imax + 1, 0, jmax + 1);

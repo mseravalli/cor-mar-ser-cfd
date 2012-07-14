@@ -41,9 +41,11 @@
 int read_parameters( 
   const char *szFileName,
   double* Re,
+  double* Pr,
   double* UI,
   double* VI,
   double* PI,
+  double* TI,
   double* GX,
   double* GY,
   double* t_end,
@@ -55,6 +57,7 @@ int read_parameters(
   int*    imax,
   int*    jmax,
   double* alpha,
+  double* beta,
   double* omg,
   double* tau,
   int*    itermax,
@@ -74,8 +77,7 @@ int read_parameters(
   double* ki,
   double* kr,
   double* Ei,
-  double* Er,
-  double* T
+  double* Er
 );
 
 /**
@@ -86,6 +88,7 @@ void init_uvp(
   double UI,
   double VI,
   double PI,
+  double TI,
   int imax,
   int jmax,
   char* problem,
@@ -93,6 +96,7 @@ void init_uvp(
   double** V,
   double** P,
   double*** C,
+  double** T,
   int kmax
 );
 

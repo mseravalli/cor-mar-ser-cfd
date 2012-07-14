@@ -4,9 +4,11 @@
 
 int read_parameters( const char *szFileName,       /* name of the file */
                     double *Re,                /* reynolds number   */
+                    double *Pr,
                     double *UI,                /* velocity x-direction */
                     double *VI,                /* velocity y-direction */
                     double *PI,                /* pressure */
+                    double *TI,
                     double *GX,                /* gravitation x-direction */
                     double *GY,                /* gravitation y-direction */
                     double *t_end,             /* end time */
@@ -18,6 +20,7 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     int  *imax,                /* number of cells x-direction*/
                     int  *jmax,                /* number of cells y-direction*/
                     double *alpha,             /* uppwind differencing factor*/
+                    double *beta,
                     double *omg,               /* relaxation factor */
                     double *tau,               /* safety factor for time step*/
                     int  *itermax,             /* max. number of iterations  */
@@ -31,21 +34,21 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     int    *cr,
                     int    *cb,
                     int    *ct,
-        		    double *dt_value,           /* time for output */
+                    double *dt_value,           /* time for output */
                     double *deltaP,
                     double* D,
                     int    *kmax,
                     double *ki,                 /* Kinetic of the irreversible reaction */
                     double *kr,                 /* Kinetic of the reversible reaction */
                     double *Ei,
-                    double *Er,
-                    double *T
+                    double *Er
 ) 
 {
    READ_DOUBLE( szFileName, *xlength );
    READ_DOUBLE( szFileName, *ylength );
 
    READ_DOUBLE( szFileName, *Re    );
+   READ_DOUBLE( szFileName, *Pr    );
    READ_DOUBLE( szFileName, *t_end );
    READ_DOUBLE( szFileName, *dt    );
 
@@ -58,6 +61,7 @@ int read_parameters( const char *szFileName,       /* name of the file */
    READ_DOUBLE( szFileName, *eps   );
    READ_DOUBLE( szFileName, *tau   );
    READ_DOUBLE( szFileName, *alpha );
+   READ_DOUBLE( szFileName, *beta  );
    
    READ_INT( szFileName, *wl );
    READ_INT( szFileName, *wr );
@@ -77,6 +81,7 @@ int read_parameters( const char *szFileName,       /* name of the file */
    READ_DOUBLE( szFileName, *GX );
    READ_DOUBLE( szFileName, *GY );
    READ_DOUBLE( szFileName, *PI );
+   READ_DOUBLE( szFileName, *TI );
 
    READ_DOUBLE( szFileName, *deltaP );
    READ_DOUBLE( szFileName, *D );
@@ -85,7 +90,6 @@ int read_parameters( const char *szFileName,       /* name of the file */
    READ_DOUBLE( szFileName, *kr );
    READ_DOUBLE( szFileName, *Ei );
    READ_DOUBLE( szFileName, *Er );
-   READ_DOUBLE( szFileName, *T );
 
 
 
@@ -128,6 +132,7 @@ void init_C0K(const char *szFileName, int kmax, double* C0, double** K, double k
 void init_uvp(double UI,
               double VI,
               double PI,
+              double TI,
               int imax,
               int jmax,
               char* problem,
@@ -135,6 +140,7 @@ void init_uvp(double UI,
               double **V,
               double **P,
               double*** C,
+              double **T,
               int kmax)
 {
     

@@ -19,7 +19,9 @@ void calculate_fg(
   double **V,
   double **F,
   double **G,
-  int **Flag
+  int **Flag,
+  double **T,
+  double beta 
 ) 
 {
     
@@ -85,7 +87,7 @@ void calculate_fg(
                     /* d2udy2 */
                     d2udy2 = (U[i][j+1] - 2*U[i][j] + U[i][j-1]) / (dy*dy);
 
-                    F[i][j] = U[i][j] + dt * ( (1/Re) * (d2udx2 + d2udy2 ) - du2dx - duvdy + GX );
+                    F[i][j] = U[i][j] + dt * ( (1/Re) * (d2udx2 + d2udy2 ) - du2dx - duvdy + GX*(1-beta*(T[i][j]+T[i+1][j])/2) );
                 }
                 
             }
@@ -133,7 +135,7 @@ void calculate_fg(
                     /* d2vdy2*/
                     d2vdy2 = (V[i][j+1] - 2*V[i][j] + V[i][j-1]) / (dy*dy);
 
-                    G[i][j] = V[i][j] + dt * ( (1/Re) * ( d2vdx2 + d2vdy2 ) - duvdx - dv2dy + GY);
+                    G[i][j] = V[i][j] + dt * ( (1/Re) * ( d2vdx2 + d2vdy2 ) - duvdx - dv2dy + GY*(1-beta*(T[i][j]+T[i][j+1])/2));
                 }
             }
         }
@@ -161,6 +163,7 @@ void calculate_fg(
 
 void calculate_dt(
   double Re,
+  double Pr,
   double tau,
   double *dt,
   double dx,
@@ -177,7 +180,7 @@ void calculate_dt(
     double vmax = 0;
     int i, j;
 
-    double dtdcond, dtcond, dxcond, dycond;
+    double dttcond, dtdcond, dtcond, dxcond, dycond;
     double minval;
 
     /******** Determine umax and vmax *********/
@@ -196,6 +199,7 @@ void calculate_dt(
 
     /******** Calculate conditions ********/
     dtdcond = D/(2*(1/(dx*dx) + 1/(dy*dy)));
+    dttcond = Re*Pr/(2*(1/(dx*dx) + 1/(dy*dy)));
     dtcond = Re/(2*(1/(dx*dx) + 1/(dy*dy)));
     dxcond = dx/fabs(umax);
     dycond = dy/fabs(vmax);
@@ -361,7 +365,7 @@ void calculate_q(
   int **Flag,
   double Ei,
   double Er,
-  double T
+  double **T
 )
 {
     int i;
@@ -387,13 +391,74 @@ void calculate_q(
 		    /*printf("%d ", cat);*/
 		    cat = cat*(2-1) + 1;
 		    /*printf("%d\n", cat);*/
-                    firstOperand = (cat*K[1][k]*exp(-Ei/T)*pow(C[0][i][j],-K[0][0])*pow(C[1][i][j],-K[0][1]));
-                    secondOperand = (K[2][k]*exp(-Er/T)*pow(C[2][i][j],K[0][2])*pow(C[3][i][j],K[0][3]));
+                    firstOperand = (cat*K[1][k]*exp(-Ei/T[i][j])*pow(C[0][i][j],-K[0][0])*pow(C[1][i][j],-K[0][1]));
+                    secondOperand = (K[2][k]*exp(-Er/T[i][j])*pow(C[2][i][j],K[0][2])*pow(C[3][i][j],K[0][3]));
                     Q[k][i][j] = firstOperand - secondOperand;
                 }
             
             }
         }
     }
+
+}
+
+void calculate_t(
+  double dt,
+  double dx,
+  double dy,
+  double alpha,
+  int imax,
+  int jmax,
+  double Re,
+  double Pr,
+  double **U,
+  double **V,
+  double **T,
+  int **Flag
+){
+    double dutdx;
+    double d2tdx2;
+    double dvtdy;
+    double d2tdy2;
+    double firstOperand;
+    double secondOperand;
+
+    int i;
+    int j;
+    int k;
+
+        for (i = 1; i <= imax; i++) {
+            for (j = 1; j <= jmax; j++) {
+
+                if (Flag[i][j] >= C_F) {
+
+                    /*** dutdx ***/
+
+                    firstOperand = (1/dx)*(U[i][j]*(T[i][j]+T[i+1][j])/2 - U[i-1][j]*(T[i-1][j]+T[i][j])/2);
+                    secondOperand = (alpha/dx)*(fabs(U[i][j])*(T[i][j]-T[i+1][j])/2 - fabs(U[i-1][j])*(T[i-1][j]-T[i][j])/2);
+
+                    dutdx = firstOperand + secondOperand;
+
+                    /*** dvtdy ***/
+
+                    firstOperand = (1/dy)*(V[i][j]*(T[i][j]+T[i][j+1])/2 - V[i][j-1]*(T[i][j-1]+T[i][j])/2);
+                    secondOperand = (alpha/dy)*(fabs(V[i][j])*(T[i][j]-T[i][j+1])/2 - fabs(V[i][j-1])*(T[i][j-1]-T[i][j])/2);
+
+                    dvtdy = firstOperand + secondOperand;
+
+                    /*** d2tdx2 ***/
+
+                    d2tdx2 = (T[i+1][j]-2*T[i][j]+T[i-1][j])/(dx*dx);
+
+                    /*** d2tdy2 ***/
+
+                    d2tdy2 = (T[i][j+1]-2*T[i][j]+T[i][j-1])/(dy*dy);
+
+                    /*** T(t+dt) ***/
+
+                    T[i][j] =  T[i][j] + dt*(1/(Re*Pr)*(d2tdx2+d2tdy2) - dutdx - dvtdy);
+                }
+            }
+        }
 
 }

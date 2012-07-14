@@ -37,7 +37,9 @@ void calculate_fg(
   double **V,
   double **F,
   double **G,
-  int **Flag
+  int **Flag,
+  double **T,
+  double beta
 );
 
 
@@ -71,6 +73,7 @@ void calculate_rs(
  */
 void calculate_dt(
   double Re,
+  double Pr,
   double tau,
   double *dt,
   double dx,
@@ -137,8 +140,22 @@ void calculate_q(
   int **Flag,
   double Ei,
   double Er,
-  double T
+  double **T
 );
 
+void calculate_t(
+  double dt,
+  double dx,
+  double dy,
+  double alpha,
+  int imax,
+  int jmax,
+  double Re,
+  double Pr,
+  double **U,
+  double **V,
+  double **T,
+  int **Flag
+);
 
 #endif
