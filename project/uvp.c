@@ -388,7 +388,7 @@ void calculate_q(
 		    cat = cat*(2-1) + 1;
 		    /*printf("%d\n", cat);*/
                     firstOperand = (cat*K[1][k]*exp(-Ei/T)*pow(C[0][i][j],-K[0][0])*pow(C[1][i][j],-K[0][1]));
-                    secondOperand = (cat*K[2][k]*exp(-Er/T)*pow(C[2][i][j],K[0][2])*pow(C[3][i][j],K[0][3]));
+                    secondOperand = (K[2][k]*exp(-Er/T)*pow(C[2][i][j],K[0][2])*pow(C[3][i][j],K[0][3]));
                     Q[k][i][j] = firstOperand - secondOperand;
                 }
             
