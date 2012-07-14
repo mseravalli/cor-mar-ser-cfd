@@ -363,7 +363,8 @@ void calculate_q(
   double Er,
   double T,
   int reactantsNum,
-  int productsNum
+  int productsNum,
+  double catRate
 )
 {
     int i;
@@ -383,9 +384,14 @@ void calculate_q(
             for (k = 0; k < kmax; k++){
                 if (Flag[i][j] >= C_F) 
 		{
+                    /* to avoid an additional if:
+                     * see if it a catalyst, if it is the result of & will be 32
+                     * shift 8 positions to obtain 1 or 0
+                     * multiply by the specified catalyst rate
+                     */
 		    cat = Flag[i][j] & 0x20;
 		    cat = cat >> 5;
-		    cat = cat*(2-1) + 1;
+		    cat = cat*(catRate-1) + 1;
 		    foFactor = 1;
 		    for(l = 0; l < reactantsNum; l++)
 		    {

@@ -75,7 +75,8 @@ int read_parameters(
   double* kr,
   double* Ei,
   double* Er,
-  double* T
+  double* T,
+  double* catRate
 );
 
 /**

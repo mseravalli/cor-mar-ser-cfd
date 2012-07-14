@@ -413,7 +413,7 @@ void spec_boundary_val(
     double*** C
     )
 {
-    /*int i;*/
+    int i;
     int j;
     int k;
     /*
@@ -443,6 +443,12 @@ void spec_boundary_val(
         }
     }
 
+    if (strcmp(problem, "semibaffle")==0) {
+        for(i = 1; i <= imax; ++i ) {
+            U[i][0] = -2 - U[i][1];
+            U[i][jmax+1] = -2 - U[i][jmax];
+        }
+    }
 
 /*
     for (i = 1; i <= imax; ++i) {

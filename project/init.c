@@ -39,7 +39,8 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     double *kr,                 /* Kinetic of the reversible reaction */
                     double *Ei,
                     double *Er,
-                    double *T
+                    double *T,
+                    double* catRate
 ) 
 {
    READ_DOUBLE( szFileName, *xlength );
@@ -87,6 +88,7 @@ int read_parameters( const char *szFileName,       /* name of the file */
    READ_DOUBLE( szFileName, *Ei );
    READ_DOUBLE( szFileName, *Er );
    READ_DOUBLE( szFileName, *T );
+   READ_DOUBLE( szFileName, *catRate );
 
 
 

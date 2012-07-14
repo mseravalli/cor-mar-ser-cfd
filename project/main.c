@@ -108,6 +108,7 @@ int main(int argn, char** args){
     double Ei;      /* Reaction Energy irreversible */
     double Er;      /* Reaction Energy reversible */
     double T;       /* Temperature */
+    double catRate;
     
     if(argn <= 1)
     {
@@ -115,6 +116,8 @@ int main(int argn, char** args){
         return 1;
     } else {
         if( !(   strcmp(args[1], "karman") == 0
+              || strcmp(args[1], "baffle") == 0 
+              || strcmp(args[1], "semibaffle") == 0 
               || strcmp(args[1], "diffusion") == 0 
               || strcmp(args[1], "plane")  == 0
               || strcmp(args[1], "step")   == 0)){
@@ -163,7 +166,8 @@ int main(int argn, char** args){
                     &kr,
                     &Ei,
                     &Er,
-                    &T);
+                    &T,
+                    &catRate);
                     
     t = 0;
     n = 0;
@@ -275,7 +279,8 @@ int main(int argn, char** args){
                     Er,
                     T,
                     reactantsNum,
-                    productsNum);
+                    productsNum,
+                    catRate);
 
           calculate_c(dt,
                     dx,

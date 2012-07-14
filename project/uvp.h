@@ -139,7 +139,8 @@ void calculate_q(
   double Er,
   double T,
   int reactantsNum,
-  int productsNum
+  int productsNum,
+  double catRate
 );
 
 
