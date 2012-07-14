@@ -58,6 +58,8 @@ int main(int argn, char** args){
     int     imax;                /* number of cells x-direction*/
     int     jmax;                /* number of cells y-direction*/
     int     kmax;
+    int     productsNum;
+    int     reactantsNum;
     double  alpha;             /* uppwind differencing factor*/
     double  omg;               /* relaxation factor */
     double  tau;               /* safety factor for time step*/
@@ -210,7 +212,7 @@ int main(int argn, char** args){
              C,
              kmax);
     
-    init_C0K(cavityFile, kmax, C0, K, ki, kr);
+    init_C0K(cavityFile, kmax, C0, K, ki, kr, &reactantsNum, &productsNum);
 
     while (t < t_end)
     {
@@ -271,7 +273,9 @@ int main(int argn, char** args){
                     Flag,
                     Ei,
                     Er,
-                    T);
+                    T,
+                    reactantsNum,
+                    productsNum);
 
           calculate_c(dt,
                     dx,

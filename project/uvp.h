@@ -137,7 +137,9 @@ void calculate_q(
   int **Flag,
   double Ei,
   double Er,
-  double T
+  double T,
+  int reactantsNum,
+  int productsNum
 );
 
 

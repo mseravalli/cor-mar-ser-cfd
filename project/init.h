@@ -113,7 +113,9 @@ void init_C0K(
     double* C0,
     double** K,
     double ki,
-    double kr
+    double kr,
+    int *reactantsNum,
+    int *productsNum
 );
 
 #endif

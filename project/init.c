@@ -80,6 +80,7 @@ int read_parameters( const char *szFileName,       /* name of the file */
 
    READ_DOUBLE( szFileName, *deltaP );
    READ_DOUBLE( szFileName, *D );
+
    READ_INT( szFileName, *kmax );
    READ_DOUBLE( szFileName, *ki );
    READ_DOUBLE( szFileName, *kr );
@@ -96,7 +97,7 @@ int read_parameters( const char *szFileName,       /* name of the file */
    return 1;
 }
 
-void init_C0K(const char *szFileName, int kmax, double* C0, double** K, double ki, double kr) {
+void init_C0K(const char *szFileName, int kmax, double* C0, double** K, double ki, double kr, int *reactantsNum, int *productsNum) {
     
     int k;
     char* baseNameC0 = "C";
@@ -114,9 +115,24 @@ void init_C0K(const char *szFileName, int kmax, double* C0, double** K, double k
         K[0][k] = var; 
     }
 
+    *reactantsNum = 0;
+    *productsNum = 0;
+
+    for(k = 0; k < kmax; ++k)
+    {
+    	if(K[0][k] < 0)
+	{
+	    (*reactantsNum)++;
+	}
+	else
+	{
+	    (*productsNum)++;
+	}
+    }
+
     for (k = 0; k < kmax; k++){
         K[1][k] = -ki*K[0][k]/K[0][0];
-        K[2][k] = kr*K[0][k]/K[0][2];
+        K[2][k] = kr*K[0][k]/K[0][*reactantsNum];
     }
 
 }
