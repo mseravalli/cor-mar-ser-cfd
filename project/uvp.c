@@ -361,7 +361,8 @@ void calculate_q(
   int **Flag,
   double Ei,
   double Er,
-  double T
+  double T,
+  double catRate
 )
 {
     int i;
@@ -377,16 +378,17 @@ void calculate_q(
 
     for (i = 1; i <= imax; i++) {
         for (j = 1; j <= jmax; j++) {
-            for (k = 0; k < kmax; k++){
-                if (Flag[i][j] >= C_F) 
-		{
-		    /*printf("%d ", Flag[i][j]);*/
-		    cat = Flag[i][j] & 0x20;
-		    /*printf("%d ", cat);*/
-		    cat = cat >> 5;
-		    /*printf("%d ", cat);*/
-		    cat = cat*(2-1) + 1;
-		    /*printf("%d\n", cat);*/
+            for (k = 0; k < kmax; k++) {
+                if (Flag[i][j] >= C_F) {
+                    /* to avoid an additional if:
+                     * see if it a catalyst, if it is the result of & will be 32
+                     * shift 8 positions to obtain 1 or 0
+                     * multiply by the specified catalyst rate
+                     */
+        		    cat = Flag[i][j] & 0x20;
+		            cat = cat >> 5;
+		            cat = cat*(catRate-1) + 1;
+
                     firstOperand = (cat*K[1][k]*exp(-Ei/T)*pow(C[0][i][j],-K[0][0])*pow(C[1][i][j],-K[0][1]));
                     secondOperand = (K[2][k]*exp(-Er/T)*pow(C[2][i][j],K[0][2])*pow(C[3][i][j],K[0][3]));
                     Q[k][i][j] = firstOperand - secondOperand;

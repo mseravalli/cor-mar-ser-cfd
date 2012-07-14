@@ -106,6 +106,7 @@ int main(int argn, char** args){
     double Ei;      /* Reaction Energy irreversible */
     double Er;      /* Reaction Energy reversible */
     double T;       /* Temperature */
+    double catRate;
     
     if(argn <= 1)
     {
@@ -163,7 +164,8 @@ int main(int argn, char** args){
                     &kr,
                     &Ei,
                     &Er,
-                    &T);
+                    &T,
+                    &catRate);
                     
     t = 0;
     n = 0;
@@ -273,7 +275,8 @@ int main(int argn, char** args){
                     Flag,
                     Ei,
                     Er,
-                    T);
+                    T,
+                    catRate);
 
           calculate_c(dt,
                     dx,
