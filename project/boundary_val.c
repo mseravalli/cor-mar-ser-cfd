@@ -25,6 +25,7 @@ void boundaryvalues(
   double** G,
   double** P,
   double*** C,
+  double** T,
   int** Flag,
   int** Sources,
   double* C0
@@ -205,6 +206,25 @@ void boundaryvalues(
         }
 
         /**** CONCENTREATION END ****/
+
+	/**** TEMPERATURE START ****/
+	
+	/** left and right wall **/
+	#pragma omp for
+	for ( j = 1; j <= jmax; ++j ) {
+		T[0][j] = T[1][j]+dx*370*(j-0.5)*dy;
+		T[imax+1][j] = T[imax][j]+dx*370*(j-0.5)*dy;
+	}
+
+	/** bottom and top wall **/
+	#pragma omp for
+	for (i = 1; i <= imax; ++i) {
+		T[i][0] = 2*370*(i-0.5)*dx-T[i][1];
+		T[i][jmax+1] = 2*371*(i-0.5)*dx - T[i][jmax];
+	}
+
+	/**** TEMPERATURE END ****/
+
         
         /******** EXTERNAL WALLS END ********/
 
@@ -413,7 +433,7 @@ void spec_boundary_val(
     double*** C
     )
 {
-    /*int i;*/
+    int i;
     int j;
     int k;
     /*
@@ -443,6 +463,12 @@ void spec_boundary_val(
         }
     }
 
+    if (strcmp(problem, "semibaffle")==0) {
+        for(i = 1; i <= imax; ++i ) {
+            U[i][0] = -2 - U[i][1];
+            U[i][jmax+1] = -2 - U[i][jmax];
+        }
+    }
 
 /*
     for (i = 1; i <= imax; ++i) {

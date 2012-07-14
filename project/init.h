@@ -77,7 +77,8 @@ int read_parameters(
   double* ki,
   double* kr,
   double* Ei,
-  double* Er
+  double* Er,
+  double* catRate
 );
 
 /**
@@ -117,7 +118,9 @@ void init_C0K(
     double* C0,
     double** K,
     double ki,
-    double kr
+    double kr,
+    int *reactantsNum,
+    int *productsNum
 );
 
 #endif

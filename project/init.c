@@ -41,7 +41,8 @@ int read_parameters( const char *szFileName,       /* name of the file */
                     double *ki,                 /* Kinetic of the irreversible reaction */
                     double *kr,                 /* Kinetic of the reversible reaction */
                     double *Ei,
-                    double *Er
+                    double *Er,
+                    double* catRate
 ) 
 {
    READ_DOUBLE( szFileName, *xlength );
@@ -85,11 +86,13 @@ int read_parameters( const char *szFileName,       /* name of the file */
 
    READ_DOUBLE( szFileName, *deltaP );
    READ_DOUBLE( szFileName, *D );
+
    READ_INT( szFileName, *kmax );
    READ_DOUBLE( szFileName, *ki );
    READ_DOUBLE( szFileName, *kr );
    READ_DOUBLE( szFileName, *Ei );
    READ_DOUBLE( szFileName, *Er );
+   READ_DOUBLE( szFileName, *catRate );
 
 
 
@@ -100,7 +103,7 @@ int read_parameters( const char *szFileName,       /* name of the file */
    return 1;
 }
 
-void init_C0K(const char *szFileName, int kmax, double* C0, double** K, double ki, double kr) {
+void init_C0K(const char *szFileName, int kmax, double* C0, double** K, double ki, double kr, int *reactantsNum, int *productsNum) {
     
     int k;
     char* baseNameC0 = "C";
@@ -118,9 +121,24 @@ void init_C0K(const char *szFileName, int kmax, double* C0, double** K, double k
         K[0][k] = var; 
     }
 
+    *reactantsNum = 0;
+    *productsNum = 0;
+
+    for(k = 0; k < kmax; ++k)
+    {
+    	if(K[0][k] < 0)
+	{
+	    (*reactantsNum)++;
+	}
+	else
+	{
+	    (*productsNum)++;
+	}
+    }
+
     for (k = 0; k < kmax; k++){
         K[1][k] = -ki*K[0][k]/K[0][0];
-        K[2][k] = kr*K[0][k]/K[0][2];
+        K[2][k] = kr*K[0][k]/K[0][*reactantsNum];
     }
 
 }
@@ -158,7 +176,7 @@ void init_uvp(double UI,
     }
     
     init_matrix(V, 0, imax + 1, 0, jmax + 1, VI);
-    
+    init_matrix(T, 1, imax, 1, jmax, TI);
     init_matrix(P, 1, imax, 1, jmax, PI);
 
     for (k = 0; k < kmax; k++){

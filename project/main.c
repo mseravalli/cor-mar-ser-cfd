@@ -60,6 +60,8 @@ int main(int argn, char** args){
     int     imax;                /* number of cells x-direction*/
     int     jmax;                /* number of cells y-direction*/
     int     kmax;
+    int     productsNum;
+    int     reactantsNum;
     double  alpha;             /* uppwind differencing factor*/
     double  beta;              /* thermal expansion coefficient */
     double  omg;               /* relaxation factor */
@@ -109,6 +111,7 @@ int main(int argn, char** args){
     double kr;      /* Kinetic Cons. reversible reaction */
     double Ei;      /* Reaction Energy irreversible */
     double Er;      /* Reaction Energy reversible */
+    double catRate;
     
     if(argn <= 1)
     {
@@ -116,6 +119,8 @@ int main(int argn, char** args){
         return 1;
     } else {
         if( !(   strcmp(args[1], "karman") == 0
+              || strcmp(args[1], "baffle") == 0 
+              || strcmp(args[1], "semibaffle") == 0 
               || strcmp(args[1], "diffusion") == 0 
               || strcmp(args[1], "plane")  == 0
               || strcmp(args[1], "step")   == 0)){
@@ -166,7 +171,8 @@ int main(int argn, char** args){
                     &ki,
                     &kr,
                     &Ei,
-                    &Er);
+                    &Er,
+                    &catRate);
                     
     t = 0;
     n = 0;
@@ -218,7 +224,7 @@ int main(int argn, char** args){
              T,
              kmax);
     
-    init_C0K(cavityFile, kmax, C0, K, ki, kr);
+    init_C0K(cavityFile, kmax, C0, K, ki, kr, &reactantsNum, &productsNum);
 
     while (t < t_end)
     {
@@ -254,6 +260,7 @@ int main(int argn, char** args){
                        G,
                        P,
                        C,
+		       T,
                        Flag,
                        Sources,
                        C0);
@@ -294,7 +301,10 @@ int main(int argn, char** args){
                     Flag,
                     Ei,
                     Er,
-                    T);
+                    T,
+                    reactantsNum,
+                    productsNum,
+                    catRate);
 
           calculate_c(dt,
                     dx,
@@ -377,25 +387,32 @@ int main(int argn, char** args){
             write_vtkFile("vtk/cavity",
 		                  n,
 		                  xlength,
-                          ylength,
-                          imax,
-                          jmax,
-                          kmax,
-                		  dx,
+                                  ylength,
+                                  imax,
+                                  jmax,
+                                  kmax,
+                	          dx,
 		                  dy,
-                          U,
-                          V,
-                          P,
-                          C);
+                                  U,
+                                  V,
+                                  P,
+                                  C);
             write_vtkConcentrations("vtk/concentration",
                                     n,
                                     imax,
                                     jmax,
                                     kmax,
-		                                dx,
-		                                dy,
+		                    dx,
+		                    dy,
                                     C);
-                                    n++;
+            write_vtkTemperature("vtk/temperature",
+                                    n,
+                                    imax,
+                                    jmax,
+		                    dx,
+		                    dy,
+                                    T);
+            n++;
         }
 
         t += dt;
@@ -422,6 +439,13 @@ int main(int argn, char** args){
                             dx,
                             dy,
                             C);
+    write_vtkTemperature("vtk/temperature",
+                            n,
+                            imax,
+                            jmax,
+                            dx,
+                            dy,
+                            T);
 
 
     free_matrix(U,  0, imax + 1, 0, jmax + 1);
@@ -441,7 +465,6 @@ int main(int argn, char** args){
 
     return 0;
 }
-
 
 
 

@@ -43,6 +43,14 @@ void write_vtkConcentrations(const char *szProblem,
 		                     double dx,
 		                     double dy,
                              double ***C);
+
+void write_vtkTemperature(const char *szProblem,
+                          int    timeStepNumber,
+                          int    imax,
+                          int    jmax,
+		          double dx,
+		          double dy,
+                          double** T);
 /**
  * Method for writing header information in vtk format. 
  * 
