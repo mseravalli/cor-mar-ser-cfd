@@ -212,15 +212,15 @@ void boundaryvalues(
 	/** left and right wall **/
 	#pragma omp for
 	for ( j = 1; j <= jmax; ++j ) {
-		T[0][j] = T[1][j]+dx*370*(j-0.5)*dy;
-		T[imax+1][j] = T[imax][j]+dx*370*(j-0.5)*dy;
+		T[0][j] = T[1][j];
+		T[imax+1][j] = T[imax][j];
 	}
 
 	/** bottom and top wall **/
 	#pragma omp for
 	for (i = 1; i <= imax; ++i) {
-		T[i][0] = 2*370*(i-0.5)*dx-T[i][1];
-		T[i][jmax+1] = 2*371*(i-0.5)*dx - T[i][jmax];
+		T[i][0] =2*372 - T[i][1];
+		T[i][jmax+1] =2*370- T[i][jmax];
 	}
 
 	/**** TEMPERATURE END ****/
