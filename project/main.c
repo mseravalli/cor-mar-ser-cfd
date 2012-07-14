@@ -81,6 +81,11 @@ int main(int argn, char** args){
     int cb;
     int ct;
 
+    double tl;
+    double tr;
+    double tb;
+    double tt;
+
     double deltaP;
 
     char imageName[64];
@@ -164,6 +169,10 @@ int main(int argn, char** args){
                     &cr,
                     &cb,
                     &ct,
+                    &tl,
+                    &tr,
+                    &tb,
+                    &tt,
                     &dt_value,
                     &deltaP,
                     &D,
@@ -254,6 +263,10 @@ int main(int argn, char** args){
                        cr,
                        cb,
                        ct,
+                       tl,
+                       tr,
+                       tb,
+                       tt,
                        U,
                        V,
                        F,

@@ -19,6 +19,10 @@ void boundaryvalues(
   int cr,
   int cb,
   int ct,
+  double tl,
+  double tr,
+  double tb,
+  double tt,
   double** U,
   double** V,
   double** F,
@@ -208,19 +212,49 @@ void boundaryvalues(
         /**** CONCENTREATION END ****/
 
 	/**** TEMPERATURE START ****/
+        /* if the temperature at a wall is 0 use neumann boundary conditions
+         * for neumann bc we use only the case that the bounday has a perfect
+         * absorbtion of the heat ie dT/dn = 0
+         * otherwise use dirichlet with the given temperature
+         */
 	
 	/** left and right wall **/
 	#pragma omp for
 	for ( j = 1; j <= jmax; ++j ) {
-		T[0][j] = T[1][j];
-		T[imax+1][j] = T[imax][j];
+            /* left wall */
+            if (tl > 0) {
+                T[0][j] = 2*tl - T[1][j];
+            } else {
+		double dTdn = 0;
+                T[0][j] = T[1][j] + (dTdn * (j - 0.5) * dy * dx);
+            }
+            /* right wall */
+            if (tr > 0) {
+                T[imax+1][j] = 2*tr - T[imax][j];
+            } else {
+		double dTdn = 0;
+                T[imax+1][j] = T[imax][j] + (dTdn * (j - 0.5) * dy * dx);
+            }
 	}
 
 	/** bottom and top wall **/
 	#pragma omp for
 	for (i = 1; i <= imax; ++i) {
-		T[i][0] =2*372 - T[i][1];
-		T[i][jmax+1] =2*370- T[i][jmax];
+            /* bottom wall */
+            if (tb > 0) {
+		T[i][0] = 2*tb - T[i][1];
+            } else {
+		double dTdn = 0;
+                T[i][0] = T[i][1] + (dTdn*(i - 0.5) *dx * dy);
+            }
+
+            /* top wall */
+            if (tt > 0) {
+		T[i][jmax+1] = 2*tt - T[i][jmax];
+            } else {
+		double dTdn = 0;
+                T[i][jmax+1] = T[i][jmax] + (dTdn * (i-0.5)*dx*dy);
+            }
 	}
 
 	/**** TEMPERATURE END ****/
@@ -412,6 +446,54 @@ void boundaryvalues(
         }
 
         /**** CONCENTRATIONS END ****/
+
+	/**** TEMPERATURE START ****/
+        #pragma omp for collapse(2)
+	for (i = 1; i <= imax; ++i) {
+            for (j = 1; j <= jmax; ++j) {
+                if (Flag[i][j] == B_N)
+                {
+                    T[i][j]=T[i][j+1];
+                }
+                
+                else if (Flag[i][j] == B_W)
+                {
+                    T[i][j]=T[i-1][j];
+                }
+
+                else if (Flag[i][j] == B_S)
+                {
+                    T[i][j]=T[i][j-1];
+                }
+
+                else if (Flag[i][j] == B_O)
+                {
+                    T[i][j]=T[i+1][j];
+                }
+
+                else if (Flag[i][j] == B_NO) 
+                {
+                    T[i][j]=(T[i+1][j]+T[i][j+1])/2;
+                }
+
+                else if (Flag[i][j] == B_NW) 
+                {
+                    T[i][j]=(T[i-1][j]+T[i][j+1])/2;
+                }
+
+                else if (Flag[i][j] == B_SO) 
+                {
+                    T[i][j]=(T[i+1][j]+T[i][j-1])/2;
+                }
+
+                else if (Flag[i][j] == B_SW) 
+                {
+                    T[i][j]=(T[i-1][j]+T[i][j-1])/2;
+                }
+            }
+        }
+
+	/**** TEMPERATURE END ****/
 
         /******** INTERNAL OBJECTS END ********/
     }

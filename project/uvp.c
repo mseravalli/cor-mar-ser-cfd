@@ -441,40 +441,39 @@ void calculate_t(
 
     int i;
     int j;
-    int k;
+    #pragma omp parallel for private (i, j, dutdx, d2tdx2, dvtdy, d2tdy2, firstOperand, secondOperand) collapse(2)
+    for (i = 1; i <= imax; i++) {
+        for (j = 1; j <= jmax; j++) {
 
-        for (i = 1; i <= imax; i++) {
-            for (j = 1; j <= jmax; j++) {
+            if (Flag[i][j] >= C_F) {
 
-                if (Flag[i][j] >= C_F) {
+                /*** dutdx ***/
 
-                    /*** dutdx ***/
+                firstOperand = (1/dx)*(U[i][j]*(T[i][j]+T[i+1][j])/2 - U[i-1][j]*(T[i-1][j]+T[i][j])/2);
+                secondOperand = (alpha/dx)*(fabs(U[i][j])*(T[i][j]-T[i+1][j])/2 - fabs(U[i-1][j])*(T[i-1][j]-T[i][j])/2);
 
-                    firstOperand = (1/dx)*(U[i][j]*(T[i][j]+T[i+1][j])/2 - U[i-1][j]*(T[i-1][j]+T[i][j])/2);
-                    secondOperand = (alpha/dx)*(fabs(U[i][j])*(T[i][j]-T[i+1][j])/2 - fabs(U[i-1][j])*(T[i-1][j]-T[i][j])/2);
+                dutdx = firstOperand + secondOperand;
 
-                    dutdx = firstOperand + secondOperand;
+                /*** dvtdy ***/
 
-                    /*** dvtdy ***/
+                firstOperand = (1/dy)*(V[i][j]*(T[i][j]+T[i][j+1])/2 - V[i][j-1]*(T[i][j-1]+T[i][j])/2);
+                secondOperand = (alpha/dy)*(fabs(V[i][j])*(T[i][j]-T[i][j+1])/2 - fabs(V[i][j-1])*(T[i][j-1]-T[i][j])/2);
 
-                    firstOperand = (1/dy)*(V[i][j]*(T[i][j]+T[i][j+1])/2 - V[i][j-1]*(T[i][j-1]+T[i][j])/2);
-                    secondOperand = (alpha/dy)*(fabs(V[i][j])*(T[i][j]-T[i][j+1])/2 - fabs(V[i][j-1])*(T[i][j-1]-T[i][j])/2);
+                dvtdy = firstOperand + secondOperand;
 
-                    dvtdy = firstOperand + secondOperand;
+                /*** d2tdx2 ***/
 
-                    /*** d2tdx2 ***/
+                d2tdx2 = (T[i+1][j]-2*T[i][j]+T[i-1][j])/(dx*dx);
 
-                    d2tdx2 = (T[i+1][j]-2*T[i][j]+T[i-1][j])/(dx*dx);
+                /*** d2tdy2 ***/
 
-                    /*** d2tdy2 ***/
+                d2tdy2 = (T[i][j+1]-2*T[i][j]+T[i][j-1])/(dy*dy);
 
-                    d2tdy2 = (T[i][j+1]-2*T[i][j]+T[i][j-1])/(dy*dy);
+                /*** T(t+dt) ***/
 
-                    /*** T(t+dt) ***/
-
-                    T[i][j] =  T[i][j] + dt*(1/(Re*Pr)*(d2tdx2+d2tdy2) - dutdx - dvtdy);
-                }
+                T[i][j] =  T[i][j] + dt*(1/(Re*Pr)*(d2tdx2+d2tdy2) - dutdx - dvtdy);
             }
         }
+    }
 
 }
