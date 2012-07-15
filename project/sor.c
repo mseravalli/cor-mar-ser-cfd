@@ -57,7 +57,13 @@ void sor(
         P[i][jmax+1] = P[i][jmax];
     }
     for(j = 1; j <= jmax; j++) {
-        if(strcmp(problem, "plane") == 0){
+        if(strcmp(problem, "plane") == 0 
+            || strcmp(problem, "noCatalystIrreversible") == 0
+            || strcmp(problem, "catalystIrreversible") == 0
+            || strcmp(problem, "catalystReversible") == 0
+            || strcmp(problem, "baffleHigherT") == 0
+            || strcmp(problem, "baffleLowerT") == 0
+          ){
             P[0][j] = 2*deltaP-P[1][j];
             P[imax+1][j] = -P[imax][j];
         }else{

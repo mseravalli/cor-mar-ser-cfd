@@ -124,9 +124,11 @@ int main(int argn, char** args){
         return 1;
     } else {
         if( !(   strcmp(args[1], "karman") == 0
-              || strcmp(args[1], "baffle") == 0 
-              || strcmp(args[1], "semibaffle") == 0 
-              || strcmp(args[1], "diffusion") == 0 
+              || strcmp(args[1], "baffleHigherT") == 0 
+              || strcmp(args[1], "baffleLowerT") == 0 
+              || strcmp(args[1], "noCatalystIrreversible") == 0 
+              || strcmp(args[1], "catalystIrreversible") == 0 
+              || strcmp(args[1], "catalystReversible") == 0 
               || strcmp(args[1], "plane")  == 0
               || strcmp(args[1], "step")   == 0)){
             printf("ERROR: the passed argument was different from karman, plane or step\n");
@@ -273,7 +275,7 @@ int main(int argn, char** args){
                        G,
                        P,
                        C,
-		       T,
+		               T,
                        Flag,
                        Sources,
                        C0);
@@ -281,7 +283,7 @@ int main(int argn, char** args){
         spec_boundary_val(problem,
                           imax,
                           jmax,
-			  kmax,
+			              kmax,
                           dx,
                           dy,
                           Re,
@@ -290,7 +292,9 @@ int main(int argn, char** args){
                           V,
                           P,
                           C);
-          calculate_t(dt,
+
+        /* out of scope of the project */ 
+        /* calculate_t(dt,
                     dx,
                     dy,
                     alpha,
@@ -302,8 +306,7 @@ int main(int argn, char** args){
                     V,
                     T,
                     Flag);
-
-
+         */
 
          calculate_q(K,
                     imax,
@@ -404,8 +407,8 @@ int main(int argn, char** args){
                                   imax,
                                   jmax,
                                   kmax,
-                	          dx,
-		                  dy,
+                	              dx,
+		                          dy,
                                   U,
                                   V,
                                   P,
@@ -415,16 +418,18 @@ int main(int argn, char** args){
                                     imax,
                                     jmax,
                                     kmax,
-		                    dx,
-		                    dy,
+		                            dx,
+		                            dy,
                                     C);
+            /*
             write_vtkTemperature("vtk/temperature",
                                     n,
                                     imax,
                                     jmax,
-		                    dx,
-		                    dy,
+		                            dx,
+		                            dy,
                                     T);
+            */
             n++;
         }
 
@@ -452,6 +457,7 @@ int main(int argn, char** args){
                             dx,
                             dy,
                             C);
+    /*
     write_vtkTemperature("vtk/temperature",
                             n,
                             imax,
@@ -459,6 +465,7 @@ int main(int argn, char** args){
                             dx,
                             dy,
                             T);
+    */
 
 
     free_matrix(U,  0, imax + 1, 0, jmax + 1);

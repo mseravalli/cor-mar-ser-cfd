@@ -471,7 +471,7 @@ void calculate_t(
 
                 /*** T(t+dt) ***/
 
-                T[i][j] =  T[i][j] + dt*(1/(Re*Pr)*(d2tdx2+d2tdy2) - dutdx - dvtdy);
+                T[i][j] =  T[i][j] + dt*((1/(Re*Pr))*(d2tdx2+d2tdy2) - dutdx - dvtdy);
             }
         }
     }
